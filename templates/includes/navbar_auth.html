@@ -1,0 +1,21 @@
+{% load static %}
+<nav class="bg-gray-800 text-white px-4 py-2 flex items-center justify-between">
+  <div class="font-semibold text-sm">
+    <a href="/" class="flex items-center gap-2">
+      <img src="{% static 'img/logo-la-central.svg' %}" alt="Logo La Central" class="h-5 w-5 object-contain"/>
+      <span>MES La Central</span>
+    </a>
+  </div>
+  <div class="space-x-4 text-xs">
+    {% if user.is_authenticated %}
+      <span class="opacity-80">{{ user.username }}{% if user.groups.all.first %} · {{ user.groups.all.first.name }}{% endif %}</span>
+      <form action="{% url 'logout' %}" method="post" class="inline">
+        {% csrf_token %}
+        <button type="submit" class="hover:underline">Salir</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}" class="hover:underline">Entrar</a>
+      <a href="{% url 'signup' %}" class="hover:underline">Registro</a>
+    {% endif %}
+  </div>
+</nav>

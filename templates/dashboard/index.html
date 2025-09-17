@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<!-- KPIs (estilo tarjetas con gradiente e icono) -->
+<div id="kpis" class="grid gap-4 md:grid-cols-3 xl:grid-cols-5 mb-8">
+  <!-- Órdenes Hoy -->
+  <div class="relative flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 shadow-lg border border-black/10 hover:shadow-xl transition kpi dark:border-emerald-700/40" data-kpi="ordenes">
+      <div class="h-10 w-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </div>
+      <div class="flex-1">
+  <p class="text-[11px] font-medium uppercase tracking-wide text-emerald-700/80">Pendientes Entrega</p>
+        <p id="kpiOrdenesHoy" class="text-xl font-semibold text-emerald-700">—</p>
+      </div>
+      <div id="deltaOrdenesHoy" class="absolute top-2 right-3 text-xs font-medium flex items-center gap-1 text-emerald-700"><span>▲</span><span class="delta">0%</span></div>
+  </div>
+  <!-- En Proceso -->
+  <div class="relative flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-sky-50 to-sky-100 dark:from-sky-900/40 dark:to-sky-800/30 shadow-lg border border-black/10 hover:shadow-xl transition kpi dark:border-sky-700/40" data-kpi="proceso">
+      <div class="h-10 w-10 rounded-full bg-sky-200 flex items-center justify-center text-sky-700 text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.757.426 1.757 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.757-2.924 1.757-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.757-.426-1.757-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-[11px] font-medium uppercase tracking-wide text-sky-700/80">En Proceso</p>
+        <p id="kpiEnProceso" class="text-xl font-semibold text-sky-700">—</p>
+      </div>
+      <div id="deltaEnProceso" class="absolute top-2 right-3 text-xs font-medium flex items-center gap-1 text-sky-700"><span>▲</span><span class="delta">0%</span></div>
+  </div>
+  <!-- Completadas -->
+  <div class="relative flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-fuchsia-50 to-pink-100 dark:from-fuchsia-900/40 dark:to-pink-900/30 shadow-lg border border-black/10 hover:shadow-xl transition kpi dark:border-pink-700/40" data-kpi="completadas">
+      <div class="h-10 w-10 rounded-full bg-pink-200 flex items-center justify-center text-pink-700 text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-[11px] font-medium uppercase tracking-wide text-pink-700/80">Completadas</p>
+        <p id="kpiCompletadas" class="text-xl font-semibold text-pink-700">—</p>
+      </div>
+      <div id="deltaCompletadas" class="absolute top-2 right-3 text-xs font-medium flex items-center gap-1 text-pink-700"><span>▲</span><span class="delta">0%</span></div>
+  </div>
+  <!-- Inventario Kg -->
+  <div class="relative flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/40 dark:to-amber-800/30 shadow-lg border border-black/10 hover:shadow-xl transition kpi dark:border-amber-700/40" data-kpi="inventario">
+      <div class="h-10 w-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8h13a4 4 0 010 8H3V8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 12h1a4 4 0 010 8H6"/></svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-[11px] font-medium uppercase tracking-wide text-amber-700/80">Inventario (Kg)</p>
+        <p id="kpiInventarioKg" class="text-xl font-semibold text-amber-700">—</p>
+      </div>
+      <div id="deltaInventarioKg" class="absolute top-2 right-3 text-xs font-medium flex items-center gap-1 text-amber-700"><span>▲</span><span class="delta">0%</span></div>
+  </div>
+  <!-- Rendimiento Promedio -->
+  <div class="relative flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-brand-light to-white dark:from-brand-dark/40 dark:to-gray-800/30 shadow-lg border border-black/10 hover:shadow-xl transition kpi dark:border-gray-700/40" data-kpi="rendimiento">
+      <div class="h-10 w-10 rounded-full bg-brand-primary/40 flex items-center justify-center text-brand-dark text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z"/></svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-[11px] font-medium uppercase tracking-wide text-brand-dark/70 dark:text-white/80">Rend. Promedio</p>
+        <p id="kpiRendPromedio" class="text-xl font-semibold text-brand-dark dark:text-white">—</p>
+      </div>
+      <div id="deltaRendPromedio" class="absolute top-2 right-3 text-xs font-medium flex items-center gap-1 text-brand-dark dark:text-white"><span>▲</span><span class="delta">0%</span></div>
+  </div>
+</div>
+
+<!-- Gráficos -->
+<div class="grid gap-6 xl:grid-cols-3">
+  <div class="bg-white dark:bg-gray-800 dark:border dark:border-gray-700 shadow rounded p-4 xl:col-span-1">
+    <h2 class="font-semibold mb-2 flex items-center justify-between">Órdenes por Estado <span id="loaderEstados" class="text-xs text-gray-400">cargando…</span></h2>
+    <canvas id="chartEstados" height="160"></canvas>
+  </div>
+  <div class="bg-white dark:bg-gray-800 dark:border dark:border-gray-700 shadow rounded p-4 xl:col-span-1">
+    <h2 class="font-semibold mb-2 flex items-center justify-between">Inventario Resumen <span id="loaderInventario" class="text-xs text-gray-400">cargando…</span></h2>
+    <canvas id="chartInventario" height="160"></canvas>
+  </div>
+  <div class="bg-white dark:bg-gray-800 dark:border dark:border-gray-700 shadow rounded p-4 xl:col-span-1">
+    <h2 class="font-semibold mb-2 flex items-center justify-between">Rendimiento Tueste (últimos 5) <span id="loaderRend" class="text-xs text-gray-400">cargando…</span></h2>
+    <canvas id="chartRendimiento" height="160"></canvas>
+  </div>
+  <div class="bg-white dark:bg-gray-800 dark:border dark:border-gray-700 shadow rounded p-4 xl:col-span-3">
+    <h2 class="font-semibold mb-2 flex items-center justify-between">Producción Diaria <span id="loaderProd" class="text-xs text-gray-400">cargando…</span></h2>
+    <canvas id="chartProduccion" height="120"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const brandPrimary = '#E8B923';
+const brandSecondary = '#DD3F2E';
+const brandDark = '#161616';
+
+async function fetchJSON(url){
+  const r = await fetch(url, {headers: {'X-Correlation-Id': crypto.randomUUID()}});
+  if(!r.ok) throw new Error('Error ' + url + ' ' + r.status);
+  return r.json();
+}
+
+function hideLoader(id){ const el = document.getElementById(id); if(el) el.remove(); }
+
+function barConfig(labels, data, label, colors){
+  return {
+    type:'bar',
+    data:{labels, datasets:[{label, data, backgroundColor: colors, borderColor: brandSecondary, borderWidth:1}]},
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  };
+}
+
+function lineConfig(labels, data, label){
+  return {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label,
+        data,
+        borderColor: brandPrimary,
+        backgroundColor: brandPrimary+'33',
+        tension:.25,
+        fill:true,
+        pointRadius:3,
+        pointBackgroundColor: brandSecondary,
+        pointBorderColor: brandSecondary,
+        pointHoverBackgroundColor: brandSecondary,
+        pointHoverBorderColor: brandSecondary
+      }]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}, interaction:{mode:'index', intersect:false}}
+  };
+}
+
+function formatNumber(n, min=0, max=0){
+  return Intl.NumberFormat('es-ES', { minimumFractionDigits: min, maximumFractionDigits: max }).format(n ?? 0);
+}
+
+async function init(){
+  try {
+  const [kpisResumen, ordenes, inventario, prod, tueste] = await Promise.all([
+      fetchJSON('/api/v1/reportes/kpis-resumen/'),
+      fetchJSON('/api/v1/reportes/ordenes-por-estado/').finally(()=>hideLoader('loaderEstados')),
+      fetchJSON('/api/v1/reportes/inventario-resumen/').finally(()=>hideLoader('loaderInventario')),
+      fetchJSON('/api/v1/reportes/produccion-diaria/?days=7').finally(()=>hideLoader('loaderProd')),
+      fetchJSON('/api/v1/reportes/rendimiento-tueste/').finally(()=>hideLoader('loaderRend')),
+    ]);
+
+    // KPIs (derivados de datasets existentes; ajustar si hay endpoints dedicados)
+  const totalOrdenes = ordenes.data.reduce((a,o)=>a+o.value,0);
+    // Heurística: estados que contienen 'proceso'
+    const enProceso = ordenes.data.filter(o=>/proceso/i.test(o.label)).reduce((a,o)=>a+o.value,0);
+    // Heurística: estados que contienen 'complet' o 'cerr'
+    const completadas = ordenes.data.filter(o=>/(complet|cerr)/i.test(o.label)).reduce((a,o)=>a+o.value,0);
+  const inventarioKg = Array.isArray(inventario.data) ? inventario.data.reduce((a,o)=>a+o.value,0) : (inventario.data?.total_cantidad ?? inventario.data ?? 0);
+  const rendPromedio = tueste.data?.promedio ?? 0;
+
+    // Helper para delta (simple: variación porcentual vs promedio de todos)
+    function setKPI(idBase, valor, ref, deltaValue){
+      const valEl = document.getElementById(idBase);
+        if(valEl) {
+          let min=0, max=0;
+          if(idBase === 'kpiInventarioKg') { min = 1; max = 1; }
+          else if(idBase === 'kpiRendPromedio') { min = 1; max = 2; }
+          valEl.textContent = formatNumber(valor, min, max);
+        }
+      const deltaWrap = document.getElementById('delta'+ idBase.charAt(0).toUpperCase()+ idBase.slice(1));
+      if(deltaWrap){
+    const pct = (deltaValue !== undefined && deltaValue !== null) ? deltaValue : ( (ref ? ((valor - ref)/ref)*100 : 0) );
+    const pctRounded = Math.round(pct);
+        const arrow = pctRounded >= 0 ? '▲' : '▼';
+        deltaWrap.querySelector('.delta').textContent = (pctRounded>=0?'+':'') + pctRounded + '%';
+        deltaWrap.firstElementChild.textContent = arrow;
+        deltaWrap.classList.remove('text-red-700','text-green-700');
+        deltaWrap.classList.add(pctRounded>=0? 'text-green-700':'text-red-700');
+          if(ref !== undefined && ref !== null){
+            let min=0, max=0;
+            if(idBase === 'kpiInventarioKg') { min = 1; max = 1; }
+            else if(idBase === 'kpiRendPromedio') { min = 1; max = 2; }
+            deltaWrap.setAttribute('title', 'Referencia: ' + formatNumber(ref, min, max));
+        }
+      }
+    }
+
+  // Sustituir por datos reales del endpoint KPIs
+  // Mostrar totales en las tarjetas principales, comparados contra día anterior
+  setKPI('kpiOrdenesHoy', kpisResumen.data.pendientes_entrega_total, kpisResumen.data.pendientes_entrega_ref, kpisResumen.data.pendientes_entrega_delta);
+  setKPI('kpiEnProceso', kpisResumen.data.en_proceso_total, kpisResumen.data.en_proceso_ref, kpisResumen.data.en_proceso_delta);
+  setKPI('kpiCompletadas', kpisResumen.data.completadas_total, kpisResumen.data.completadas_ref, kpisResumen.data.completadas_delta);
+  // Inventario y Rendimiento: mostrar valores "reales" de sus endpoints dedicados
+  setKPI('kpiInventarioKg', inventarioKg, kpisResumen.data.inventario_kg_ref, kpisResumen.data.inventario_kg_delta);
+  setKPI('kpiRendPromedio', rendPromedio, kpisResumen.data.rend_promedio_ref, kpisResumen.data.rend_promedio_delta);
+
+    // Gráficos
+    new Chart(document.getElementById('chartEstados'), barConfig(
+      ordenes.data.map(o=>o.label),
+      ordenes.data.map(o=>o.value),
+      'Órdenes', ordenes.data.map(()=>brandPrimary)
+    ));
+
+    new Chart(document.getElementById('chartInventario'), barConfig(
+      inventario.data.map(o=>o.label),
+      inventario.data.map(o=>o.value),
+      'Inventario', inventario.data.map(()=>brandPrimary)
+    ));
+
+    new Chart(document.getElementById('chartRendimiento'), {
+      type:'bar',
+      data:{
+        labels: tueste.data.ultimos.map(x=>x.id),
+        datasets:[{
+          label:'Rendimiento',
+          data: tueste.data.ultimos.map(x=>x.rendimiento),
+          backgroundColor: brandPrimary,
+          borderColor: brandSecondary,
+          borderWidth: 1
+        }]
+      },
+      options:{plugins:{legend:{display:false}, title:{display:true,text:'Promedio '+ formatNumber(rendPromedio)}}, responsive:true, scales:{y:{beginAtZero:true}}}
+    });
+
+    new Chart(document.getElementById('chartProduccion'), lineConfig(
+      prod.data.map(o=>o.label),
+      prod.data.map(o=>o.value),
+      'Órdenes/Día'
+    ));
+  } catch(e){
+    console.error(e);
+    // Mostrar error simple
+    const cont = document.createElement('div');
+    cont.className = 'mt-6 p-4 rounded border border-red-300 bg-red-50 text-red-700';
+    cont.textContent = 'Error cargando datos del dashboard: ' + e.message;
+    document.currentScript.parentElement.appendChild(cont);
+  }
+}
+init();
+</script>
+{% endblock %}

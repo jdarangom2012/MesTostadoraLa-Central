@@ -1,0 +1,68 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold">➕ Nuevo Empaque</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <form method="post" class="p-6 space-y-4" action="{% url 'empaque_nuevo' %}" data-modal-form>
+      {% csrf_token %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Orden</label>
+          {{ form.orden }}
+        </div>
+        <div>
+          <label class="label">Molienda</label>
+          {{ form.molienda }}
+        </div>
+        <div>
+          <label class="label">Estado Café</label>
+          {{ form.estado_inven_cafe }}
+        </div>
+        <div>
+          <label class="label">Estado Tareas</label>
+          {{ form.estado_tareas }}
+        </div>
+        <div>
+          <label class="label">Cant. Empaque</label>
+          {{ form.cant_empaque }}
+        </div>
+        <div>
+          <label class="label">Cant. Empacada</label>
+          {{ form.cant_empacada }}
+        </div>
+        <div>
+          <label class="label">Cant. Etiquetas</label>
+          {{ form.cant_etiquetas }}
+        </div>
+        <div>
+          <label class="label">Emp. Clientes</label>
+          {{ form.emp_clientes }}
+        </div>
+        <div>
+          <label class="label">Total Empaques</label>
+          {{ form.total_empaques }}
+        </div>
+        <div>
+          <label class="label">Total Etiquetas</label>
+          {{ form.total_etiquetas }}
+        </div>
+        <div>
+          <label class="label">Total Paquetes</label>
+          {{ form.total_paquetes }}
+        </div>
+        <div class="md:col-span-2">
+          <label class="label">Notas</label>
+          {{ form.notas }}
+        </div>
+      </div>
+      {% if form.non_field_errors %}
+        <p class="error">{{ form.non_field_errors|striptags }}</p>
+      {% endif %}
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button type="button" data-close-modal class="btn-base">Cancelar</button>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

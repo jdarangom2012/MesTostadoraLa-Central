@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Login · MES{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+<div class="max-w-sm mx-auto mt-10 bg-white p-6 rounded shadow">
+  <h1 class="text-lg font-semibold mb-4">Iniciar Sesión</h1>
+  {% if error %}<p class="text-sm text-red-600 mb-3">{{ error }}</p>{% endif %}
+  <form method="post" class="space-y-4">{% csrf_token %}
+  {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <div>
+      <label class="block text-xs font-medium mb-1">Usuario</label>
+      <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username" class="w-full border border-gray-300 focus:border-brand-primary focus:ring-brand-primary rounded px-3 py-2 text-sm text-black placeholder-black" placeholder="Usuario" required>
+      {% if form.username.errors %}<p class="text-xs text-red-500 mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+    </div>
+    <div>
+      <label class="block text-xs font-medium mb-1">Contraseña</label>
+      <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}" autocomplete="current-password" class="w-full border border-gray-300 focus:border-brand-primary focus:ring-brand-primary rounded px-3 py-2 text-sm text-black placeholder-black" placeholder="Contraseña" required>
+      {% if form.password.errors %}<p class="text-xs text-red-500 mt-1">{{ form.password.errors.0 }}</p>{% endif %}
+    </div>
+    <button class="w-full bg-brand-primary hover:bg-brand-secondary text-white font-medium text-sm py-2 rounded">Entrar</button>
+  </form>
+  <p class="text-xs text-center mt-4 text-gray-600">¿No tienes cuenta? <a href="{% url 'signup' %}" class="text-brand-secondary hover:underline">Crear cuenta</a></p>
+</div>
+{% endblock %}

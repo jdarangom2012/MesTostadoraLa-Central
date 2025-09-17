@@ -1,0 +1,71 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-4xl rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">✏️ Editar Orden Selección Tostado #{{ obj.id }}</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+    <form method="post" action="{% url 'orden_seleccion_tostado_editar' obj.id %}" class="p-6 space-y-6" data-modal-form>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Orden</label>
+          {{ form.orden }}
+          {{ form.orden.errors }}
+        </div>
+        <div>
+          <label class="label">Inventario Café</label>
+          {{ form.inventario_cafe_ref }}
+          {{ form.inventario_cafe_ref.errors }}
+        </div>
+        <div>
+          <label class="label">Estado</label>
+          {{ form.estado_tareas }}
+          {{ form.estado_tareas.errors }}
+        </div>
+
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <label class="flex items-center gap-2">{{ form.cat_limpieza }} <span>Limpieza</span></label>
+          <label class="flex items-center gap-2">{{ form.cat_quaker }} <span>Quaker</span></label>
+          <div>
+            <label class="label">Peso Quaker (kg)</label>
+            {{ form.peso_quaker }}
+            {{ form.peso_quaker.errors }}
+          </div>
+        </div>
+
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="flex items-center gap-2">{{ form.cat_grupo1 }} <span>Grupo 1</span></label>
+            <label class="label">Desc Grupo 1</label>
+            {{ form.desc_grupo1 }}
+            <label class="label">Peso Grupo 1</label>
+            {{ form.peso_grupo1 }}
+          </div>
+          <div>
+            <label class="flex items-center gap-2">{{ form.cat_grupo2 }} <span>Grupo 2</span></label>
+            <label class="label">Desc Grupo 2</label>
+            {{ form.desc_grupo2 }}
+            <label class="label">Peso Grupo 2</label>
+            {{ form.peso_grupo2 }}
+          </div>
+          <div>
+            <label class="flex items-center gap-2">{{ form.cat_grupo3 }} <span>Grupo 3</span></label>
+            <label class="label">Desc Grupo 3</label>
+            {{ form.desc_grupo3 }}
+            <label class="label">Peso Grupo 3</label>
+            {{ form.peso_grupo3 }}
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

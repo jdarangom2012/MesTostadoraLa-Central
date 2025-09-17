@@ -1,0 +1,80 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-3xl rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2 tracking-tight">🫘 Nuevo Registro de Café</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <form method="post" action="{% url 'inventario_cafe_nuevo' %}" class="p-6 space-y-4" data-modal-form>
+      {% csrf_token %}
+      <input type="hidden" name="q" value="{{ search }}" />
+      <input type="hidden" name="origen" value="{{ f_origen }}" />
+      <input type="hidden" name="proceso" value="{{ f_proceso }}" />
+      <input type="hidden" name="variedad" value="{{ f_variedad }}" />
+      <input type="hidden" name="page" value="{{ page_num }}" />
+      <div>
+        <label class="label">Cliente</label>
+        {{ form.cliente }}
+        {{ form.cliente.errors }}
+      </div>
+      <div>
+        <label class="label">Estado Café</label>
+        {{ form.estado_cafe }}
+        {{ form.estado_cafe.errors }}
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="label">Origen</label>
+          {{ form.origen }}
+          {{ form.origen.errors }}
+        </div>
+        <div>
+          <label class="label">Proceso</label>
+          {{ form.proceso_inven_cafe }}
+          {{ form.proceso_inven_cafe.errors }}
+        </div>
+        <div>
+          <label class="label">Variedad</label>
+          {{ form.variendad_inven_cafe }}
+          {{ form.variendad_inven_cafe.errors }}
+        </div>
+      </div>
+      <div>
+        <label class="label">Empaque Café</label>
+        {{ form.empaquecafe }}
+        {{ form.empaquecafe.errors }}
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Código</label>
+          {{ form.codigo }}
+        </div>
+        <div>
+          <label class="label">Cantidad (kg)</label>
+          {{ form.cantidad }}
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="label">Sacos</label>
+          {{ form.sacos }}
+        </div>
+        <div>
+          <label class="label">Bolsas Empaque</label>
+          {{ form.cantidad_bolsas_emp }}
+        </div>
+        <div>
+          <label class="label">Paquetes</label>
+          {{ form.cantidad_paquetes }}
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        {% if is_fragment %}
+          <button type="button" class="btn-base" data-close-modal>Cancelar</button>
+        {% else %}
+          <a href="{{ back_url }}" class="btn-base">Cancelar</a>
+        {% endif %}
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>

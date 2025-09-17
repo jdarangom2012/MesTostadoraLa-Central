@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es" class="h-full">
+    <head>
+        {% include 'includes/head.html' %}
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body class="min-h-screen flex flex-col bg-gradient-to-br from-brand-light to-white text-gray-900 dark:from-brand-dark dark:to-gray-900 dark:text-gray-100 transition-colors">
+        {% include 'includes/header.html' %}
+        <div class="flex flex-1 min-h-0">
+            {% block sidebar %}{% include 'includes/sidebar.html' %}{% endblock %}
+            <main class="flex-1 min-h-0 overflow-y-auto p-4 lg:p-6 dark:bg-transparent" id="app-main">
+                                {% if messages %}
+                                    <div class="space-y-2 mb-4">
+                                        {% for m in messages %}
+                                            <div class="text-sm px-3 py-2 rounded border {{ m.tags }} {% if 'error' in m.tags %}bg-red-50 border-red-300 text-red-700{% elif 'success' in m.tags %}bg-green-50 border-green-300 text-green-700{% else %}bg-gray-50 border-gray-300 text-gray-700{% endif %}">{{ m }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                {% block breadcrumbs %}{% endblock %}
+                {% block page_header %}{% endblock %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+        {% include 'includes/footer.html' %}
+        {% block extra_js %}{% endblock %}
+                        <script>
+                // Carga modal clientes y materiales vía fragmento sin recargar página
+                        document.addEventListener('click', async (ev) => {
+                            const triggerClientes = ev.target.closest('a[data-modal-clientes]');
+                            const modalNavLink = ev.target.closest('a[data-modal-navigate]');
+                            if (triggerClientes) {
+                        ev.preventDefault();
+                                const url = triggerClientes.getAttribute('href');
+                        try {
+                            const res = await fetch(url + (url.includes('?')?'&':'?') + 'fragment=1', {headers:{'X-Fragment':'1'}});
+                            if(!res.ok) throw new Error('Error '+res.status);
+                            const html = await res.text();
+                            // eliminar modal existente si hay
+                            document.querySelectorAll('[data-modal-root]').forEach(m=>m.remove());
+                            const temp = document.createElement('div');
+                            temp.innerHTML = html.trim();
+                            const modal = temp.firstElementChild;
+                            document.body.appendChild(modal);
+                            bindModal(modal);
+                        } catch(e){
+                            console.error(e); location.href = url; // fallback
+                        }
+                    }
+                            if (modalNavLink) {
+                                const url = modalNavLink.getAttribute('href');
+                                if(url) {
+                                    ev.preventDefault();
+                                    await loadFragment(url);
+                                }
+                            }
+                });
+                function bindModal(root){
+                    if(!root) return;
+                    root.addEventListener('click', e=>{ if(e.target === root) close(); });
+                    root.querySelectorAll('[data-close-modal]').forEach(btn=>btn.addEventListener('click', (e)=>{ e.preventDefault(); close(); }));
+                            // intercept submit
+                                        root.querySelectorAll('form[data-modal-form]').forEach(form=>{
+                                form.addEventListener('submit', async e=>{
+                                    e.preventDefault();
+                                    const formData = new FormData(form);
+                                    const action = form.getAttribute('action') || location.href;
+                                    try {
+                                                    const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+                                                    const res = await fetch(action.replace(/([?&])fragment=1/,'$1') + (action.includes('?')?'&':'?') + 'fragment=1', {
+                                                        method:'POST',
+                                                        body: formData,
+                                                        headers:{'X-Fragment':'1', ...(csrf?{'X-CSRFToken':csrf}:{})},
+                                                        credentials:'same-origin'
+                                                    });
+                                        if(!res.ok) throw new Error('Error '+res.status);
+                                        const html = await res.text();
+                                        // si la respuesta contiene listado reemplazar modal completo por nuevo listado
+                                        if(html.includes('data-modal-root')){
+                                            document.querySelectorAll('[data-modal-root]').forEach(m=>m.remove());
+                                            const t = document.createElement('div'); t.innerHTML = html.trim();
+                                            document.body.appendChild(t.firstElementChild); // asumimos listado
+                                            bindModal(document.querySelector('[data-modal-root]'));
+                                        } else {
+                                            // fallback
+                                            location.reload();
+                                        }
+                                    } catch(err){ console.error(err); location.reload(); }
+                                });
+                            });
+                    function close(){ root.remove(); }
+
+                                // Datepicker (Flatpickr + fallback) inicializado de forma genérica
+                                (function initDatePickers(){
+                                    const inputs = Array.from(root.querySelectorAll('input[data-datepicker], input[name="fecha_orden"], input[name="fecha_entrega"]'));
+                                    if(!inputs.length) return;
+                                    // Normaliza agregando el atributo data-datepicker para estilos y futura detección
+                                    inputs.forEach(i=>{ if(!i.hasAttribute('data-datepicker')) i.setAttribute('data-datepicker','1'); });
+                                    const attachOpener = (input)=>{
+                                        if(input.dataset.dpOpener==='1') return; // evitar duplicados
+                                        const wrap = document.createElement('div');
+                                        wrap.style.position = 'relative';
+                                        input.parentNode.insertBefore(wrap, input);
+                                        wrap.appendChild(input);
+                                        const btn = document.createElement('button');
+                                        btn.type = 'button'; btn.className = 'dp-btn'; btn.setAttribute('aria-label','Abrir calendario');
+                                        btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>';
+                                        wrap.appendChild(btn);
+                                        btn.addEventListener('click', (e)=>{
+                                            e.preventDefault();
+                                            const mdp = input._mdp; if(mdp && mdp.open){ mdp.open(); return; }
+                                            try{ input.focus(); input.click(); if(typeof input.showPicker==='function') input.showPicker(); }catch(_){ }
+                                        }, {passive:false});
+                                        input.dataset.dpOpener='1';
+                                    };
+
+                                    // SIEMPRE usar MicroDatepicker local
+                                    const initLocal = ()=>{ inputs.forEach(el=>{ window.MicroDatepicker.attach(el); attachOpener(el); }); };
+                                    if(!window.MicroDatepicker){
+                                        const s=document.createElement('script');
+                                        s.src='{% static "js/micro_datepicker.js" %}';
+                                        s.onload = initLocal;
+                                        s.onerror = ()=>{
+                                            // última opción: nativo
+                                            inputs.forEach(el=>{
+                                                if(el.type!=='date') el.type='date';
+                                                const open=()=>{ try{ if(typeof el.showPicker==='function') el.showPicker(); }catch(_){ } };
+                                                el.addEventListener('focus', open, {passive:true}); el.addEventListener('click', open, {passive:true});
+                                                attachOpener(el);
+                                            });
+                                        };
+                                        document.head.appendChild(s);
+                                    } else {
+                                        initLocal();
+                                    }
+                                })();
+
+                                // Auto-buscar (debounce) en listados con data-list-url (clientes, materiales)
+                                            const searchInput = root.querySelector('[data-autosearch]');
+                                            if(searchInput){
+                                                const listUrl = root.getAttribute('data-list-url') || '/clientes/listar/';
+                                                const status = root.querySelector('[data-search-status]');
+                                                let t=null; const delay=250; let lastValue = searchInput.value;
+                                                const runSearch = ()=>{
+                                                    const q = searchInput.value.trim();
+                                                    if(q === lastValue) return; // evita duplicar
+                                                    lastValue = q;
+                                                    if(status){ status.textContent='Buscando…'; }
+                                                    const url = listUrl + (q?`?q=${encodeURIComponent(q)}`:'');
+                                                    loadFragment(url).then(()=>{ /* nuevo modal tendrá su propio status */ });
+                                                };
+                                                searchInput.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(runSearch, delay); });
+                                                // Enter fuerza búsqueda inmediata
+                                                searchInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(t); runSearch(); } });
+                                            }
+                }
+                // Si la vista ya trae un modal en el DOM (render del servidor), enlazar comportamiento
+                document.addEventListener('DOMContentLoaded', ()=>{
+                    const existing = document.querySelector('[data-modal-root]');
+                    if(existing) bindModal(existing);
+                });
+                                async function loadFragment(url){
+                            try {
+                            const full = url + (url.includes('?')?'&':'?') + 'fragment=1';
+                            const spinner = document.querySelector('[data-modal-root] [data-loading]');
+                            if(spinner) spinner.classList.remove('hidden');
+                            const res = await fetch(full, {headers:{'X-Fragment':'1'}});
+                                if(!res.ok) throw new Error('Error '+res.status);
+                                const html = await res.text();
+                                document.querySelectorAll('[data-modal-root]').forEach(m=>m.remove());
+                                const temp = document.createElement('div'); temp.innerHTML = html.trim();
+                                        const modal = temp.firstElementChild; document.body.appendChild(modal); bindModal(modal);
+                                        // Reintentar inicialización de datepickers por si el modal llegó sin ellos
+                                        try { if(typeof window.MicroDatepicker!== 'undefined') {
+                                            modal.querySelectorAll('input[name="fecha_orden"], input[name="fecha_entrega"]').forEach(el=>{
+                                                if(!el.hasAttribute('data-datepicker')) el.setAttribute('data-datepicker','1');
+                                                window.MicroDatepicker.attach(el);
+                                            });
+                                        }} catch(_){ }
+                                                    // Restaurar foco en búsqueda si existe (para experiencia continua)
+                                                    const autoInput = modal.querySelector('[data-autosearch]');
+                                                    if(autoInput){
+                                                        setTimeout(()=>{ try { autoInput.focus(); const v=autoInput.value; autoInput.setSelectionRange(v.length,v.length);} catch(_){} },10);
+                                                    }
+                                        // Actualizar contador resultados si existe
+                                        const tbl = modal.querySelector('table.mes-table tbody');
+                                        const status = modal.querySelector('[data-search-status]');
+                                        if(tbl && status){
+                                            const rows = tbl.querySelectorAll('tr.row').length;
+                                            status.textContent = rows + ' resultado' + (rows===1?'':'s');
+                                        }
+                            } catch(e){ console.error(e); location.href=url; }
+                        }
+                </script>
+    </body>
+</html>

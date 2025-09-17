@@ -1,0 +1,73 @@
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+
+# Virtual env
+.venv/
+venv/
+ENV/
+
+# Django stuff
+media/
+staticfiles/
+*.log
+
+# Local SQLite DB (si quieres versionarla comenta la línea)
+db.sqlite3
+
+# Migrations pycache (mantener migraciones .py pero no sus cache)
+**/__pycache__/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE / Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Node / Frontend
+node_modules/
+.npm/
+package-lock.json
+# Si deseas versionar package-lock.json elimina la línea anterior
+
+# Build / Dist
+build/
+dist/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage / Testing
+htmlcov/
+.coverage*
+.pytest_cache/
+
+# Temporary
+*.tmp
+*.swp
+*.bak
+
+# Tailwind / PostCSS cache
+.postcss-cache/
+
+# Reports / docs generados
+*.pdf
+*.docx
+!README.md
+
+# Scripts outputs
+scripts/output/
+
+# Cloudflare / Túnel config (si se añade luego)
+.cloudflared/
+

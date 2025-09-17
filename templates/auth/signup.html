@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Registro · MES{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-10 bg-white p-6 rounded shadow">
+  <h1 class="text-lg font-semibold mb-1">Crear Cuenta</h1>
+  <p class="text-xs text-gray-600 mb-4">Se asignará un rol según tu selección. Los roles definen permisos.</p>
+  {% if error %}<p class="text-sm text-red-600 mb-3">{{ error }}</p>{% endif %}
+  <form method="post" class="grid gap-4">{% csrf_token %}
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium mb-1">Nombre de usuario</label>
+        {{ form.username }}
+        {% if form.username.errors %}<p class="text-xs text-red-500 mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}<p class="text-xs text-red-500 mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium mb-1">Nombre</label>
+        {{ form.first_name }}
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1">Apellido</label>
+        {{ form.last_name }}
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium mb-1">Contraseña</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}<p class="text-xs text-red-500 mt-1">{{ form.password1.errors.0 }}</p>{% endif %}
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1">Confirmar Contraseña</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}<p class="text-xs text-red-500 mt-1">{{ form.password2.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+    <div>
+      <label class="block text-xs font-medium mb-1">Rol</label>
+      {{ form.role }}
+      {% if form.role.errors %}<p class="text-xs text-red-500 mt-1">{{ form.role.errors.0 }}</p>{% endif %}
+    </div>
+    <button class="w-full bg-brand-primary hover:bg-brand-secondary text-white font-medium text-sm py-2 rounded">Registrar</button>
+  </form>
+  <p class="text-xs text-center mt-4 text-gray-600">¿Ya tienes cuenta? <a href="{% url 'login' %}" class="text-brand-secondary hover:underline">Inicia sesión</a></p>
+</div>
+{% endblock %}

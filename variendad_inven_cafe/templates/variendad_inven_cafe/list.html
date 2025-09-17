@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-xl font-bold mb-4">Variedad Inventario Café</h1>
+{% for obj in object_list %}
+  <div>{{ obj }}</div>
+{% empty %}
+  <p>No hay datos.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,50 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <form method="post" action="{% url 'orden_trilla_nuevo' %}" data-modal-form class="p-0">
+      {% csrf_token %}
+      <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+        <h2 class="text-lg font-semibold">Nueva Orden de Trilla</h2>
+        <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        {% if form.errors %}
+          <div class="mb-2 text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
+            Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
+          </div>
+        {% endif %}
+        {{ form.non_field_errors }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="label">Orden</label>
+            {{ form.orden }}
+            {{ form.orden.errors }}
+          </div>
+          <div>
+            <label class="label">Estado Tareas</label>
+            {{ form.estado_tareas }}
+            {{ form.estado_tareas.errors }}
+          </div>
+          <div>
+            <label class="label">Peso Café Bruto (kg)</label>
+            {{ form.peso_cafe_bruto }}
+            {{ form.peso_cafe_bruto.errors }}
+          </div>
+          <div>
+            <label class="label">Peso Café Verde (kg)</label>
+            {{ form.peso_cafe_verde }}
+            {{ form.peso_cafe_verde.errors }}
+          </div>
+          <div>
+            <label class="label">Rendimiento (%)</label>
+            {{ form.rendimiento }}
+            {{ form.rendimiento.errors }}
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-end gap-2 border-t border-brand-dark/20">
+        <button type="button" class="btn-base" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

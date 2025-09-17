@@ -1,0 +1,6 @@
+from django.apps import AppConfig
+
+
+class OrigenCafeConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'origen_cafe'

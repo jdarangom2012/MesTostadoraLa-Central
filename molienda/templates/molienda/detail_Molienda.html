@@ -1,0 +1,44 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+	<div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+		<div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+			<h2 class="text-lg font-semibold">✏️ Editar Molienda #{{ obj.id }}</h2>
+			<button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+		</div>
+		<form method="post" class="p-6 space-y-4" action="{% url 'molienda_editar' obj.pk %}" data-modal-form>
+			{% csrf_token %}
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div>
+					<label class="label">Orden</label>
+					{{ form.orden }}
+				</div>
+				<div>
+					<label class="label">Estado Tarea</label>
+					{{ form.estado_tarea }}
+				</div>
+				<div>
+					<label class="label">Nivel Molienda</label>
+					{{ form.nivel_molienda }}
+				</div>
+				<div>
+					<label class="label">Estado Café</label>
+					{{ form.estado_inven_cafe }}
+				</div>
+				<div>
+					<label class="label">Peso a moler</label>
+					{{ form.peso_moler }}
+				</div>
+				<div class="md:col-span-2">
+					<label class="label">Notas</label>
+					{{ form.notas }}
+				</div>
+			</div>
+			{% if form.non_field_errors %}
+				<p class="error">{{ form.non_field_errors|striptags }}</p>
+			{% endif %}
+			<div class="flex items-center justify-end gap-2 pt-2">
+				<button type="button" data-close-modal class="btn-base">Cancelar</button>
+						<button type="submit" class="btn-base btn-primary">Guardar</button>
+			</div>
+		</form>
+	</div>
+</div>

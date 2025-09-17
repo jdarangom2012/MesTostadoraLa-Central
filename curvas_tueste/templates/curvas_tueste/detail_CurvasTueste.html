@@ -1,0 +1,35 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold">Editar Curva de Tueste #{{ obj.id }}</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <form method="post" class="p-6 space-y-4" action="{% url 'curvas_tueste_editar' obj.id %}" data-modal-form>
+      {% csrf_token %}
+      <div>
+        <label class="label">Temp Set</label>
+        {{ form.temp_set_point }}
+        {{ form.temp_set_point.errors }}
+      </div>
+      <div>
+        <label class="label">Temp Tost</label>
+        {{ form.temp_tost }}
+        {{ form.temp_tost.errors }}
+      </div>
+      <div>
+        <label class="label">% Aire</label>
+        {{ form.porcentaje_aire }}
+        {{ form.porcentaje_aire.errors }}
+      </div>
+      <div>
+        <label class="label">% Gas</label>
+        {{ form.porcentaje_gas }}
+        {{ form.porcentaje_gas.errors }}
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-primary" data-modal-form>Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

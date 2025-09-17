@@ -1,0 +1,22 @@
+{% load static %}
+<meta charset="UTF-8" />
+<title>{% block title %}MES La Central{% endblock %}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="{% static 'css/styles.css' %}?v={{ STATIC_VERSION|default:'1' }}" />
+<link rel="icon" type="image/png" href="{% static 'favicon.png' %}" />
+<!-- Tailwind + Config Paleta Centralizada -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+	tailwind.config = {
+		theme: {
+			extend: {
+				colors: {
+					brand: { primary: '#E8B923', secondary: '#DD3F2E', dark: '#161616', light: '#F2F2F2' }
+				}
+			}
+		}
+	}
+</script>
+<link rel="stylesheet" href="{% static 'css/mes.css' %}?v={{ STATIC_VERSION|default:'1' }}" />
+{% block head_css %}{% endblock %}
+{% block head_js %}{% endblock %}

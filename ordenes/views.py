@@ -1,0 +1,169 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import permission_required
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+from django.db import IntegrityError, DatabaseError
+from django import forms
+from django.utils import timezone
+from .models import Orden
+
+
+class OrdenForm(forms.ModelForm):
+    # Usar solo fecha (sin hora) en el formulario
+    # Acepta DD/MM/YYYY y también ISO (fallback de los inputs type=date)
+    fecha_orden = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
+    fecha_entrega = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
+
+    class Meta:
+        model = Orden
+        fields = [
+            'cliente', 'estado_orden', 'estado_inven_cafe',
+            'fecha_orden', 'fecha_entrega', 'notas',
+            'trilla', 'selec_cafe_verde', 'tueste_flag', 'selec_cafe_tostado',
+            'molienda_flag', 'empaque_flag',
+            'conf_trilla', 'conf_sel_verde', 'conf_tueste', 'conf_sel_tostado', 'conf_molienda', 'conf_empaque',
+            'prioridad',
+        ]
+        widgets = {
+            'cliente': forms.Select(attrs={'class': 'w-full select'}),
+            'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
+            'estado_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
+            'fecha_orden': forms.TextInput(attrs={
+                'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
+                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\\d{2}/\\d{2}/\\d{4}'
+            }),
+            'fecha_entrega': forms.TextInput(attrs={
+                'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
+                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\\d{2}/\\d{2}/\\d{4}'
+            }),
+            'notas': forms.TextInput(attrs={'class': 'w-full input'}),
+            'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
+        }
+        labels = {
+            'estado_inven_cafe': 'Estado Café',
+        }
+
+    def _to_aware_dt(self, d):
+        if not d:
+            return None
+        from datetime import datetime, time
+        dt = datetime.combine(d, time.min)
+        # Hacer timezone-aware usando la zona actual
+        if timezone.is_naive(dt):
+            dt = timezone.make_aware(dt, timezone.get_current_timezone())
+        return dt
+
+    def clean_fecha_orden(self):
+        d = self.cleaned_data.get('fecha_orden')
+        return self._to_aware_dt(d)
+
+    def clean_fecha_entrega(self):
+        d = self.cleaned_data.get('fecha_entrega')
+        return self._to_aware_dt(d)
+
+
+@permission_required('ordenes.view_orden', raise_exception=True)
+def listar_ordenes(request):
+    qs = Orden.objects.select_related('cliente', 'estado_orden').order_by('-fecha_orden', '-id')
+    search = request.GET.get('q', '').strip()
+    if search:
+        search_int = None
+        try:
+            search_int = int(search)
+        except Exception:
+            search_int = None
+        q = (
+            Q(cliente__nombre__icontains=search) |
+            Q(cliente__apellidos__icontains=search) |
+            Q(estado_orden__estado_orden__icontains=search)
+        )
+        if search_int is not None:
+            q = q | Q(id=search_int)
+        qs = qs.filter(q)
+
+    paginator = Paginator(qs, 7)
+    page = request.GET.get('page')
+    try:
+        items = paginator.page(page)
+    except PageNotAnInteger:
+        items = paginator.page(1)
+    except EmptyPage:
+        items = paginator.page(paginator.num_pages)
+
+    ctx = {
+        'items': items,
+        'page_obj': items,
+        'paginator': paginator,
+        'is_paginated': paginator.num_pages > 1,
+        'search': search,
+    }
+    if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
+        return render(request, 'ordenes/_modal_listar_OrdenesProduccion.html', ctx)
+    return render(request, 'ordenes/listar_OrdenesProduccion.html', ctx)
+
+
+@require_http_methods(["GET", "POST"])
+@permission_required('ordenes.add_orden', raise_exception=True)
+def add_orden(request):
+    if request.method == 'POST':
+        form = OrdenForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            if not obj.fecha_ingreso:
+                obj.fecha_ingreso = timezone.now()
+            if not obj.created_at:
+                obj.created_at = timezone.now()
+            try:
+                obj.save()
+            except (IntegrityError, DatabaseError) as e:
+                form.add_error(None, f'Error al guardar en base de datos: {e}')
+            else:
+                messages.success(request, 'Orden creada correctamente.')
+                if request.headers.get('X-Fragment') or request.GET.get('fragment') == '1':
+                    return listar_ordenes(request)
+                return redirect('ordenes_produccion_listar')
+    else:
+        form = OrdenForm()
+    if request.headers.get('X-Fragment') or request.GET.get('fragment') == '1':
+        return render(request, 'ordenes/add_OrdenesProduccion.html', {'form': form})
+    return render(request, 'ordenes/listar_OrdenesProduccion.html', {})
+
+
+@require_http_methods(["GET", "POST"])
+@permission_required('ordenes.change_orden', raise_exception=True)
+def edit_orden(request, pk):
+    obj = get_object_or_404(Orden, pk=pk)
+    if request.method == 'POST':
+        form = OrdenForm(request.POST, instance=obj)
+        if form.is_valid():
+            inst = form.save(commit=False)
+            inst.updated_at = timezone.now()
+            try:
+                inst.save()
+            except (IntegrityError, DatabaseError) as e:
+                form.add_error(None, f'Error al guardar en base de datos: {e}')
+            else:
+                messages.success(request, 'Orden actualizada correctamente.')
+                if request.headers.get('X-Fragment'):
+                    return listar_ordenes(request)
+                return redirect('ordenes_produccion_listar')
+    else:
+        form = OrdenForm(instance=obj)
+    if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
+        return render(request, 'ordenes/detail_OrdenesProduccion.html', {'form': form, 'obj': obj})
+    return render(request, 'ordenes/listar_OrdenesProduccion.html', {})
+
+
+@permission_required('ordenes.delete_orden', raise_exception=True)
+def delete_orden(request, pk):
+    obj = get_object_or_404(Orden, pk=pk)
+    if request.method == 'POST':
+        obj.delete()
+        if request.headers.get('X-Fragment'):
+            return listar_ordenes(request)
+        return redirect('ordenes_produccion_listar')
+    if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
+        return render(request, 'ordenes/confirm_delete_OrdenesProduccion.html', {'obj': obj})
+    return render(request, 'ordenes/listar_OrdenesProduccion.html', {})

@@ -1,0 +1,42 @@
+{# Fragmento modal creación material #}
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">➕ Nuevo Material</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+  <form method="post" action="{% url 'material_nuevo' %}" class="p-6 space-y-6" data-modal-form>{% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="grid grid-cols-2 gap-5 text-sm">
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Código</label>{{ form.codigo_material }}
+          {{ form.codigo_material.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Descripción</label>{{ form.descripcion }}
+          {{ form.descripcion.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Cantidad</label>{{ form.cantidad }}
+          {{ form.cantidad.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Estado</label>
+          <div class="flex items-center gap-2">{{ form.estado }}<span class="text-xs">Activo</span></div>
+          {{ form.estado.errors }}
+        </div>
+        <div class="field col-span-2">
+          <label class="field-label">Cliente</label>{{ form.cliente }}
+          {{ form.cliente.errors }}
+        </div>
+        
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
+        <button class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+ </div>

@@ -1,0 +1,25 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-md rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2 tracking-tight">Nuevo Empaque Café</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+  <form method="post" class="p-6 space-y-4" action="{% url 'cafe_empaque_nuevo' %}" data-modal-form>
+      {% csrf_token %}
+      <div>
+        <label class="label">Nombre</label>
+        {{ form.empaque_cafe }}
+        {% if form.empaque_cafe.errors %}
+          <p class="error">{{ form.empaque_cafe.errors|striptags }}</p>
+        {% endif %}
+      </div>
+      {% if form.non_field_errors %}
+        <div class="error">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

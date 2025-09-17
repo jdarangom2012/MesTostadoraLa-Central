@@ -1,0 +1,91 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="tamano-empaque-list" data-list-url="/tamano-empaque/listar/">
+  <div class="palette-surface w-full max-w-3xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2 tracking-tight">📏 Tamaños de Empaque</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <div class="p-6 space-y-5 relative">
+      <div class="hidden absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm flex items-center justify-center text-brand-dark dark:text-gray-200 text-sm" data-loading>
+        <div class="animate-spin h-5 w-5 border-2 border-brand-primary border-t-transparent rounded-full mr-2"></div> Cargando...
+      </div>
+      <form method="get" class="flex flex-col md:flex-row md:items-center gap-2" action="" data-search-form>
+        <div class="flex-1 relative">
+          <input type="text" name="q" data-autosearch value="{{ search }}" autocomplete="off" placeholder="Buscar tamaño (auto)" class="w-full field-input rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary pr-20"/>
+          <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
+        </div>
+        <div class="flex gap-2">
+          {% if perms.tamano_empaque.add_tamanoempaque %}
+            <a href="{% url 'tamano_empaque_nuevo' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
+          {% endif %}
+        </div>
+      </form>
+      <div class="overflow-x-auto rounded-lg border border-brand-dark/30 shadow-inner">
+        <table class="mes-table leading-tight w-full">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th>Editar</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for obj in items %}
+            <tr class="row group">
+              <td class="td">{{ obj.tamano_empaque }}</td>
+              <td class="td action">
+                {% if perms.tamano_empaque.change_tamanoempaque %}
+                  <a href="{% url 'tamano_empaque_editar' obj.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
+                {% else %}
+                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
+                {% endif %}
+              </td>
+              <td class="td action">
+                {% if perms.tamano_empaque.delete_tamanoempaque %}
+                  <a href="{% url 'tamano_empaque_eliminar' obj.pk %}" class="link link-delete" data-modal-navigate>Eliminar</a>
+                {% else %}
+                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3" class="text-center py-8 text-brand-dark/60 text-sm">No hay tamaños.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if is_paginated %}
+      {% url 'tamano_empaque_listar' as base_list_url %}
+      <nav class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[11px] mt-4">
+        <div>
+          Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }} tamaños
+        </div>
+        <ul class="flex flex-wrap items-center gap-1">
+          {% if page_obj.has_previous %}
+            <li><a class="pager" href="{{ base_list_url }}?page={{ page_obj.previous_page_number }}{% if search %}&q={{ search }}{% endif %}" data-modal-navigate>Anterior</a></li>
+          {% else %}
+            <li><span class="pager disabled">Anterior</span></li>
+          {% endif %}
+          {% for num in paginator.page_range %}
+            {% if num == page_obj.number %}
+              <li><span class="pager active">{{ num }}</span></li>
+            {% else %}
+              <li><a class="pager" href="{{ base_list_url }}?page={{ num }}{% if search %}&q={{ search }}{% endif %}" data-modal-navigate>{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li><a class="pager" href="{{ base_list_url }}?page={{ page_obj.next_page_number }}{% if search %}&q={{ search }}{% endif %}" data-modal-navigate>Siguiente</a></li>
+          {% else %}
+            <li><span class="pager disabled">Siguiente</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+  <script>
+    setTimeout(()=>{
+      const input=document.querySelector('[data-modal-root] [name="q"]');
+      if(input) input.focus();
+    },50);
+  </script>
+  </div>

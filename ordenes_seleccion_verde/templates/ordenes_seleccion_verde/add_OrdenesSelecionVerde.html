@@ -1,0 +1,93 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-4xl rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">➕ Nueva Selección Verde</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+    <form method="post" action="{% url 'orden_seleccion_verde_nuevo' %}" class="p-6 space-y-6" data-modal-form>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Estado</label>
+          {{ form.estado_tareas }}
+          {{ form.estado_tareas.errors }}
+        </div>
+        <div class="flex items-center gap-2 pt-6">
+          <label class="flex items-center gap-2">{{ form.zaranda }} <span>Zaranda</span></label>
+        </div>
+        <div>
+          <label class="label">Grupo 1</label>{{ form.grupo1 }}
+          <label class="label">Peso</label>{{ form.peso_grupo1 }}
+        </div>
+        <div>
+          <label class="label">Grupo 2</label>{{ form.grupo2 }}
+          <label class="label">Peso</label>{{ form.peso_grupo2 }}
+        </div>
+        <div>
+          <label class="label">Grupo 3</label>{{ form.grupo3 }}
+          <label class="label">Peso</label>{{ form.peso_grupo3 }}
+        </div>
+        <div>
+          <label class="label">Grupo 4</label>{{ form.grupo4 }}
+          <label class="label">Peso</label>{{ form.peso_grupo4 }}
+        </div>
+        <div>
+          <label class="label">Grupo 5</label>{{ form.grupo5 }}
+          <label class="label">Peso</label>{{ form.peso_grupo5 }}
+        </div>
+        <div>
+          <label class="label">Peso Ripio</label>{{ form.peso_grupo_ripio }}
+        </div>
+        <div class="flex items-center gap-4 md:col-span-2">
+          <label class="flex items-center gap-2">{{ form.catadora }} <span>Catadora</span></label>
+          <label class="flex items-center gap-2">{{ form.catacion_ripio }} <span>Catación Ripio</span></label>
+          <div>
+            <label class="label">Peso Cat. Ripio</label>{{ form.peso_cat_ripio }}
+          </div>
+          <label class="flex items-center gap-2">{{ form.catacion_balsos }} <span>Catación Balsos</span></label>
+          <div>
+            <label class="label">Peso Cat. Balsos</label>{{ form.peso_cat_balsos }}
+          </div>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-2">{{ form.catacion_grupo1 }} <span>Catación Grupo 1</span></label>
+            <label class="flex items-center gap-2">{{ form.catacion_grupo2 }} <span>Catación Grupo 2</span></label>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="label">Peso Cat. Grupo 1</label>{{ form.peso_cat_grupo1 }}
+            </div>
+            <div>
+              <label class="label">Peso Cat. Grupo 2</label>{{ form.peso_cat_grupo2 }}
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:col-span-2">
+          <div>
+            <label class="label">Peso Aceptado</label>{{ form.peso_aceptado }}
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-2">{{ form.medir_humedad }} <span>Medir Humedad</span></label>
+            <div class="flex-1">
+              <label class="label">Humedad</label>{{ form.humedad }}
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-2">{{ form.medir_densidad }} <span>Medir Densidad</span></label>
+            <div class="flex-1">
+              <label class="label">Densidad</label>{{ form.densidad }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

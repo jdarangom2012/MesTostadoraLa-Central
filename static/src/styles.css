@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand helpers */
+.btn-primary { @apply bg-brand-primary text-black font-semibold px-4 py-2 rounded hover:opacity-90; }
+.btn-secondary { @apply bg-brand-secondary text-white font-semibold px-4 py-2 rounded hover:opacity-90; }

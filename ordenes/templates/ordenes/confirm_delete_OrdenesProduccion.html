@@ -1,0 +1,17 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-md rounded-xl shadow-xl border border-brand-dark/30 fade-in p-0">
+  <form method="post" action="{% url 'ordenes_produccion_eliminar' obj.pk %}" data-modal-form>
+      {% csrf_token %}
+      <div class="modal-head px-6 py-4 rounded-t-xl">
+        <h2 class="text-lg font-semibold">Eliminar Orden #{{ obj.id }}</h2>
+      </div>
+      <div class="p-6 space-y-4 text-sm">
+        <p>¿Confirmas eliminar esta orden? Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-end gap-2 border-t border-brand-dark/20">
+        <button type="button" class="btn-base" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-danger">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>

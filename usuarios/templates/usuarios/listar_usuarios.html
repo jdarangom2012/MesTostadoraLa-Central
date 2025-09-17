@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+    <h1 class="text-xl font-semibold">Usuarios y Roles</h1>
+    <form method="get" class="flex items-center gap-2">
+      <input type="text" name="q" value="{{ search }}" placeholder="Buscar usuario, nombre o email" class="input w-64" />
+      <button class="btn-base btn-primary" type="submit">Buscar</button>
+    </form>
+  </div>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="space-y-3">
+      <h2 class="font-semibold text-sm uppercase tracking-wide">Usuarios ({{ users|length }})</h2>
+      <div class="rounded border border-gray-300 dark:border-gray-700 overflow-hidden bg-white/70 dark:bg-gray-900/60">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-100/70 dark:bg-gray-800/70 text-xs">
+            <tr>
+              <th class="px-2 py-1 text-left">Usuario</th>
+              <th class="px-2 py-1 text-left">Nombre</th>
+              <th class="px-2 py-1 text-left">Email</th>
+              <th class="px-2 py-1">Staff</th>
+              <th class="px-2 py-1">Activo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr class="border-t border-gray-200 dark:border-gray-800 hover:bg-brand-primary/5">
+              <td class="px-2 py-1 font-mono text-[12px]">{{ u.username }}</td>
+              <td class="px-2 py-1">{{ u.get_full_name|default:'—' }}</td>
+              <td class="px-2 py-1">{{ u.email|default:'—' }}</td>
+              <td class="px-2 py-1 text-center">{% if u.is_staff %}✅{% else %}—{% endif %}</td>
+              <td class="px-2 py-1 text-center">{% if u.is_active %}🟢{% else %}⚪{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="px-2 py-4 text-center text-xs text-gray-500">Sin usuarios</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="space-y-3">
+      <h2 class="font-semibold text-sm uppercase tracking-wide">Grupos ({{ groups|length }})</h2>
+      <div class="rounded border border-gray-300 dark:border-gray-700 overflow-hidden bg-white/70 dark:bg-gray-900/60 h-full">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-800 text-sm max-h-96 overflow-auto">
+          {% for g in groups %}
+          <li class="px-3 py-2">{{ g.name }}</li>
+          {% empty %}
+          <li class="px-3 py-4 text-center text-xs text-gray-500">Sin grupos</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="space-y-3">
+      <h2 class="font-semibold text-sm uppercase tracking-wide">Permisos ({{ perms|length }})</h2>
+      <div class="rounded border border-gray-300 dark:border-gray-700 overflow-hidden bg-white/70 dark:bg-gray-900/60 h-full">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-800 text-xs leading-tight max-h-96 overflow-auto font-mono">
+          {% for p in perms %}
+          <li class="px-2 py-1"><span class="text-gray-500">{{ p.content_type.app_label }}.</span>{{ p.codename }}</li>
+          {% empty %}
+          <li class="px-3 py-4 text-center text-xs text-gray-500">Sin permisos</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

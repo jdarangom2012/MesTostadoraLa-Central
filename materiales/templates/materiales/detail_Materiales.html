@@ -1,0 +1,27 @@
+{# Fragmento modal edición material #}
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">✏️ Editar Material</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+    <form method="post" action="{% url 'material_editar' material.pk %}" class="p-6 space-y-6" data-modal-form>{% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="grid grid-cols-2 gap-5 text-sm">
+        {% for field in form %}
+          {% if field.name != 'fecha_ingreso' %}
+          <div class="field col-span-2 sm:col-span-1">
+            <label class="field-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p class="text-red-600 text-[10px] mt-1 leading-snug">{{ field.errors|join:', ' }}</p>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
+        <button class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

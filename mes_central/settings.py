@@ -1,0 +1,222 @@
+import os
+from pathlib import Path
+from datetime import timedelta
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-insecure-key')
+DEBUG = True
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,.trycloudflare.com').split(',') if h.strip()]
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://*.trycloudflare.com').split(',') if o.strip()]
+
+# Honor proxy headers when running behind Cloudflare Tunnel
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Third-party
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    # Domain apps (initial batch; more will be appended)
+    'tipo_identificacion',
+    'tipo_clientes',
+    'estados_clientes',
+    'estado_ordenes',
+    'estado_cafe',
+    'estado_inven_cafe',
+    'estado_tareas',
+    'clientes',
+    'cafe_empaque',
+    'tamano_empaque',
+    # Added batch 2
+    'origen_cafe',
+    'proceso_inven_cafe',
+    'variedad_cafe',
+    'variendad_inven_cafe',
+    'nivel_molienda',
+    'nivel_tueste',
+    'zaranda_grupo',
+    'log_eventos',
+    'ordenes',
+    'ordenes_trilla',
+    'ordenes_seleccion_verde',
+    'ordenes_seleccion_tostado',
+    'curvas_tueste',
+    'inventario_cafe',
+    'seleccion_tueste',
+    'tueste',
+    'molienda',
+    'empaques',
+    'materiales',
+    'core',
+    'reportes',
+    'usuarios',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middleware.CorrelationIdMiddleware',
+    'core.middleware.CurrentUserMiddleware',
+]
+
+ROOT_URLCONF = 'mes_central.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'core.context_processors.user_groups',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'mes_central.wsgi.application'
+
+# Placeholder DB config; adjust with real SQL Server credentials
+DATABASES = {
+    'default': {
+        'ENGINE': 'mssql',
+        'NAME': os.getenv('DB_NAME', 'dbTostadoraCentral'),
+        'USER': os.getenv('DB_USER', 'sa'),
+        'PASSWORD': os.getenv('DB_PASSWORD', '12345'),
+        # Double backslash in instance name if provided directly here
+        'HOST': os.getenv('DB_HOST', 'DESKTOP-RKBESQD\JUANDA'),
+        'PORT': os.getenv('DB_PORT', '1433'),
+        'OPTIONS': {
+            'driver': os.getenv('ODBC_DRIVER', 'ODBC Driver 18 for SQL Server'),
+            # Encryption / trust handled via env flags
+            # For mssql-django you can also use extra_params
+            'extra_params': f"TrustServerCertificate={os.getenv('DB_TRUST_CERT', 'yes')};" + ("Encrypt=yes;" if os.getenv('DB_ENCRYPT', 'no').lower() in ['1','true','yes'] else ''),
+            'connection_timeout': int(os.getenv('DB_TIMEOUT', '8')),
+        },
+    }
+}
+
+# Dynamic fallback to SQLite for local/dev if credentials missing or flag set.
+if (
+    os.getenv('DB_ENGINE', 'mssql').lower() == 'sqlite'
+    or os.getenv('USE_SQLITE', '0') == '1'
+):
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+LANGUAGE_CODE = 'es-es'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_VERSION = '1'
+
+# Optional Redis cache
+if os.getenv('REDIS_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL'),
+        }
+    }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': int(os.getenv('API_PAGE_SIZE', '25')),
+    'DEFAULT_FILTER_BACKENDS': (
+        'core.filters.DynamicSearchFilter',
+        'core.filters.DynamicOrderingFilter',
+    ),
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'MES La Central API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+from rest_framework.settings import api_settings  # noqa: E402
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+# Correlation ID header name
+CORRELATION_ID_HEADER = 'HTTP_X_CORRELATION_ID'
+APP_NAME = 'mes-la-central'
+ORDER_DETALLE_CACHE_SECONDS = int(os.getenv('ORDER_DETALLE_CACHE_SECONDS', '30'))  # TTL cache para /ordenes/{id}/detalle/
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'correlation': {
+            '()': 'core.logging.CorrelationIdFilter',
+        }
+    },
+    'formatters': {
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            # Use 'format' (dictConfig maps it to 'fmt') to avoid ValueError
+            'format': '%(asctime)s %(levelname)s %(name)s %(message)s %(correlation_id)s %(user)s',
+        },
+        'console': {
+            'format': '[%(asctime)s] %(levelname)s %(name)s %(correlation_id)s %(user)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'json' if os.getenv('LOG_JSON', '0') == '1' else 'console',
+            'filters': ['correlation'],
+        }
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO'
+    },
+}

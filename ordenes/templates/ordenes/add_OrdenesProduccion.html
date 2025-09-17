@@ -1,0 +1,77 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+  <form method="post" action="{% url 'ordenes_produccion_nuevo' %}" data-modal-form class="p-0">
+      {% csrf_token %}
+      <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+        <h2 class="text-lg font-semibold">Nueva Orden de Producción</h2>
+        <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        {% if form.errors %}
+          <div class="mb-2 text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
+            Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
+          </div>
+        {% endif %}
+        {{ form.non_field_errors }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="label">Cliente</label>
+            {{ form.cliente }}
+            {{ form.cliente.errors }}
+          </div>
+          <div>
+            <label class="label">Estado Orden</label>
+            {{ form.estado_orden }}
+            {{ form.estado_orden.errors }}
+          </div>
+          <div>
+            <label class="label">Estado Café</label>
+            {{ form.estado_inven_cafe }}
+            {{ form.estado_inven_cafe.errors }}
+          </div>
+          <div>
+            <label class="label">Fecha Orden</label>
+            {{ form.fecha_orden }}
+            {{ form.fecha_orden.errors }}
+          </div>
+          <div>
+            <label class="label">Fecha Entrega</label>
+            {{ form.fecha_entrega }}
+            {{ form.fecha_entrega.errors }}
+          </div>
+          <div class="md:col-span-2">
+            <label class="label">Notas</label>
+            {{ form.notas }}
+            {{ form.notas.errors }}
+          </div>
+          <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <label class="flex items-center gap-2">{{ form.trilla }} <span>Trilla</span></label>
+            <label class="flex items-center gap-2">{{ form.selec_cafe_verde }} <span>Selección Verde</span></label>
+            <label class="flex items-center gap-2">{{ form.tueste_flag }} <span>Tueste</span></label>
+            <label class="flex items-center gap-2">{{ form.selec_cafe_tostado }} <span>Selección Tostado</span></label>
+            <label class="flex items-center gap-2">{{ form.molienda_flag }} <span>Molienda</span></label>
+            <label class="flex items-center gap-2">{{ form.empaque_flag }} <span>Empaque</span></label>
+          </div>
+          <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <label class="flex items-center gap-2">{{ form.conf_trilla }} <span>Conf. Trilla</span></label>
+            <label class="flex items-center gap-2">{{ form.conf_sel_verde }} <span>Conf. Sel Verde</span></label>
+            <label class="flex items-center gap-2">{{ form.conf_tueste }} <span>Conf. Tueste</span></label>
+            <label class="flex items-center gap-2">{{ form.conf_sel_tostado }} <span>Conf. Sel Tostado</span></label>
+            <label class="flex items-center gap-2">{{ form.conf_molienda }} <span>Conf. Molienda</span></label>
+            <label class="flex items-center gap-2">{{ form.conf_empaque }} <span>Conf. Empaque</span></label>
+          </div>
+          <div>
+            <label class="label">Prioridad</label>
+            {{ form.prioridad }}
+            {{ form.prioridad.errors }}
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 flex items-center justify-end gap-2 border-t border-brand-dark/20">
+        <button type="button" class="btn-base" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Datepicker se inicializa de forma global en base.html (MicroDatepicker local) -->

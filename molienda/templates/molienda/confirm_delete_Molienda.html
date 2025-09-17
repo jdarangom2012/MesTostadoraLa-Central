@@ -1,0 +1,18 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+	<div class="palette-surface w-full max-w-md rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+		<div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+			<h2 class="text-lg font-semibold">🗑️ Eliminar Molienda #{{ obj.id }}</h2>
+			<button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+		</div>
+		<div class="p-6 space-y-4">
+			<p>¿Seguro que deseas eliminar este registro?</p>
+			<form method="post" action="{% url 'molienda_eliminar' obj.pk %}" data-modal-form>
+				{% csrf_token %}
+				<div class="flex items-center justify-end gap-2">
+					<button type="button" data-close-modal class="btn-base">Cancelar</button>
+					<button type="submit" class="btn-base btn-danger">Eliminar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

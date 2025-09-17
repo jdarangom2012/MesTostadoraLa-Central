@@ -1,0 +1,185 @@
+<aside class="hidden md:flex w-60 shrink-0 flex-col border-r bg-white/80 dark:bg-gray-900/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 border-gray-200 dark:border-gray-800 overflow-y-auto text-[13px]" x-data>
+  <style>
+    /* Guía vertical + indentación uniforme para submenús */
+    #app-sidebar-nav .children { position: relative; padding-left: 2.5rem !important; }
+    #app-sidebar-nav .children::before {
+      content: ""; position: absolute; left: 1.1rem; top: 0.25rem; bottom: 0.25rem; width: 2px;
+      /* Línea punteada gris tenue */
+      background: repeating-linear-gradient(to bottom, rgba(156,163,175,0.45) 0 6px, rgba(156,163,175,0) 6px 12px);
+      border-radius: 2px; pointer-events: none;
+    }
+    #app-sidebar-nav .children > li > a { padding-left: 0.25rem !important; }
+  </style>
+  <nav class="flex-1 p-2 space-y-1" id="app-sidebar-nav">
+    <!-- Item simple -->
+  <!-- Enlace Dashboard eliminado -->
+
+    <!-- Grupo: Órdenes (abierto por defecto) -->
+    <div class="sidebar-group" data-open="true">
+      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="true">
+        <span class="w-4 text-[11px]">📦</span>
+        <span class="flex-1 text-left">Órdenes</span>
+        <span class="caret transition-transform duration-200 rotate-90 text-[10px]">▶</span>
+      </button>
+  <ul class="mt-1 space-y-1 children">
+  <li><a href="/ordenes-produccion/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧾</span><span class="flex-1">Órdenes de Producción</span></a></li>
+  <li><a href="/ordenes-trilla/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌾</span><span class="flex-1">Órdenes de Trilla</span></a></li>
+  <li><a href="/ordenes-tueste/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🔥</span><span class="flex-1">Órdenes de Tueste</span></a></li>
+  <li><a href="{% url 'ordenes_seleccion_tueste_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🔍</span><span class="flex-1">Órdenes Selección Tueste</span></a></li>
+  <li><a href="{% url 'ordenes_seleccion_verde_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🍃</span><span class="flex-1">Órdenes Selección Verde</span></a></li>
+  <li><a href="{% url 'ordenes_seleccion_tostado_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">☕</span><span class="flex-1">Órdenes Selección Tostado</span></a></li>
+      </ul>
+    </div>
+
+    <!-- Grupo: Producción -->
+    <div class="sidebar-group" data-open="false">
+      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
+        <span class="w-4 text-[11px]">🏭</span>
+        <span class="flex-1 text-left">Producción</span>
+        <span class="caret transition-transform duration-200 text-[10px]">▶</span>
+      </button>
+  <ul class="mt-1 space-y-1 children hidden">
+  <li><a href="/molienda/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">⚙️</span><span class="flex-1">Molienda</span></a></li>
+  <li><a href="/empaque/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🏷️</span><span class="flex-1">Empaque</span></a></li>
+      </ul>
+    </div>
+
+  <!-- Grupo: Calidad -->
+  {% if user.is_authenticated %}
+    {% if user.is_staff or HAS_GROUP_CALIDAD %}
+  <div class="sidebar-group" data-open="false">
+      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
+        <span class="w-4 text-[11px]">🧪</span>
+        <span class="flex-1 text-left">Calidad</span>
+        <span class="caret transition-transform duration-200 text-[10px]">▶</span>
+      </button>
+  <ul class="mt-1 space-y-1 children hidden">
+  <li><a href="/curvas_tueste/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📈</span><span class="flex-1">Curvas de Tueste</span></a></li>
+      </ul>
+    </div>
+    {% endif %}
+  {% endif %}
+
+    <!-- Grupo: Inventario -->
+    <div class="sidebar-group" data-open="false">
+      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
+        <span class="w-4 text-[11px]">📦</span>
+        <span class="flex-1 text-left">Inventario</span>
+        <span class="caret transition-transform duration-200 text-[10px]">▶</span>
+      </button>
+  <ul class="mt-1 space-y-1 children hidden">
+  <li><a href="{% url 'inventario_cafe_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🫘</span><span class="flex-1">Café</span></a></li>
+      </ul>
+    </div>
+
+    <!-- Grupo: Maestros -->
+    <div class="sidebar-group" data-open="false">
+      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
+        <span class="w-4 text-[11px]">🗂️</span>
+        <span class="flex-1 text-left">Maestros</span>
+        <span class="caret transition-transform duration-200 text-[10px]">▶</span>
+      </button>
+  <ul class="mt-1 pl-8 space-y-1 children hidden">
+  {% if CAN_VIEW_CLIENTES %}
+  <li><a href="/clientes/listar/" data-modal-clientes class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👥</span><span class="flex-1">Clientes</span></a></li>
+  {% endif %}
+  <li><a href="/materiales/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧱</span><span class="flex-1">Materiales</span></a></li>
+  <li><a href="/estado-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🏷️</span><span class="flex-1">Estados</span></a></li>
+  <li><a href="/origen-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌍</span><span class="flex-1">Orígenes</span></a></li>
+  <li><a href="/proceso-inven-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧪</span><span class="flex-1">Proceso Inventario Café</span></a></li>
+  <li><a href="/empaque-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📦</span><span class="flex-1">Empaque Café</span></a></li>
+  <li><a href="/estado-orden/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📑</span><span class="flex-1">Estado Orden</span></a></li>
+  <li><a href="/estado-tareas/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">✅</span><span class="flex-1">Estado Tareas</span></a></li>
+  <li><a href="/zaranda-grupo/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🗺️</span><span class="flex-1">Zaranda/Grupo</span></a></li>
+  <li><a href="/nivel-molienda/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📊</span><span class="flex-1">Niveles Molienda</span></a></li>
+  <li><a href="/tamano-empaque/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📏</span><span class="flex-1">Tamaños Empaque</span></a></li>
+      </ul>
+    </div>
+
+    <!-- Item simple Reportes -->
+    <a href="/reportes/" class="group flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition">
+      <span class="w-4 text-[11px]">📈</span>
+      <span class="flex-1">Reportes</span>
+    </a>
+
+  <!-- Grupo: Administración (solo staff) -->
+  {% if user.is_authenticated and user.is_staff %}
+    <div class="sidebar-group" data-open="false">
+      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
+        <span class="w-4 text-[11px]">⚙️</span>
+        <span class="flex-1 text-left">Administración</span>
+        <span class="caret transition-transform duration-200 text-[10px]">▶</span>
+      </button>
+  <ul class="mt-1 space-y-1 children hidden">
+  <li><a href="/admin/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🛠️</span><span class="flex-1">Django Admin</span></a></li>
+  <li><a href="/usuarios/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👤</span><span class="flex-1">Usuarios y Roles</span></a></li>
+  <li><a href="/parametros/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">⚙️</span><span class="flex-1">Parámetros</span></a></li>
+      </ul>
+    </div>
+    {% endif %}
+  </nav>
+  <div class="p-2 text-[10px] text-gray-500 dark:text-gray-600 border-t border-gray-200 dark:border-gray-800">© {{ now|date:'Y' }} La Central</div>
+</aside>
+<script>
+/* Sidebar: toggle + ruta activa + persistencia estado */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const groups = Array.from(document.querySelectorAll('#app-sidebar-nav .sidebar-group'));
+  // Asignar IDs si no existen
+  groups.forEach((g,i)=>{ if(!g.dataset.id) g.dataset.id = String(i); });
+
+  const LS_KEY = 'sidebarOpenGroups';
+  // Restaurar estado desde localStorage
+  let stored = [];
+  try { stored = JSON.parse(localStorage.getItem(LS_KEY)||'[]'); } catch(_) { stored = []; }
+
+  groups.forEach(group=>{
+    const btn = group.querySelector('.parent-btn');
+    const list = group.querySelector('.children');
+    const caret = group.querySelector('.caret');
+    const shouldOpen = group.getAttribute('data-open') === 'true' || stored.includes(group.dataset.id);
+    if(!shouldOpen){ list.classList.add('hidden'); caret.classList.remove('rotate-90'); } else { caret.classList.add('rotate-90'); }
+    btn.setAttribute('aria-expanded', String(!list.classList.contains('hidden')));
+    btn.addEventListener('click', ()=>{
+      const isHidden = list.classList.toggle('hidden');
+      caret.classList.toggle('rotate-90', !isHidden);
+      btn.setAttribute('aria-expanded', String(!isHidden));
+      persist();
+    });
+  });
+
+  function persist(){
+    const openIds = groups.filter(g=>!g.querySelector('.children').classList.contains('hidden')).map(g=>g.dataset.id);
+    localStorage.setItem(LS_KEY, JSON.stringify(openIds));
+  }
+
+  // Resaltar ruta activa (mejor coincidencia más larga)
+  const current = location.pathname.replace(/\/+$/,'/') || '/';
+  const links = Array.from(document.querySelectorAll('#app-sidebar-nav a[href]'));
+  let best = null;
+  links.forEach(a=>{
+    let href = a.getAttribute('href');
+    if(!href || href.startsWith('http') || href.startsWith('#')) return;
+    href = href.replace(/\/+$/,'/');
+    if(current.startsWith(href)){
+      if(!best || href.length > best.href.length){ best = {el:a, href}; }
+    }
+  });
+  if(best){
+    const el = best.el;
+    el.classList.add('active-link','bg-brand-primary/15','dark:bg-gray-800','border-l-2','border-brand-primary','font-semibold');
+    // Expand parent if inside group
+    const parentGroup = el.closest('.sidebar-group');
+    if(parentGroup){
+      const list = parentGroup.querySelector('.children');
+      const caret = parentGroup.querySelector('.caret');
+      const btn = parentGroup.querySelector('.parent-btn');
+      if(list && list.classList.contains('hidden')){
+        list.classList.remove('hidden');
+        caret && caret.classList.add('rotate-90');
+        btn && btn.setAttribute('aria-expanded','true');
+        persist();
+      }
+    }
+  }
+});
+</script>
