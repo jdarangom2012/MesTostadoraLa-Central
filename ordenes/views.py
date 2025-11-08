@@ -19,6 +19,7 @@ class OrdenForm(forms.ModelForm):
     class Meta:
         model = Orden
         fields = [
+            'orden',
             'cliente', 'estado_orden', 'estado_inven_cafe',
             'fecha_orden', 'fecha_entrega', 'notas',
             'trilla', 'selec_cafe_verde', 'tueste_flag', 'selec_cafe_tostado',
@@ -27,37 +28,21 @@ class OrdenForm(forms.ModelForm):
             'prioridad',
         ]
         widgets = {
+            'orden': forms.TextInput(attrs={'class': 'w-full input', 'placeholder': 'Código de orden'}),
             'cliente': forms.Select(attrs={'class': 'w-full select'}),
             'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
             'estado_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
             'fecha_orden': forms.TextInput(attrs={
                 'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\\d{2}/\\d{2}/\\d{4}'
+                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
             }),
             'fecha_entrega': forms.TextInput(attrs={
                 'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\\d{2}/\\d{2}/\\d{4}'
+                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
             }),
             'notas': forms.TextInput(attrs={'class': 'w-full input'}),
             'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
         }
-        labels = {
-            'estado_inven_cafe': 'Estado Café',
-        }
-
-    def _to_aware_dt(self, d):
-        if not d:
-            return None
-        from datetime import datetime, time
-        dt = datetime.combine(d, time.min)
-        # Hacer timezone-aware usando la zona actual
-        if timezone.is_naive(dt):
-            dt = timezone.make_aware(dt, timezone.get_current_timezone())
-        return dt
-
-    def clean_fecha_orden(self):
-        d = self.cleaned_data.get('fecha_orden')
-        return self._to_aware_dt(d)
 
     def clean_fecha_entrega(self):
         d = self.cleaned_data.get('fecha_entrega')
@@ -76,28 +61,23 @@ def listar_ordenes(request):
             search_int = None
         q = (
             Q(cliente__nombre__icontains=search) |
-            Q(cliente__apellidos__icontains=search) |
-            Q(estado_orden__estado_orden__icontains=search)
+            Q(cliente__apellidos__icontains=search)
+            # ...otros filtros...
         )
-        if search_int is not None:
-            q = q | Q(id=search_int)
         qs = qs.filter(q)
-
-    paginator = Paginator(qs, 7)
+    paginator = Paginator(qs, 20)
     page = request.GET.get('page')
     try:
-        items = paginator.page(page)
+        ordenes = paginator.page(page)
     except PageNotAnInteger:
-        items = paginator.page(1)
+        ordenes = paginator.page(1)
     except EmptyPage:
-        items = paginator.page(paginator.num_pages)
-
+        ordenes = paginator.page(paginator.num_pages)
     ctx = {
-        'items': items,
-        'page_obj': items,
+        'ordenes': ordenes,
         'paginator': paginator,
         'is_paginated': paginator.num_pages > 1,
-        'search': search,
+        'search': search
     }
     if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
         return render(request, 'ordenes/_modal_listar_OrdenesProduccion.html', ctx)

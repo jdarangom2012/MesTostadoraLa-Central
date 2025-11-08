@@ -1,4 +1,4 @@
-# MES La Central
+# AgroInduGestor
 
 Stack: Django 5 + DRF + SimpleJWT, SQL Server, TailwindCSS, logging estructurado y auditoría.
 

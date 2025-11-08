@@ -6,15 +6,49 @@
       <button type="button" class="close text-sm" data-close-modal>✕</button>
     </div>
   <form method="post" action="{% url 'cliente_editar' cliente.pk %}" class="p-6 space-y-6" data-modal-form>{% csrf_token %}
+      {{ form.non_field_errors }}
       <div class="grid grid-cols-2 gap-5">
-        {{ form.non_field_errors }}
-        {% for field in form %}
-          <div class="field col-span-2 sm:col-span-1">
-            <label class="field-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}<p class="text-red-600 text-[10px] mt-1 leading-snug">{{ field.errors|join:', ' }}</p>{% endif %}
-          </div>
-        {% endfor %}
+        <!-- Orden requerido -->
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Id Tipo Cliente</label>{{ form.id_tipo_cliente }}
+          {{ form.id_tipo_cliente.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Id Tipo Identificación</label>{{ form.id_tipo_identificacion }}
+          {{ form.id_tipo_identificacion.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Código</label>{{ form.codigo }}
+          {{ form.codigo.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Nombre</label>{{ form.nombre }}
+          {{ form.nombre.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1" id="field-representante-legal">
+          <label class="field-label">Representante Legal</label>{{ form.representante_legal }}
+          {{ form.representante_legal.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1" id="field-apellidos">
+          <label class="field-label">Apellidos</label>{{ form.apellidos }}
+          {{ form.apellidos.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Teléfono</label>{{ form.telefono }}
+          {{ form.telefono.errors }}
+        </div>
+        <div class="field col-span-2">
+          <label class="field-label">Dirección</label>{{ form.direccion }}
+          {{ form.direccion.errors }}
+        </div>
+        <div class="field col-span-2">
+          <label class="field-label">Email</label>{{ form.email }}
+          {{ form.email.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Id Estado Cliente</label>{{ form.id_estado_cliente }}
+          {{ form.id_estado_cliente.errors }}
+        </div>
       </div>
       <div class="flex justify-end gap-2 pt-2">
         <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
@@ -23,3 +57,39 @@
     </form>
   </div>
 </div>
+
+<script>
+  (function(){
+    const root = document.currentScript.closest('[data-modal-root]') || document;
+    const tipoSelect = root.querySelector('[name="id_tipo_cliente"]');
+    const apellidos = root.querySelector('[name="apellidos"]');
+    const representanteLegal = root.querySelector('[name="representante_legal"]');
+    const fieldWrapApellidos = apellidos ? apellidos.closest('#field-apellidos') || apellidos.closest('.field') : null;
+    const fieldWrapRepresentante = representanteLegal ? representanteLegal.closest('#field-representante-legal') || representanteLegal.closest('.field') : null;
+    
+    function normalize(txt){ return (txt || '').toString().trim().toLowerCase(); }
+    function updateFields(){
+      if(!tipoSelect) return;
+      const optText = normalize(tipoSelect.options[tipoSelect.selectedIndex]?.text);
+      const isEmpresa = optText.includes('empresa');
+      
+      // Manejar Apellidos
+      if(apellidos) {
+        apellidos.disabled = isEmpresa;
+        apellidos.readOnly = isEmpresa;
+        if(isEmpresa) apellidos.value = '';
+        if(fieldWrapApellidos) fieldWrapApellidos.classList.toggle('opacity-60', isEmpresa);
+      }
+      
+      // Manejar Representante Legal
+      if(representanteLegal) {
+        representanteLegal.disabled = !isEmpresa;
+        representanteLegal.readOnly = !isEmpresa;
+        if(!isEmpresa) representanteLegal.value = '';
+        if(fieldWrapRepresentante) fieldWrapRepresentante.classList.toggle('opacity-60', !isEmpresa);
+      }
+    }
+    tipoSelect && tipoSelect.addEventListener('change', updateFields);
+    updateFields();
+  })();
+  </script>

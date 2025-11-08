@@ -28,6 +28,7 @@
             <tr>
               <th>ID</th>
               <th>Código</th>
+              <th>Descripción</th>
               <th>Cliente</th>
               <th>Estado</th>
               <th>Origen</th>
@@ -45,6 +46,7 @@
               <tr class="row group">
                 <td class="td mono">{{ r.id }}</td>
                 <td class="td">{{ r.codigo|default:'—' }}</td>
+                <td class="td">{{ r.descripcion|default:'—' }}</td>
                 <td class="td">{{ r.cliente|default:'—' }}</td>
                 <td class="td">{{ r.estado_cafe|default:'—' }}</td>
                 <td class="td">{{ r.origen|default:'—' }}</td>
@@ -69,7 +71,7 @@
                 </td>
               </tr>
             {% empty %}
-              <tr><td colspan="9" class="text-center py-8 text-brand-dark/60 text-sm">No hay registros de Inventario de Café.</td></tr>
+              <tr><td colspan="13" class="text-center py-8 text-brand-dark/60 text-sm">No hay registros de Inventario de Café.</td></tr>
             {% endfor %}
           </tbody>
         </table>

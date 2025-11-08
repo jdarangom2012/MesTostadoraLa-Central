@@ -9,12 +9,42 @@ from django import forms
 
 
 class ClienteForm(forms.ModelForm):
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '')
+        # Validación estándar de email usando el validador de Django
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+        try:
+            validate_email(email)
+        except ValidationError:
+            raise forms.ValidationError('Ingrese un email válido.')
+        return email
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si el instance o datos indican Empresa, marcar Apellidos como solo lectura en el render
+        tipo_obj = None
+        if self.instance and getattr(self.instance, 'id_tipo_cliente_id', None):
+            tipo_obj = getattr(self.instance, 'id_tipo_cliente', None)
+        else:
+            # Si viene en POST, intentar usar el valor enviado para preconfigurar
+            data = args[0] if args else None
+            if isinstance(data, dict):
+                # No resolvemos a objeto aquí; el JS del frontend lo gestionará dinámicamente
+                pass
+        if tipo_obj is not None:
+            nombre_tipo = (getattr(tipo_obj, 'tipo_cliente', '') or '').strip().lower()
+            if 'empresa' in nombre_tipo:
+                # Para Empresa: desactivar apellidos, activar representante_legal
+                self.fields['apellidos'].widget.attrs['readonly'] = True
+                self.fields['apellidos'].widget.attrs['disabled'] = True
+            else:
+                # Para Persona Natural: activar apellidos, desactivar representante_legal
+                self.fields['representante_legal'].widget.attrs['readonly'] = True
+                self.fields['representante_legal'].widget.attrs['disabled'] = True
+
     class Meta:
         model = Cliente
-        fields = [
-            'codigo','nombre','apellidos','telefono','direccion','email',
-            'id_tipo_cliente','id_tipo_identificacion','id_estado_cliente'
-        ]
+        exclude = ['codigo_cliente']
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'w-full input'}),
             'nombre': forms.TextInput(attrs={'class': 'w-full input'}),
@@ -22,10 +52,34 @@ class ClienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'w-full input'}),
             'direccion': forms.TextInput(attrs={'class': 'w-full input'}),
             'email': forms.EmailInput(attrs={'class': 'w-full input'}),
-            'id_tipo_cliente': forms.Select(attrs={'class': 'w-full select'}),
+            'representante_legal': forms.TextInput(attrs={'class': 'w-full input'}),
+            'id_tipo_cliente': forms.Select(attrs={'class': 'w-full select',
+                                                  'onchange': "(function(s){var r=s.closest('[data-modal-root]')||document;var a=r.querySelector('[name=apellidos]');var rl=r.querySelector('[name=representante_legal]');var t=(s.options[s.selectedIndex].text||'').toLowerCase();var emp=t.indexOf('empresa')>-1;if(a){a.disabled=emp;a.readOnly=emp;if(emp)a.value='';var w=a.closest('#field-apellidos')||a.closest('.field');if(w)w.classList.toggle('opacity-60',emp);}if(rl){rl.disabled=!emp;rl.readOnly=!emp;if(!emp)rl.value='';var w2=rl.closest('#field-representante-legal')||rl.closest('.field');if(w2)w2.classList.toggle('opacity-60',!emp);}})(this)"}),
             'id_tipo_identificacion': forms.Select(attrs={'class': 'w-full select'}),
             'id_estado_cliente': forms.Select(attrs={'class': 'w-full select'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        tipo = cleaned.get('id_tipo_cliente')
+        apellidos = cleaned.get('apellidos')
+        representante_legal = cleaned.get('representante_legal')
+        nombre_tipo = ''
+        if tipo is not None:
+            nombre_tipo = (getattr(tipo, 'tipo_cliente', '') or '').strip().lower()
+
+        if 'empresa' in nombre_tipo:
+            # Si es Empresa: apellidos se desactiva y representante_legal es obligatorio
+            cleaned['apellidos'] = ''
+            if not representante_legal:
+                self.add_error('representante_legal', 'Representante Legal es obligatorio para Empresa.')
+        else:
+            # Si es Persona Natural: apellidos es obligatorio y representante_legal se desactiva
+            cleaned['representante_legal'] = ''
+            if nombre_tipo.startswith('persona') and not apellidos:
+                self.add_error('apellidos', 'Apellidos es obligatorio para Persona Natural.')
+
+        return cleaned
 
 
 @permission_required('clientes.view_cliente', raise_exception=True)
@@ -71,6 +125,7 @@ def add_cliente(request):
             from django.utils import timezone
             obj.created_at = timezone.now()
             obj.save()
+            obj.refresh_from_db(fields=["codigo_cliente"])
             if request.headers.get('X-Fragment') or request.GET.get('fragment') == '1':
                 return listar_clientes(request)
             return redirect('clientes_listar')
@@ -106,6 +161,7 @@ def edit_cliente(request, pk):
             from django.utils import timezone
             obj.updated_at = timezone.now()
             obj.save()
+            obj.refresh_from_db(fields=["codigo_cliente"])
             if request.headers.get('X-Fragment'):
                 return listar_clientes(request)
             return redirect('clientes_listar')

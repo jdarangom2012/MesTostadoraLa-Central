@@ -24,6 +24,7 @@
           <thead>
             <tr>
               <th>#</th>
+              <th>Orden</th>
               <th>Cliente</th>
               <th>Estado</th>
               <th>Fecha Orden</th>
@@ -33,9 +34,10 @@
             </tr>
           </thead>
           <tbody>
-          {% for o in items %}
+          {% for o in ordenes %}
             <tr class="row group">
               <td class="td mono">{{ o.id }}</td>
+              <td class="td mono">{{ o.orden }}</td>
               <td class="td">{{ o.cliente }}</td>
               <td class="td">{{ o.estado_orden }}</td>
               <td class="td">{{ o.fecha_orden|date:'d/m/Y' }}</td>

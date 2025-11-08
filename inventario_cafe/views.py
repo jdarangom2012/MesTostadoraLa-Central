@@ -27,9 +27,10 @@ class InventarioCafeForm(forms.ModelForm):
 
     class Meta:
         model = InventarioCafe
-        fields = ['cliente', 'estado_cafe', 'origen', 'proceso_inven_cafe', 'variendad_inven_cafe', 'empaquecafe', 'codigo', 'cantidad', 'sacos', 'cantidad_bolsas_emp', 'cantidad_paquetes']
+        fields = ['cliente', 'estado_cafe', 'origen', 'proceso_inven_cafe', 'variendad_inven_cafe', 'empaquecafe', 'codigo', 'descripcion', 'cantidad', 'sacos', 'cantidad_bolsas_emp', 'cantidad_paquetes']
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'w-full input'}),
+            'descripcion': forms.TextInput(attrs={'class': 'w-full input'}),
             'cantidad': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
             'sacos': forms.NumberInput(attrs={'class': 'w-full input', 'step': '1', 'min': '0'}),
             'cantidad_bolsas_emp': forms.NumberInput(attrs={'class': 'w-full input', 'step': '1', 'min': '0'}),

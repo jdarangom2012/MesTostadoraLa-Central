@@ -4,6 +4,7 @@ from django.db import models
 class Orden(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)
     cliente = models.ForeignKey('clientes.Cliente', models.SET_NULL, db_column='IdClientes', blank=True, null=True)
+    orden = models.CharField(db_column='Orden', max_length=8, blank=True, null=True)
     # Nota: ahora este campo referencia a estado_cafe.EstadoCafe, conservando el mismo nombre y columna.
     estado_inven_cafe = models.ForeignKey('estado_cafe.EstadoCafe', models.SET_NULL, db_column='IdInvenCafe', blank=True, null=True)
     estado_orden = models.ForeignKey('estado_ordenes.EstadoOrden', models.SET_NULL, db_column='IdEstadoOrden', blank=True, null=True)

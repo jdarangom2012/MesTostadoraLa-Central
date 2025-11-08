@@ -23,11 +23,14 @@
         <table class="mes-table leading-tight w-full">
           <thead>
             <tr>
+              <th>ID</th>
+              <th>Código Cliente</th>
               <th>Código</th>
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Teléfono</th>
               <th>Email</th>
+              <th>Representante Legal</th>
               <th>Estado</th>
               <th>Editar</th>
               <th>Eliminar</th>
@@ -36,11 +39,14 @@
           <tbody>
           {% for c in clientes %}
             <tr class="row group">
+              <td class="td mono">{{ c.id }}</td>
+              <td class="td mono">{{ c.codigo_cliente }}</td>
               <td class="td mono">{{ c.codigo }}</td>
               <td class="td">{{ c.nombre }}</td>
               <td class="td">{{ c.apellidos }}</td>
               <td class="td">{{ c.telefono }}</td>
               <td class="td">{{ c.email }}</td>
+              <td class="td">{{ c.representante_legal }}</td>
               <td class="td">{{ c.id_estado_cliente }}</td>
               <td class="td action">
                 {% if perms.clientes.change_cliente %}
@@ -58,7 +64,7 @@
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="8" class="text-center py-8 text-brand-dark/60 text-sm">No hay clientes.</td></tr>
+            <tr><td colspan="9" class="text-center py-8 text-brand-dark/60 text-sm">No hay clientes.</td></tr>
           {% endfor %}
           </tbody>
         </table>

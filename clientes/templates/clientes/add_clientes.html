@@ -6,10 +6,31 @@
       <button type="button" class="close text-sm" data-close-modal>✕</button>
     </div>
   <form method="post" action="{% url 'cliente_nuevo' %}" class="p-6 space-y-6" data-modal-form>{% csrf_token %}
+      {% if form.errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded mb-2">
+          <strong>Corrige los siguientes errores:</strong>
+          <ul class="list-disc ml-4">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li>{{ field|capfirst }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
       {% if form.non_field_errors %}
         <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="grid grid-cols-2 gap-5 text-sm">
+        <!-- Orden requerido: Tipo Cliente, Tipo Identificación, Código, Nombre, Apellidos, Teléfono, Dirección, Email, Estado -->
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Id Tipo Cliente</label>{{ form.id_tipo_cliente }}
+          {{ form.id_tipo_cliente.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Id Tipo Identificación</label>{{ form.id_tipo_identificacion }}
+          {{ form.id_tipo_identificacion.errors }}
+        </div>
         <div class="field col-span-2 sm:col-span-1">
           <label class="field-label">Código</label>{{ form.codigo }}
           {{ form.codigo.errors }}
@@ -18,7 +39,11 @@
           <label class="field-label">Nombre</label>{{ form.nombre }}
           {{ form.nombre.errors }}
         </div>
-        <div class="field col-span-2 sm:col-span-1">
+        <div class="field col-span-2 sm:col-span-1" id="field-representante-legal">
+          <label class="field-label">Representante Legal</label>{{ form.representante_legal }}
+          {{ form.representante_legal.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1" id="field-apellidos">
           <label class="field-label">Apellidos</label>{{ form.apellidos }}
           {{ form.apellidos.errors }}
         </div>
@@ -35,15 +60,7 @@
           {{ form.email.errors }}
         </div>
         <div class="field col-span-2 sm:col-span-1">
-          <label class="field-label">Tipo Cliente</label>{{ form.id_tipo_cliente }}
-          {{ form.id_tipo_cliente.errors }}
-        </div>
-        <div class="field col-span-2 sm:col-span-1">
-          <label class="field-label">Tipo Identificación</label>{{ form.id_tipo_identificacion }}
-          {{ form.id_tipo_identificacion.errors }}
-        </div>
-        <div class="field col-span-2 sm:col-span-1">
-          <label class="field-label">Estado</label>{{ form.id_estado_cliente }}
+          <label class="field-label">Id Estado Cliente</label>{{ form.id_estado_cliente }}
           {{ form.id_estado_cliente.errors }}
         </div>
       </div>
@@ -54,3 +71,39 @@
     </form>
   </div>
 </div>
+
+<script>
+  (function(){
+    const root = document.currentScript.closest('[data-modal-root]') || document;
+    const tipoSelect = root.querySelector('[name="id_tipo_cliente"]');
+    const apellidos = root.querySelector('[name="apellidos"]');
+    const representanteLegal = root.querySelector('[name="representante_legal"]');
+    const fieldWrapApellidos = apellidos ? apellidos.closest('#field-apellidos') || apellidos.closest('.field') : null;
+    const fieldWrapRepresentante = representanteLegal ? representanteLegal.closest('#field-representante-legal') || representanteLegal.closest('.field') : null;
+    
+    function normalize(txt){ return (txt || '').toString().trim().toLowerCase(); }
+    function updateFields(){
+      if(!tipoSelect) return;
+      const optText = normalize(tipoSelect.options[tipoSelect.selectedIndex]?.text);
+      const isEmpresa = optText.includes('empresa');
+      
+      // Manejar Apellidos
+      if(apellidos) {
+        apellidos.disabled = isEmpresa;
+        apellidos.readOnly = isEmpresa;
+        if(isEmpresa) apellidos.value = '';
+        if(fieldWrapApellidos) fieldWrapApellidos.classList.toggle('opacity-60', isEmpresa);
+      }
+      
+      // Manejar Representante Legal
+      if(representanteLegal) {
+        representanteLegal.disabled = !isEmpresa;
+        representanteLegal.readOnly = !isEmpresa;
+        if(!isEmpresa) representanteLegal.value = '';
+        if(fieldWrapRepresentante) fieldWrapRepresentante.classList.toggle('opacity-60', !isEmpresa);
+      }
+    }
+    tipoSelect && tipoSelect.addEventListener('change', updateFields);
+    updateFields();
+  })();
+  </script>

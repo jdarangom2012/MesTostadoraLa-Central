@@ -11,6 +11,7 @@ class InventarioCafe(models.Model):
     empaquecafe = models.ForeignKey('cafe_empaque.CafeEmpaque', models.SET_NULL, db_column='IdEmpaqueCafe', blank=True, null=True)
     fecha_ingreso = models.DateTimeField(db_column='FechaIngreso', blank=True, null=True)
     codigo = models.CharField(db_column='Codigo', max_length=20, blank=True, null=True)
+    descripcion = models.CharField(db_column='Descripcion', max_length=50, blank=True, null=True)
     cantidad = models.FloatField(db_column='Cantidad', blank=True, null=True)
     sacos = models.IntegerField(db_column='Sacos', blank=True, null=True)
     cantidad_bolsas_emp = models.IntegerField(db_column='CantidadBolsasEmp', blank=True, null=True)
