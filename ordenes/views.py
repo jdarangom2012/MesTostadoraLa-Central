@@ -11,9 +11,15 @@ from .models import Orden
 
 
 class OrdenForm(forms.ModelForm):
+    id_empleado = forms.ModelChoiceField(queryset=None, required=False)
+    sacos_entero = forms.IntegerField(required=False, min_value=0)
+    peso_bruto = forms.FloatField(required=False, min_value=0)
+    peso = forms.FloatField(required=False, min_value=0)
+    trabajo_empaque = forms.BooleanField(required=False)
+    etiqueta_invima = forms.BooleanField(required=False)
     # Usar solo fecha (sin hora) en el formulario
     # Acepta DD/MM/YYYY y también ISO (fallback de los inputs type=date)
-    fecha_orden = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
+    fecha_inicio_orden = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
     fecha_entrega = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
 
     class Meta:
@@ -21,37 +27,55 @@ class OrdenForm(forms.ModelForm):
         fields = [
             'orden',
             'cliente', 'estado_orden', 'estado_inven_cafe',
-            'fecha_orden', 'fecha_entrega', 'notas',
+            'id_empleado',
+            'fecha_inicio_orden', 'fecha_entrega', 'notas',
+            'sacos_entero', 'peso_bruto', 'peso', 'trabajo_empaque', 'etiqueta_invima',
             'trilla', 'selec_cafe_verde', 'tueste_flag', 'selec_cafe_tostado',
             'molienda_flag', 'empaque_flag',
             'conf_trilla', 'conf_sel_verde', 'conf_tueste', 'conf_sel_tostado', 'conf_molienda', 'conf_empaque',
             'prioridad',
         ]
-        widgets = {
-            'orden': forms.TextInput(attrs={'class': 'w-full input', 'placeholder': 'Código de orden'}),
-            'cliente': forms.Select(attrs={'class': 'w-full select'}),
-            'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
-            'estado_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
-            'fecha_orden': forms.TextInput(attrs={
-                'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
-            }),
-            'fecha_entrega': forms.TextInput(attrs={
-                'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-                'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
-            }),
-            'notas': forms.TextInput(attrs={'class': 'w-full input'}),
-            'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
-        }
+    widgets = {
+        'id_empleado': forms.Select(attrs={'class': 'w-full select'}),
+        'sacos_entero': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Sacos enteros'}),
+        'peso_bruto': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso bruto (kg)', 'step': '0.01'}),
+        'peso': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso neto (kg)', 'step': '0.01'}),
+        'trabajo_empaque': forms.CheckboxInput(attrs={'class': 'checkbox'}),
+        'etiqueta_invima': forms.CheckboxInput(attrs={'class': 'checkbox'}),
+        'orden': forms.TextInput(attrs={'class': 'w-full input', 'placeholder': 'Código de orden'}),
+        'cliente': forms.Select(attrs={'class': 'w-full select'}),
+        'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
+        'estado_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
+        'fecha_inicio_orden': forms.TextInput(attrs={
+            'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
+            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
+        }),
+        'fecha_entrega': forms.TextInput(attrs={
+            'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
+            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
+        }),
+        'notas': forms.TextInput(attrs={'class': 'w-full input'}),
+        'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from empleados.models import Empleado
+        self.fields['id_empleado'].queryset = Empleado.objects.all()
 
     def clean_fecha_entrega(self):
+        from django.utils import timezone
+        from datetime import datetime
         d = self.cleaned_data.get('fecha_entrega')
-        return self._to_aware_dt(d)
+        if d:
+            dt = datetime.combine(d, datetime.min.time())
+            return timezone.make_aware(dt)
+        return d
 
 
 @permission_required('ordenes.view_orden', raise_exception=True)
 def listar_ordenes(request):
-    qs = Orden.objects.select_related('cliente', 'estado_orden').order_by('-fecha_orden', '-id')
+    qs = Orden.objects.select_related('cliente', 'estado_orden').order_by('-fecha_inicio_orden', '-id')
     search = request.GET.get('q', '').strip()
     if search:
         search_int = None

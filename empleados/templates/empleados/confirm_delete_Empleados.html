@@ -1,0 +1,50 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-md rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold">Eliminar Empleado</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <div class="p-6 text-center">
+      <p class="text-gray-700 mb-6">
+        ¿Estás seguro que deseas eliminar el empleado <span class="font-semibold text-red-600">{{ empleado.nombres }} {{ empleado.apellidos }}</span>?
+      </p>
+      <form id="deleteEmpleadoForm" method="POST" action="{% url 'delete_empleado' empleado.id_empleado %}">
+        {% csrf_token %}
+        <div class="flex justify-end space-x-2">
+          <button
+            id="btnCancelarEliminar"
+            type="button"
+            class="bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-gray-800 transition"
+          >
+            CANCELAR
+          </button>
+          <button
+            type="submit"
+            class="bg-red-600 text-white font-semibold rounded-md px-4 py-2 hover:bg-red-700 transition"
+          >
+            ELIMINAR
+          </button>
+        </div>
+      </form>
+    </div>
+    <script>
+      // ELIMINAR: mantiene la lógica AJAX actual
+      const form = document.querySelector('#deleteEmpleadoForm');
+      const modalContainer = document.querySelector('#app-modal-container');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const resp = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: new FormData(form),
+        });
+        const result = await resp.json();
+        if (result.success) {
+          const listado = await fetch("{% url 'listar_empleados' %}", {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const html = await listado.text();
+          modalContainer.innerHTML = html;
+        }
+      });
+    </script>

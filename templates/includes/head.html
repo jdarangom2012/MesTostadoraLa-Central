@@ -20,3 +20,7 @@
 <link rel="stylesheet" href="{% static 'css/mes.css' %}?v={{ STATIC_VERSION|default:'1' }}" />
 {% block head_css %}{% endblock %}
 {% block head_js %}{% endblock %}
+
+<script src="{% static 'js/modal_navigate.js' %}?v={{ STATIC_VERSION|default:'1' }}"></script>
+<script src="{% static 'js/modal_close.js' %}?v={{ STATIC_VERSION|default:'1' }}"></script>
+<script src="{% static 'js/modal_form_submit.js' %}?v={{ STATIC_VERSION|default:'1' }}"></script>

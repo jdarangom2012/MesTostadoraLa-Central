@@ -16,7 +16,7 @@ from typing import List, Dict, Any
 
 
 class OrdenViewSet(OptimizedQuerysetMixin, viewsets.ModelViewSet):
-    queryset = Orden.objects.all().order_by('-fecha_orden')
+    queryset = Orden.objects.all().order_by('-fecha_inicio_orden')
     serializer_class = OrdenSerializer
     select_related_fields = ['cliente', 'estado_orden']
 

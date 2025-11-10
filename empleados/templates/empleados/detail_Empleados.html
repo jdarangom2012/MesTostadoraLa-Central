@@ -1,0 +1,44 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+  <form method="POST" action="{% url 'detail_empleado' empleado.id_empleado %}" class="space-y-3">
+      {% csrf_token %}
+      <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+        <h2 class="text-lg font-semibold">Editar Empleado</h2>
+        <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <label>Identificación</label>
+        <input type="text" name="identificacion" value="{{ empleado.identificacion }}" class="w-full border rounded-md p-2">
+
+        <label>Nombres</label>
+        <input type="text" name="nombres" value="{{ empleado.nombres }}" class="w-full border rounded-md p-2">
+
+        <label>Apellidos</label>
+        <input type="text" name="apellidos" value="{{ empleado.apellidos }}" class="w-full border rounded-md p-2">
+
+        <label>Estado</label>
+        <input type="text" name="estado" value="{{ empleado.estado }}" class="w-full border rounded-md p-2">
+
+        <label>Fecha Ingreso</label>
+        <input type="text" name="fecha_ingreso" value="{{ empleado.fecha_ingreso|date:'d/m/Y H:i' }}" readonly class="w-full border rounded-md p-2 bg-gray-100 text-gray-700">
+
+        <div class="flex justify-end space-x-2 pt-4">
+          <button
+            type="submit"
+            name="cancelar"
+            class="bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-gray-800 transition"
+          >
+            CANCELAR
+          </button>
+          <button
+            type="submit"
+            name="guardar"
+            class="bg-[#E8B923] text-black font-semibold rounded-md px-4 py-2 hover:bg-[#d4a81f] transition"
+          >
+            GUARDAR
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

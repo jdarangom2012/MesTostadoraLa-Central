@@ -1,0 +1,102 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 overflow-y-auto" data-modal-root>
+  <div class="w-full max-w-3xl bg-white rounded-lg overflow-hidden shadow-sm border border-brand-dark/30 fade-in relative">
+    <!-- Encabezado -->
+  <div class="flex items-center justify-between bg-black text-white px-4 py-2 rounded-t-lg">
+      <h2 class="font-semibold text-lg">Empleados</h2>
+      <button type="button" class="text-white hover:text-[#E8B923] text-lg" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <!-- Buscador y botón Nuevo -->
+  <div class="flex justify-between items-center bg-white border-b border-gray-200 px-4 py-3 mt-0 rounded-t-none">
+      <input type="text" name="q" value="{{ search }}" placeholder="Buscar código, nombre o apellido (auto)" class="w-full max-w-md rounded-md border border-gray-300 shadow-sm p-2 focus:ring-[#E8B923] focus:border-[#E8B923] font-inter text-sm" id="empleado-search-input" />
+      <a href="{% url 'add_empleado' %}" data-modal-navigate="true" data-modal-target="#app-modal-container"
+         class="ml-4 bg-[#E8B923] text-black font-semibold text-sm rounded-md px-4 py-2 h-9 shadow-sm hover:bg-[#d4a81f] hover:shadow-md transition-all duration-150 my-0 items-center flex">
+        NUEVO
+      </a>
+      <script>
+        // Búsqueda automática al escribir
+        document.addEventListener('DOMContentLoaded', function() {
+          var input = document.getElementById('empleado-search-input');
+          if (!input) return;
+          let timer = null;
+          input.addEventListener('input', function() {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+              const val = input.value.trim();
+              const url = '?q=' + encodeURIComponent(val);
+              const a = document.createElement('a');
+              a.href = url;
+              a.setAttribute('data-modal-navigate', 'true');
+              a.setAttribute('data-modal-target', '#app-modal-container');
+              a.style.display = 'none';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }, 400); // 400ms debounce
+          });
+        });
+      </script>
+    </div>
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-full text-sm border-collapse font-inter">
+        <thead class="bg-black text-white font-semibold">
+          <tr>
+            <th class="px-4 py-2 text-left">Fecha Ingreso</th>
+            <th class="px-4 py-2 text-left">Identificación</th>
+            <th class="px-4 py-2 text-left">Nombres</th>
+            <th class="px-4 py-2 text-left">Apellidos</th>
+            <th class="px-4 py-2 text-left">Estado</th>
+            <th class="px-4 py-2 text-center">Editar</th>
+            <th class="px-4 py-2 text-center">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% if empleados %}
+            {% for emp in empleados %}
+            <tr class="hover:bg-[#fdf7e3] transition-colors duration-150">
+              <td class="px-4 py-2 text-black">{{ emp.fecha_ingreso|date:'Y-m-d' }}</td>
+              <td class="px-4 py-2 text-black">{{ emp.identificacion }}</td>
+              <td class="px-4 py-2 text-black">{{ emp.nombres }}</td>
+              <td class="px-4 py-2 text-black">{{ emp.apellidos }}</td>
+              <td class="px-4 py-2 text-black">{{ emp.estado }}</td>
+              <td class="text-center text-blue-600 hover:underline">
+                <a href="{% url 'detail_empleado' emp.id_empleado %}" data-modal-navigate="true" data-modal-target="#app-modal-container">Editar</a>
+              </td>
+              <td class="text-center text-red-600 hover:underline">
+                <a href="{% url 'delete_empleado' emp.id_empleado %}" data-modal-navigate="true" data-modal-target="#app-modal-container">Eliminar</a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="7" class="text-center text-gray-500 py-3">Sin empleados</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+    <!-- Info y paginación -->
+  <div class="flex justify-between items-center px-4 py-2 bg-white border-t border-gray-200 rounded-b-lg">
+      <p class="text-sm text-gray-700">
+        Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} procesos
+      </p>
+      <div class="flex space-x-1">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" data-modal-navigate="true" class="px-3 py-1 border rounded-md text-gray-700 hover:bg-gray-100">Anterior</a>
+        {% else %}
+          <button class="px-3 py-1 border rounded-md text-gray-400 bg-gray-50" disabled>Anterior</button>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <button class="px-3 py-1 rounded-md font-semibold bg-[#E8B923] text-black">{{ num }}</button>
+          {% else %}
+            <a href="?page={{ num }}" data-modal-navigate="true" class="px-3 py-1 rounded-md bg-black text-white hover:bg-[#E8B923] hover:text-black">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" data-modal-navigate="true" class="px-3 py-1 border rounded-md text-gray-700 hover:bg-gray-100">Siguiente</a>
+        {% else %}
+          <button class="px-3 py-1 border rounded-md text-gray-400 bg-gray-50" disabled>Siguiente</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

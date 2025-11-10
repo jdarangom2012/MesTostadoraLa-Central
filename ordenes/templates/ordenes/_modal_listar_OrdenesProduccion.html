@@ -26,9 +26,16 @@
               <th>#</th>
               <th>Orden</th>
               <th>Cliente</th>
+              <th>Empleado</th>
               <th>Estado</th>
-              <th>Fecha Orden</th>
+              <th>Fecha Ingreso</th>
+              <th>Fecha Inicio Orden</th>
               <th>Fecha Entrega</th>
+              <th>Sacos Enteros</th>
+              <th>Peso Bruto</th>
+              <th>Peso Neto</th>
+              <th>Trabajo Empaque</th>
+              <th>Etiqueta Invima</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
@@ -39,9 +46,16 @@
               <td class="td mono">{{ o.id }}</td>
               <td class="td mono">{{ o.orden }}</td>
               <td class="td">{{ o.cliente }}</td>
+              <td class="td">{% if o.id_empleado %}{{ o.id_empleado.nombres }} {{ o.id_empleado.apellidos }}{% else %}-{% endif %}</td>
               <td class="td">{{ o.estado_orden }}</td>
-              <td class="td">{{ o.fecha_orden|date:'d/m/Y' }}</td>
+              <td class="td">{{ o.fecha_ingreso|date:'d/m/Y' }}</td>
+              <td class="td">{{ o.fecha_inicio_orden|date:'d/m/Y' }}</td>
               <td class="td">{{ o.fecha_entrega|date:'d/m/Y' }}</td>
+              <td class="td">{{ o.sacos_entero }}</td>
+              <td class="td">{{ o.peso_bruto }}</td>
+              <td class="td">{{ o.peso }}</td>
+              <td class="td">{% if o.trabajo_empaque %}Sí{% else %}No{% endif %}</td>
+              <td class="td">{% if o.etiqueta_invima %}Sí{% else %}No{% endif %}</td>
               <td class="td action">
                 {% if perms.ordenes.change_orden %}
                   <a href="{% url 'ordenes_produccion_editar' o.pk %}" class="link link-edit" data-modal-navigate>Editar</a>

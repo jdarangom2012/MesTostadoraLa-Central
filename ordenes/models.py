@@ -2,6 +2,18 @@ from django.db import models
 
 
 class Orden(models.Model):
+    id_empleado = models.ForeignKey(
+        'empleados.Empleado',
+        on_delete=models.SET_NULL,
+        db_column='IdEmpleado',
+        null=True,
+        blank=True
+    )
+    sacos_entero = models.IntegerField(db_column='SacosEntero', null=True, blank=True, help_text="Número de sacos enteros procesados")
+    peso_bruto = models.FloatField(db_column='PesoBruto', null=True, blank=True, help_text="Peso bruto total en kilogramos")
+    peso = models.FloatField(db_column='Peso', null=True, blank=True, help_text="Peso neto total en kilogramos")
+    trabajo_empaque = models.BooleanField(db_column='TrabajoEmpaque', default=False, help_text="Indica si el proceso incluye empaque manual")
+    etiqueta_invima = models.BooleanField(db_column='EtiquetaInvima', default=False, help_text="Indica si requiere etiqueta Invima en el empaque")
     id = models.AutoField(db_column='Id', primary_key=True)
     cliente = models.ForeignKey('clientes.Cliente', models.SET_NULL, db_column='IdClientes', blank=True, null=True)
     orden = models.CharField(db_column='Orden', max_length=8, blank=True, null=True)
@@ -9,7 +21,7 @@ class Orden(models.Model):
     estado_inven_cafe = models.ForeignKey('estado_cafe.EstadoCafe', models.SET_NULL, db_column='IdInvenCafe', blank=True, null=True)
     estado_orden = models.ForeignKey('estado_ordenes.EstadoOrden', models.SET_NULL, db_column='IdEstadoOrden', blank=True, null=True)
     fecha_ingreso = models.DateTimeField(db_column='FechaIngreso', blank=True, null=True)
-    fecha_orden = models.DateTimeField(db_column='FechaOrden', blank=True, null=True)
+    fecha_inicio_orden = models.DateTimeField(db_column='FechaIncioOrden', blank=True, null=True)
     fecha_entrega = models.DateTimeField(db_column='FechaEntrega', blank=True, null=True)
     notas = models.CharField(db_column='Notas', max_length=30, blank=True, null=True)
     trilla = models.BooleanField(db_column='Trilla', blank=True, null=True)
@@ -25,13 +37,13 @@ class Orden(models.Model):
     conf_molienda = models.BooleanField(db_column='ConfMolienda', blank=True, null=True)
     conf_empaque = models.BooleanField(db_column='ConfEmpaque', blank=True, null=True)
     prioridad = models.IntegerField(db_column='Prioridad', blank=True, null=True)
-    created_at = models.DateTimeField(db_column='created_at')
+    created_at = models.DateTimeField(db_column='created_at', auto_now_add=True)
     updated_at = models.DateTimeField(db_column='updated_at', blank=True, null=True)
 
     class Meta:
         db_table = 'tblOrdenes'
         indexes = [
-            models.Index(fields=['fecha_orden'], name='idx_orden_fecha'),
+            models.Index(fields=['fecha_inicio_orden'], name='idx_orden_fecha'),
             models.Index(fields=['cliente'], name='idx_orden_cliente'),
             models.Index(fields=['estado_orden'], name='idx_orden_estado'),
         ]

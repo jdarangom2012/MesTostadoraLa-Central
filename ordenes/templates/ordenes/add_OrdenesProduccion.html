@@ -25,6 +25,11 @@
             {{ form.cliente.errors }}
           </div>
           <div>
+            <label class="label">Empleado</label>
+            {{ form.id_empleado }}
+            {{ form.id_empleado.errors }}
+          </div>
+          <div>
             <label class="label">Estado Orden</label>
             {{ form.estado_orden }}
             {{ form.estado_orden.errors }}
@@ -35,9 +40,29 @@
             {{ form.estado_inven_cafe.errors }}
           </div>
           <div>
-            <label class="label">Fecha Orden</label>
-            {{ form.fecha_orden }}
-            {{ form.fecha_orden.errors }}
+            <label class="label">Sacos Enteros</label>
+            {{ form.sacos_entero }}
+            {{ form.sacos_entero.errors }}
+          </div>
+          <div>
+            <label class="label">Peso Bruto (kg)</label>
+            {{ form.peso_bruto }}
+            {{ form.peso_bruto.errors }}
+          </div>
+          <div>
+            <label class="label">Peso Neto (kg)</label>
+            {{ form.peso }}
+            {{ form.peso.errors }}
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="label">Trabajo Empaque</label>
+            {{ form.trabajo_empaque }}
+            {{ form.trabajo_empaque.errors }}
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="label">Etiqueta Invima</label>
+            {{ form.etiqueta_invima }}
+            {{ form.etiqueta_invima.errors }}
           </div>
           <div>
             <label class="label">Fecha Entrega</label>
@@ -46,7 +71,11 @@
           </div>
           <div class="md:col-span-2">
             <label class="label">Notas</label>
-            {{ form.notas }}
+            <textarea
+              name="notas"
+              id="id_notas"
+              class="w-full h-24 max-h-40 overflow-y-auto resize-y border rounded input p-2 text-sm"
+            >{{ form.notas.value|default_if_none:'' }}</textarea>
             {{ form.notas.errors }}
           </div>
           <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">

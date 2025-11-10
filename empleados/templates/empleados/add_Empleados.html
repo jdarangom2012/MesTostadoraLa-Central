@@ -1,0 +1,30 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <form method="POST" action="{% url 'add_empleado' %}" class="space-y-3">
+      {% csrf_token %}
+      <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+        <h2 class="text-lg font-semibold">Nuevo Empleado</h2>
+        <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <label>Identificación</label>
+        <input type="text" name="identificacion" placeholder="Identificación" class="w-full border rounded-md p-2">
+
+        <label>Nombres</label>
+        <input type="text" name="nombres" placeholder="Nombres" class="w-full border rounded-md p-2">
+
+        <label>Apellidos</label>
+        <input type="text" name="apellidos" placeholder="Apellidos" class="w-full border rounded-md p-2">
+
+        <label>Estado</label>
+        <input type="text" name="estado" placeholder="Estado" class="w-full border rounded-md p-2">
+
+        <div class="pt-4">
+          <button type="submit" class="w-full bg-[#E8B923] text-black font-semibold rounded-md py-2 hover:bg-[#d4a81f] transition">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

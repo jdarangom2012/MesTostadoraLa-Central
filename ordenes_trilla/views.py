@@ -110,9 +110,8 @@ def add_orden_trilla(request):
             return redirect('ordenes_trilla_listar')
     else:
         form = OrdenTrillaForm()
-    if request.headers.get('X-Fragment') or request.GET.get('fragment') == '1':
-        return render(request, 'ordenes_trilla/add_OrdenesTrilla.html', {'form': form})
-    return render(request, 'ordenes_trilla/listar_OrdenesTrilla.html', {})
+    # Siempre mostrar el formulario, tanto por AJAX, fragment o acceso directo
+    return render(request, 'ordenes_trilla/add_OrdenesTrilla.html', {'form': form})
 
 
 @require_http_methods(["GET","POST"])
