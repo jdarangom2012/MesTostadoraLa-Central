@@ -70,13 +70,13 @@ def delete_empleado(request, id):
             return JsonResponse({'success': True})
         else:
             return redirect('listar_empleados')
-    return render(request, 'empleados/confirm_delete_Empleados.html', {'empleado': empleado})
+    return render(request, 'empleados/confirm_delete_empleado.html', {'empleado': empleado})
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Empleado
 
 def detail_empleado(request, id):
-    empleado = get_object_or_404(TblEmpleados, pk=id)
+    empleado = get_object_or_404(Empleado, pk=id)
 
 
     if request.method == 'POST':
@@ -190,11 +190,11 @@ def detail_empleado(request, id):
 
 @require_http_methods(["GET", "POST"])
 def delete_empleado(request, id):
-    empleado = get_object_or_404(TblEmpleados, pk=id)
+    empleado = get_object_or_404(Empleado, pk=id)
     if request.method == 'POST':
         empleado.delete()
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True})
         else:
             return redirect('listar_empleados')
-    return render(request, 'empleados/confirm_delete_Empleados.html', {'empleado': empleado})
+    return render(request, 'empleados/confirm_delete_empleado.html', {'empleado': empleado})

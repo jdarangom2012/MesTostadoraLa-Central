@@ -1,84 +1,96 @@
-<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 overflow-y-auto" data-modal-root>
-  <div class="w-full max-w-3xl bg-white rounded-lg overflow-hidden shadow-sm border border-brand-dark/30 fade-in relative">
-    <!-- Encabezado -->
-  <div class="flex items-center justify-between bg-black text-white px-4 py-2 rounded-t-lg">
-      <h2 class="font-semibold text-lg">Empleados</h2>
-      <button type="button" class="text-white hover:text-[#E8B923] text-lg" data-close-modal aria-label="Cerrar">✕</button>
+<div id="modalEmpleados" class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="empleados-list" data-list-url="/empleados/listar/">
+  <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2 tracking-tight">👤 Empleados</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
     </div>
-    <!-- Buscador y botón Nuevo -->
-  <div class="flex justify-between items-center bg-white border-b border-gray-200 px-4 py-3 mt-0 rounded-t-none">
-      <input type="text" name="q" value="{{ search }}" placeholder="Buscar código, nombre o apellido (auto)" class="w-full max-w-md rounded-md border border-gray-300 shadow-sm p-2 focus:ring-[#E8B923] focus:border-[#E8B923] font-inter text-sm" id="empleado-search-input" />
-      <a href="{% url 'add_empleado' %}" data-modal-navigate="true" data-modal-target="#app-modal-container"
-         class="ml-4 bg-[#E8B923] text-black font-semibold text-sm rounded-md px-4 py-2 h-9 shadow-sm hover:bg-[#d4a81f] hover:shadow-md transition-all duration-150 my-0 items-center flex">
-        NUEVO
-      </a>
-      <script>
-        // Búsqueda automática al escribir
-        document.addEventListener('DOMContentLoaded', function() {
-          var input = document.getElementById('empleado-search-input');
-          if (!input) return;
-          let timer = null;
-          input.addEventListener('input', function() {
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-              const val = input.value.trim();
-              const url = '?q=' + encodeURIComponent(val);
-              const a = document.createElement('a');
-              a.href = url;
-              a.setAttribute('data-modal-navigate', 'true');
-              a.setAttribute('data-modal-target', '#app-modal-container');
-              a.style.display = 'none';
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            }, 400); // 400ms debounce
-          });
-        });
-      </script>
-    </div>
-    <!-- Tabla -->
-    <div class="overflow-x-auto">
-      <table class="w-full min-w-full text-sm border-collapse font-inter">
-        <thead class="bg-black text-white font-semibold">
-          <tr>
-            <th class="px-4 py-2 text-left">Fecha Ingreso</th>
-            <th class="px-4 py-2 text-left">Identificación</th>
-            <th class="px-4 py-2 text-left">Nombres</th>
-            <th class="px-4 py-2 text-left">Apellidos</th>
-            <th class="px-4 py-2 text-left">Estado</th>
-            <th class="px-4 py-2 text-center">Editar</th>
-            <th class="px-4 py-2 text-center">Eliminar</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          {% if empleados %}
-            {% for emp in empleados %}
-            <tr class="hover:bg-[#fdf7e3] transition-colors duration-150">
-              <td class="px-4 py-2 text-black">{{ emp.fecha_ingreso|date:'Y-m-d' }}</td>
-              <td class="px-4 py-2 text-black">{{ emp.identificacion }}</td>
-              <td class="px-4 py-2 text-black">{{ emp.nombres }}</td>
-              <td class="px-4 py-2 text-black">{{ emp.apellidos }}</td>
-              <td class="px-4 py-2 text-black">{{ emp.estado }}</td>
-              <td class="text-center text-blue-600 hover:underline">
-                <a href="{% url 'detail_empleado' emp.id_empleado %}" data-modal-navigate="true" data-modal-target="#app-modal-container">Editar</a>
+    <div class="p-6 space-y-5 relative">
+      <div class="hidden absolute inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm flex items-center justify-center text-brand-dark dark:text-gray-200 text-sm" data-loading>
+        <div class="animate-spin h-5 w-5 border-2 border-brand-primary border-t-transparent rounded-full mr-2"></div> Cargando...
+      </div>
+      <form method="get" class="flex flex-col md:flex-row md:items-center gap-2" action="" data-search-form>
+        <div class="flex-1 relative">
+          <input type="text" name="q" data-autosearch value="{{ search }}" autocomplete="off" placeholder="Buscar código, nombre o apellido (auto)" class="w-full field-input rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary pr-20"/>
+          <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
+        </div>
+        <div class="flex gap-2">
+          {% if perms.empleados.add_empleado %}
+            <a href="{% url 'add_empleado' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
+          {% endif %}
+        </div>
+      </form>
+      <div class="overflow-x-auto rounded-lg border border-brand-dark/30 shadow-inner">
+        <table class="mes-table leading-tight w-full">
+          <thead>
+            <tr>
+              <th>Fecha Ingreso</th>
+              <th>Identificación</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Estado</th>
+              <th>Editar</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for emp in empleados %}
+            <tr class="row group">
+              <td class="td mono">{{ emp.fecha_ingreso|date:'d/m/Y' }}</td>
+              <td class="td mono">{{ emp.identificacion }}</td>
+              <td class="td">{{ emp.nombres }}</td>
+              <td class="td">{{ emp.apellidos }}</td>
+              <td class="td">{{ emp.estado }}</td>
+              <td class="td action">
+                {% if perms.empleados.change_empleado %}
+                  <a href="{% url 'detail_empleado' emp.id_empleado %}" class="link link-edit" data-modal-navigate>Editar</a>
+                {% else %}
+                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
+                {% endif %}
               </td>
-              <td class="text-center text-red-600 hover:underline">
-                <a href="{% url 'delete_empleado' emp.id_empleado %}" data-modal-navigate="true" data-modal-target="#app-modal-container">Eliminar</a>
+              <td class="td action">
+                {% if perms.empleados.delete_empleado %}
+                  <a href="{% url 'delete_empleado' emp.id_empleado %}" class="link link-delete" data-modal-navigate>Eliminar</a>
+                {% else %}
+                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>
+                {% endif %}
               </td>
             </tr>
-            {% endfor %}
+          {% empty %}
+            <tr><td colspan="7" class="text-center py-8 text-brand-dark/60 text-sm">No hay empleados.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if is_paginated %}
+      {% url 'listar_empleados' as base_list_url %}
+      <nav class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[11px] mt-4">
+        <div>
+          Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ paginator.count }} empleados
+        </div>
+        <ul class="flex flex-wrap items-center gap-1">
+          {% if page_obj.has_previous %}
+            <li><a class="pager" href="{{ base_list_url }}?page={{ page_obj.previous_page_number }}{% if search %}&q={{ search }}{% endif %}" data-modal-navigate>Anterior</a></li>
           {% else %}
-            <tr><td colspan="7" class="text-center text-gray-500 py-3">Sin empleados</td></tr>
+            <li><span class="pager disabled">Anterior</span></li>
           {% endif %}
-        </tbody>
-      </table>
+          {% for num in paginator.page_range %}
+            {% if num == page_obj.number %}
+              <li><span class="pager active">{{ num }}</span></li>
+            {% else %}
+              <li><a class="pager" href="{{ base_list_url }}?page={{ num }}{% if search %}&q={{ search }}{% endif %}" data-modal-navigate>{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li><a class="pager" href="{{ base_list_url }}?page={{ page_obj.next_page_number }}{% if search %}&q={{ search }}{% endif %}" data-modal-navigate>Siguiente</a></li>
+          {% else %}
+            <li><span class="pager disabled">Siguiente</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
     </div>
-    <!-- Info y paginación -->
-  <div class="flex justify-between items-center px-4 py-2 bg-white border-t border-gray-200 rounded-b-lg">
-      <p class="text-sm text-gray-700">
-        Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} procesos
-      </p>
-      <div class="flex space-x-1">
+  </div>
+</div>
         {% if page_obj.has_previous %}
           <a href="?page={{ page_obj.previous_page_number }}" data-modal-navigate="true" class="px-3 py-1 border rounded-md text-gray-700 hover:bg-gray-100">Anterior</a>
         {% else %}

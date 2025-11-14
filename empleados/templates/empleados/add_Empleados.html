@@ -1,29 +1,50 @@
-<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
-  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
-    <form method="POST" action="{% url 'add_empleado' %}" class="space-y-3">
-      {% csrf_token %}
-      <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
-        <h2 class="text-lg font-semibold">Nuevo Empleado</h2>
-        <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
-      </div>
-      <div class="p-6 space-y-4">
-        <label>Identificación</label>
-        <input type="text" name="identificacion" placeholder="Identificación" class="w-full border rounded-md p-2">
-
-        <label>Nombres</label>
-        <input type="text" name="nombres" placeholder="Nombres" class="w-full border rounded-md p-2">
-
-        <label>Apellidos</label>
-        <input type="text" name="apellidos" placeholder="Apellidos" class="w-full border rounded-md p-2">
-
-        <label>Estado</label>
-        <input type="text" name="estado" placeholder="Estado" class="w-full border rounded-md p-2">
-
-        <div class="pt-4">
-          <button type="submit" class="w-full bg-[#E8B923] text-black font-semibold rounded-md py-2 hover:bg-[#d4a81f] transition">
-            Guardar
-          </button>
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">👤 Nuevo Empleado</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+    <form method="post" action="{% url 'add_empleado' %}" class="p-6 space-y-6" data-modal-form>{% csrf_token %}
+      {% if form.errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded mb-2">
+          <strong>Corrige los siguientes errores:</strong>
+          <ul class="list-disc ml-4">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li>{{ field|capfirst }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
         </div>
+      {% endif %}
+      {% if form.non_field_errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="grid grid-cols-2 gap-5 text-sm">
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Identificación</label>{{ form.identificacion }}
+          {{ form.identificacion.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Nombres</label>{{ form.nombres }}
+          {{ form.nombres.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Apellidos</label>{{ form.apellidos }}
+          {{ form.apellidos.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Estado</label>{{ form.estado }}
+          {{ form.estado.errors }}
+        </div>
+        <div class="field col-span-2 sm:col-span-1">
+          <label class="field-label">Fecha Ingreso</label>{{ form.fecha_ingreso }}
+          {{ form.fecha_ingreso.errors }}
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
+        <button class="btn-base btn-primary">Guardar</button>
       </div>
     </form>
   </div>
