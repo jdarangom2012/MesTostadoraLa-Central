@@ -12,90 +12,137 @@
             Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
           </div>
         {% endif %}
-        {{ form.non_field_errors }}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="label">Orden</label>
-            {{ form.orden }}
-            {{ form.orden.errors }}
-          </div>
-          <div>
-            <label class="label">Cliente</label>
-            {{ form.cliente }}
-            {{ form.cliente.errors }}
-          </div>
-          <div>
-            <label class="label">Empleado</label>
-            {{ form.id_empleado }}
-            {{ form.id_empleado.errors }}
-          </div>
-          <div>
-            <label class="label">Estado Orden</label>
-            {{ form.estado_orden }}
-            {{ form.estado_orden.errors }}
-          </div>
-          <div>
-            <label class="label">Estado Café</label>
-            {{ form.estado_inven_cafe }}
-            {{ form.estado_inven_cafe.errors }}
-          </div>
-          <div>
-            <label class="label">Sacos Enteros</label>
-            {{ form.sacos_entero }}
-            {{ form.sacos_entero.errors }}
-          </div>
-          <div>
-            <label class="label">Peso Bruto (kg)</label>
-            {{ form.peso_bruto }}
-            {{ form.peso_bruto.errors }}
-          </div>
-          <div>
-            <label class="label">Peso Neto (kg)</label>
-            {{ form.peso }}
-            {{ form.peso.errors }}
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="label">Trabajo Empaque</label>
-            {{ form.trabajo_empaque }}
-            {{ form.trabajo_empaque.errors }}
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="label">Etiqueta Invima</label>
-            {{ form.etiqueta_invima }}
-            {{ form.etiqueta_invima.errors }}
-          </div>
-          <div>
-            <label class="label">Fecha Entrega</label>
-            {{ form.fecha_entrega }}
-            {{ form.fecha_entrega.errors }}
-          </div>
-          <div class="md:col-span-2">
-            <label class="label">Notas</label>
-            <textarea
-              name="notas"
-              id="id_notas"
-              class="w-full h-24 max-h-40 overflow-y-auto resize-y border rounded input p-2 text-sm"
-            >{{ form.notas.value|default_if_none:'' }}</textarea>
-            {{ form.notas.errors }}
-          </div>
-          <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
-            <label class="flex items-center gap-2">{{ form.trilla }} <span>Trilla</span></label>
-            <label class="flex items-center gap-2">{{ form.selec_cafe_verde }} <span>Selección Verde</span></label>
-            <label class="flex items-center gap-2">{{ form.tueste_flag }} <span>Tueste</span></label>
-            <label class="flex items-center gap-2">{{ form.selec_cafe_tostado }} <span>Selección Tostado</span></label>
-            <label class="flex items-center gap-2">{{ form.molienda_flag }} <span>Molienda</span></label>
-            <label class="flex items-center gap-2">{{ form.empaque_flag }} <span>Empaque</span></label>
-          </div>
-          <div class="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
-            <label class="flex items-center gap-2">{{ form.conf_trilla }} <span>Conf. Trilla</span></label>
-            <label class="flex items-center gap-2">{{ form.conf_sel_verde }} <span>Conf. Sel Verde</span></label>
-            <label class="flex items-center gap-2">{{ form.conf_tueste }} <span>Conf. Tueste</span></label>
-            <label class="flex items-center gap-2">{{ form.conf_sel_tostado }} <span>Conf. Sel Tostado</span></label>
-            <label class="flex items-center gap-2">{{ form.conf_molienda }} <span>Conf. Molienda</span></label>
-            <label class="flex items-center gap-2">{{ form.conf_empaque }} <span>Conf. Empaque</span></label>
-          </div>
-          <div>
-            <label class="label">Prioridad</label>
+                <!-- Bloque 1 — Datos principales -->
+                <div class="mb-6">
+                  <h3 class="text-base font-semibold mb-2">Datos principales</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="label">Orden</label>
+                      {{ form.orden }}
+                      {{ form.orden.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Cliente</label>
+                      {{ form.cliente }}
+                      {{ form.cliente.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Empleado</label>
+                      {{ form.id_empleado }}
+                      {{ form.id_empleado.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Estado Orden</label>
+                      {{ form.estado_orden }}
+                      {{ form.estado_orden.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Estado Café</label>
+                      {{ form.estado_inven_cafe }}
+                      {{ form.estado_inven_cafe.errors }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bloque 2 — Inventario Café -->
+                <div class="mb-6">
+                  <h3 class="text-base font-semibold mb-2">Cafe</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="label">Cafe</label>
+                      {{ form.id_inven_cafe }}
+                      {{ form.id_inven_cafe.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Sacos Enteros</label>
+                      {{ form.sacos_entero }}
+                      {{ form.sacos_entero.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Peso Bruto (kg)</label>
+                      {{ form.peso_bruto }}
+                      {{ form.peso_bruto.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Peso Neto (kg)</label>
+                      {{ form.peso }}
+                      {{ form.peso.errors }}
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <label class="label">Trajo Empaque</label>
+                      {{ form.trabajo_empaque }}
+                      {{ form.trabajo_empaque.errors }}
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <label class="label">Etiqueta Invima</label>
+                      {{ form.etiqueta_invima }}
+                      {{ form.etiqueta_invima.errors }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bloque 3 — Procesos de transformación -->
+                <div class="mb-6">
+                  <h3 class="text-base font-semibold mb-2">Procesos de transformación</h3>
+                  <div class="grid grid-cols-4 gap-3">
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.trilla }}
+                      <span class="text-xs text-gray-600 mt-1">Trilla</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.selec_cafe_verde }}
+                      <span class="text-xs text-gray-600 mt-1">Selección Verde</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.tueste_flag }}
+                      <span class="text-xs text-gray-600 mt-1">Tostado</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.selec_cafe_tostado }}
+                      <span class="text-xs text-gray-600 mt-1">Selección Tostado</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.molienda_flag }}
+                      <span class="text-xs text-gray-600 mt-1">Molienda</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.empaque_flag }}
+                      <span class="text-xs text-gray-600 mt-1">Empaque</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.conf_trilla }}
+                      <span class="text-xs text-gray-600 mt-1">Config. Trilla</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.conf_sel_verde }}
+                      <span class="text-xs text-gray-600 mt-1">Config. Sel Verde</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.conf_tueste }}
+                      <span class="text-xs text-gray-600 mt-1">Config. Tostado</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.conf_molienda }}
+                      <span class="text-xs text-gray-600 mt-1">Config. Molienda</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+                      {{ form.conf_empaque }}
+                      <span class="text-xs text-gray-600 mt-1">Config. Empaque</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bloque 4 — Otros datos -->
+                <div class="mb-6">
+                  <h3 class="text-base font-semibold mb-2">Otros datos</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="label">Fecha Entrega</label>
+                      {{ form.fecha_entrega }}
+                      {{ form.fecha_entrega.errors }}
+                    </div>
+                    <div>
+                      <label class="label">Prioridad</label>
             {{ form.prioridad }}
             {{ form.prioridad.errors }}
           </div>

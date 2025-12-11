@@ -12,6 +12,7 @@ from .models import Orden
 
 class OrdenForm(forms.ModelForm):
     id_empleado = forms.ModelChoiceField(queryset=None, required=False)
+    id_inven_cafe = forms.ModelChoiceField(queryset=None, required=False)
     sacos_entero = forms.IntegerField(required=False, min_value=0)
     peso_bruto = forms.FloatField(required=False, min_value=0)
     peso = forms.FloatField(required=False, min_value=0)
@@ -21,13 +22,13 @@ class OrdenForm(forms.ModelForm):
     # Acepta DD/MM/YYYY y también ISO (fallback de los inputs type=date)
     fecha_inicio_orden = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
     fecha_entrega = forms.DateField(required=False, input_formats=['%d/%m/%Y', '%Y-%m-%d'])
-
     class Meta:
         model = Orden
         fields = [
             'orden',
-            'cliente', 'estado_orden', 'estado_inven_cafe',
+            'cliente', 'estado_orden',
             'id_empleado',
+            'id_inven_cafe',
             'fecha_inicio_orden', 'fecha_entrega', 'notas',
             'sacos_entero', 'peso_bruto', 'peso', 'trabajo_empaque', 'etiqueta_invima',
             'trilla', 'selec_cafe_verde', 'tueste_flag', 'selec_cafe_tostado',
@@ -37,6 +38,7 @@ class OrdenForm(forms.ModelForm):
         ]
     widgets = {
         'id_empleado': forms.Select(attrs={'class': 'w-full select'}),
+        'id_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
         'sacos_entero': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Sacos enteros'}),
         'peso_bruto': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso bruto (kg)', 'step': '0.01'}),
         'peso': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso neto (kg)', 'step': '0.01'}),
@@ -45,14 +47,13 @@ class OrdenForm(forms.ModelForm):
         'orden': forms.TextInput(attrs={'class': 'w-full input', 'placeholder': 'Código de orden'}),
         'cliente': forms.Select(attrs={'class': 'w-full select'}),
         'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
-        'estado_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
         'fecha_inicio_orden': forms.TextInput(attrs={
             'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
+            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': r'\d{2}/\d{2}/\d{4}'
         }),
         'fecha_entrega': forms.TextInput(attrs={
             'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': '\d{2}/\d{2}/\d{4}'
+            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': r'\d{2}/\d{2}/\d{4}'
         }),
         'notas': forms.TextInput(attrs={'class': 'w-full input'}),
         'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
@@ -61,7 +62,9 @@ class OrdenForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from empleados.models import Empleado
+        from inventario_cafe.models import InventarioCafe
         self.fields['id_empleado'].queryset = Empleado.objects.all()
+        self.fields['id_inven_cafe'].queryset = InventarioCafe.objects.all()
 
     def clean_fecha_entrega(self):
         from django.utils import timezone

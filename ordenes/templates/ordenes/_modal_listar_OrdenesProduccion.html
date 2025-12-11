@@ -26,7 +26,6 @@
               <th>#</th>
               <th>Orden</th>
               <th>Cliente</th>
-              <th>Empleado</th>
               <th>Estado</th>
               <th>Fecha Ingreso</th>
               <th>Fecha Inicio Orden</th>
@@ -38,6 +37,7 @@
               <th>Etiqueta Invima</th>
               <th>Editar</th>
               <th>Eliminar</th>
+              <th>Cafe</th>
             </tr>
           </thead>
           <tbody>
@@ -46,7 +46,6 @@
               <td class="td mono">{{ o.id }}</td>
               <td class="td mono">{{ o.orden }}</td>
               <td class="td">{{ o.cliente }}</td>
-              <td class="td">{% if o.id_empleado %}{{ o.id_empleado.nombres }} {{ o.id_empleado.apellidos }}{% else %}-{% endif %}</td>
               <td class="td">{{ o.estado_orden }}</td>
               <td class="td">{{ o.fecha_ingreso|date:'d/m/Y' }}</td>
               <td class="td">{{ o.fecha_inicio_orden|date:'d/m/Y' }}</td>
@@ -59,6 +58,7 @@
               <td class="td action">
                 {% if perms.ordenes.change_orden %}
                   <a href="{% url 'ordenes_produccion_editar' o.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
+              <td class="td">{% if o.id_inventario_cafe %}{{ o.id_inventario_cafe.codigo }}{% else %}-{% endif %}</td>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}
