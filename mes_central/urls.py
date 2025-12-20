@@ -76,3 +76,6 @@ urlpatterns.append(path('', include('ordenes_seleccion_tostado.urls')))  # rutas
 urlpatterns.append(path('', include('molienda.urls')))  # rutas HTML molienda (/molienda/listar/ etc.)
 urlpatterns.append(path('', include('curvas_tueste.urls')))  # rutas HTML curvas tueste (/curvas_tueste/ etc.)
 urlpatterns.append(path('usuarios/', include('usuarios.urls')))  # página Usuarios y Roles
+urlpatterns.append(path('', include('clientes.urls')))  # rutas HTML clientes (/clientes/listar/ etc.)
+urlpatterns.append(path('', include('empleados.urls')))  # rutas HTML empleados (/empleados/ etc.)
+urlpatterns.append(path('', include('materiales.urls')))  # rutas HTML materiales (/materiales/listar/ etc.)

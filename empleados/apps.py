@@ -2,7 +2,7 @@ import os
 from django.apps import AppConfig
 
 
-class SeleccionTuesteConfig(AppConfig):
+class EmpleadosConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'seleccion_tueste'
+    name = 'empleados'
     path = os.path.dirname(os.path.abspath(__file__))
