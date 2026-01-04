@@ -92,7 +92,7 @@
 
                                 // Datepicker (Flatpickr + fallback) inicializado de forma genérica
                                 (function initDatePickers(){
-                                    const inputs = Array.from(root.querySelectorAll('input[data-datepicker], input[name="fecha_orden"], input[name="fecha_entrega"]'));
+                                    const inputs = Array.from(root.querySelectorAll('input[data-datepicker], input[name="fecha_orden"], input[name="fecha_inicio_orden"], input[name="fecha_entrega"]'));
                                     if(!inputs.length) return;
                                     // Normaliza agregando el atributo data-datepicker para estilos y futura detección
                                     inputs.forEach(i=>{ if(!i.hasAttribute('data-datepicker')) i.setAttribute('data-datepicker','1'); });
@@ -172,7 +172,7 @@
                                         const modal = temp.firstElementChild; document.body.appendChild(modal); bindModal(modal);
                                         // Reintentar inicialización de datepickers por si el modal llegó sin ellos
                                         try { if(typeof window.MicroDatepicker!== 'undefined') {
-                                            modal.querySelectorAll('input[name="fecha_orden"], input[name="fecha_entrega"]').forEach(el=>{
+                                            modal.querySelectorAll('input[name="fecha_orden"], input[name="fecha_inicio_orden"], input[name="fecha_entrega"]').forEach(el=>{
                                                 if(!el.hasAttribute('data-datepicker')) el.setAttribute('data-datepicker','1');
                                                 window.MicroDatepicker.attach(el);
                                             });

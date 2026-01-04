@@ -7,14 +7,6 @@ class Cliente(models.Model):
     id_tipo_identificacion = models.ForeignKey('tipo_identificacion.TipoIdentificacion', models.SET_NULL, db_column='IdTipoIdentificacion', null=True, blank=True)
     id_estado_cliente = models.ForeignKey('estados_clientes.EstadoCliente', models.SET_NULL, db_column='IdEstadoCliente', null=True, blank=True)
     codigo = models.CharField(db_column='Codigo', max_length=25, blank=True, null=True)
-    codigo_cliente = models.CharField(
-        max_length=9,
-        db_column='CodigoCliente',
-        unique=True,
-        editable=False,
-        blank=True,
-        null=True
-    )
     nombre = models.CharField(db_column='Nombre', max_length=50, blank=True, null=True)
     apellidos = models.CharField(db_column='Apellidos', max_length=50, blank=True, null=True)
     telefono = models.CharField(db_column='Telefono', max_length=30, blank=True, null=True)

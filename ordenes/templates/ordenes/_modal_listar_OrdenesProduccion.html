@@ -35,9 +35,9 @@
               <th>Peso Neto</th>
               <th>Trabajo Empaque</th>
               <th>Etiqueta Invima</th>
+              <th>Café</th>
               <th>Editar</th>
               <th>Eliminar</th>
-              <th>Cafe</th>
             </tr>
           </thead>
           <tbody>
@@ -55,10 +55,12 @@
               <td class="td">{{ o.peso }}</td>
               <td class="td">{% if o.trabajo_empaque %}Sí{% else %}No{% endif %}</td>
               <td class="td">{% if o.etiqueta_invima %}Sí{% else %}No{% endif %}</td>
+              <td class="td">{% if o.id_inven_cafe %}
+                {% if o.id_inven_cafe.codigo %}{{ o.id_inven_cafe.codigo }}{% elif o.id_inven_cafe.descripcion %}{{ o.id_inven_cafe.descripcion }}{% else %}{{ o.id_inven_cafe }}{% endif %}
+              {% else %}-{% endif %}</td>
               <td class="td action">
                 {% if perms.ordenes.change_orden %}
                   <a href="{% url 'ordenes_produccion_editar' o.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
-              <td class="td">{% if o.id_inventario_cafe %}{{ o.id_inventario_cafe.codigo }}{% else %}-{% endif %}</td>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}

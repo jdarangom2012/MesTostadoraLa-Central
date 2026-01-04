@@ -63,9 +63,11 @@ class ProduccionDiariaView(BaseReportView):
     def get(self, request):
         days = int(request.GET.get('days', 7))
         since = timezone.now() - timedelta(days=days)
+        # Usar el campo existente `fecha_inicio_orden` y truncar a fecha
         qs = (
-            Orden.objects.filter(fecha_orden__gte=since)
-            .extra(select={'day': "CONVERT(date, FechaOrden)"})  # SQL Server date cast
+            Orden.objects
+            .filter(fecha_inicio_orden__gte=since)
+            .annotate(day=TruncDate('fecha_inicio_orden'))
             .values('day')
             .annotate(total=Count('id'))
             .order_by('day')
@@ -85,27 +87,27 @@ class KPIsResumenView(BaseReportView):
         hace_7 = hoy - timedelta(days=7)
 
         # Órdenes hoy / ayer
-        ordenes_hoy = Orden.objects.filter(fecha_orden__date=hoy).count()
-        ordenes_ayer = Orden.objects.filter(fecha_orden__date=ayer).count()
+        ordenes_hoy = Orden.objects.filter(fecha_inicio_orden__date=hoy).count()
+        ordenes_ayer = Orden.objects.filter(fecha_inicio_orden__date=ayer).count()
 
         # En proceso / completadas (estado global y variante día anterior)
         en_proceso_filter = Q(estado_orden__estado_orden__icontains='proceso')
         completadas_filter = Q(estado_orden__estado_orden__icontains='complet') | Q(estado_orden__estado_orden__icontains='cerr')
 
-        en_proceso_hoy = Orden.objects.filter(fecha_orden__date=hoy).filter(en_proceso_filter).count()
-        en_proceso_ayer = Orden.objects.filter(fecha_orden__date=ayer).filter(en_proceso_filter).count()
+        en_proceso_hoy = Orden.objects.filter(fecha_inicio_orden__date=hoy).filter(en_proceso_filter).count()
+        en_proceso_ayer = Orden.objects.filter(fecha_inicio_orden__date=ayer).filter(en_proceso_filter).count()
 
-        completadas_hoy = Orden.objects.filter(fecha_orden__date=hoy).filter(completadas_filter).count()
-        completadas_ayer = Orden.objects.filter(fecha_orden__date=ayer).filter(completadas_filter).count()
+        completadas_hoy = Orden.objects.filter(fecha_inicio_orden__date=hoy).filter(completadas_filter).count()
+        completadas_ayer = Orden.objects.filter(fecha_inicio_orden__date=ayer).filter(completadas_filter).count()
 
         # Activas creadas hoy vs ayer (no completadas/cerradas)
         activas_hoy = (
-            Orden.objects.filter(fecha_orden__date=hoy)
+            Orden.objects.filter(fecha_inicio_orden__date=hoy)
             .exclude(completadas_filter)
             .count()
         )
         activas_ayer = (
-            Orden.objects.filter(fecha_orden__date=ayer)
+            Orden.objects.filter(fecha_inicio_orden__date=ayer)
             .exclude(completadas_filter)
             .count()
         )
@@ -119,14 +121,14 @@ class KPIsResumenView(BaseReportView):
         )
         pendientes_entrega_hoy = (
             Orden.objects
-            .filter(fecha_orden__date=hoy)
+            .filter(fecha_inicio_orden__date=hoy)
             .filter(Q(fecha_entrega__date__gte=hoy) | Q(fecha_entrega__isnull=True))
             .exclude(completadas_filter)
             .count()
         )
         pendientes_entrega_ayer = (
             Orden.objects
-            .filter(fecha_orden__date=ayer)
+            .filter(fecha_inicio_orden__date=ayer)
             .filter(Q(fecha_entrega__date__gte=ayer) | Q(fecha_entrega__isnull=True))
             .exclude(completadas_filter)
             .count()

@@ -17,14 +17,6 @@ class Migration(migrations.Migration):
             name='id_inventario_cafe',
             field=models.ForeignKey(blank=True, db_column='IdInventarioCafe', null=True, on_delete=django.db.models.deletion.CASCADE, to='inventario_cafe.inventariocafe'),
         ),
-        migrations.RunSQL(
-            sql=(
-                "UPDATE dbo.tblOrdenes SET IdInventarioCafe = CASE WHEN IdInventarioCafe IS NULL THEN estado_inven_cafe ELSE IdInventarioCafe END"
-            ),
-            reverse_sql=(
-                "UPDATE dbo.tblOrdenes SET estado_inven_cafe = IdInventarioCafe"
-            ),
-        ),
         migrations.AlterField(
             model_name='orden',
             name='fecha_inicio_orden',

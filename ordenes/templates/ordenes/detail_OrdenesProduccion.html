@@ -1,163 +1,176 @@
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
   <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
-    <form method="post" action="{% url 'ordenes_produccion_editar' obj.pk %}" data-modal-form class="p-0">
+    <form method="post" action="{% url 'ordenes_produccion_editar' obj.pk %}" data-modal-form class="flex flex-col h-full">
       {% csrf_token %}
-      <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <div class="modal-head shrink-0 flex items-center justify-between px-6 py-4 rounded-t-xl">
         <h2 class="text-lg font-semibold">Editar Orden #{{ obj.id }}</h2>
         <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="modal-body grow overflow-y-auto p-6 space-y-4">
         {% if form.errors %}
           <div class="mb-2 text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
             Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
           </div>
+          {% if form.non_field_errors %}
+          <div class="mb-2 text-sm px-3 py-2 rounded border bg-yellow-50 border-yellow-300 text-yellow-800">
+            {{ form.non_field_errors }}
+          </div>
+          {% endif %}
         {% endif %}
-                <!-- Bloque 1 — Datos principales -->
-                <div class="mb-6">
-                  <h3 class="text-base font-semibold mb-2">Datos principales</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="label">Orden</label>
-                      {{ form.orden }}
-                      {{ form.orden.errors }}
-                    </div>
-                    <div>
-                      <label class="label">Cliente</label>
-                      {{ form.cliente }}
-                      {{ form.cliente.errors }}
-                    </div>
-                    <div>
-                      <label class="label">Empleado</label>
-                      <input type="text" class="w-full input" value="{{ obj.id_empleado.nombres }} {{ obj.id_empleado.apellidos }}" readonly>
-                    </div>
-                    <div>
-                      <label class="label">Estado Orden</label>
-                      {{ form.estado_orden }}
-                      {{ form.estado_orden.errors }}
-                    </div>
-                    <div>
-                      <label class="label">Estado Café</label>
-                      {{ form.estado_inven_cafe }}
-                      {{ form.estado_inven_cafe.errors }}
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Bloque 2 — Inventario Café -->
-                <div class="mb-6">
-                  <h3 class="text-base font-semibold mb-2">Cafe</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="label">Cafe</label>
-                      {{ form.id_inventario_cafe }}
-                      {{ form.id_inventario_cafe.errors }}
-                    </div>
-                    <div>
-                      <label class="label">Sacos Enteros</label>
-                      <input type="number" class="w-full input" value="{{ obj.sacos_entero }}" readonly>
-                    </div>
-                    <div>
-                      <label class="label">Peso Bruto (kg)</label>
-                      <input type="number" class="w-full input" value="{{ obj.peso_bruto }}" readonly>
-                    </div>
-                    <div>
-                      <label class="label">Peso Neto (kg)</label>
-                      <input type="number" class="w-full input" value="{{ obj.peso }}" readonly>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <label class="label">Trajo Empaque</label>
-                      <input type="checkbox" {% if obj.trabajo_empaque %}checked{% endif %} disabled>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <label class="label">Etiqueta Invima</label>
-                      <input type="checkbox" {% if obj.etiqueta_invima %}checked{% endif %} disabled>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Bloque 3 — Procesos de transformación -->
-                <div class="mb-6">
-                  <h3 class="text-base font-semibold mb-2">Procesos de transformación</h3>
-                  <div class="grid grid-cols-4 gap-3">
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.trilla }}
-                      <span class="text-xs text-gray-500 mt-1">Trilla</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.selec_cafe_verde }}
-                      <span class="text-xs text-gray-500 mt-1">Selección Verde</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.tueste_flag }}
-                      <span class="text-xs text-gray-500 mt-1">Tostado</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.selec_cafe_tostado }}
-                      <span class="text-xs text-gray-500 mt-1">Selección Tostado</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.molienda_flag }}
-                      <span class="text-xs text-gray-500 mt-1">Molienda</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.empaque_flag }}
-                      <span class="text-xs text-gray-500 mt-1">Empaque</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.conf_trilla }}
-                      <span class="text-xs text-gray-500 mt-1">Config. Trilla</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.conf_sel_verde }}
-                      <span class="text-xs text-gray-500 mt-1">Config. Sel Verde</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.conf_tueste }}
-                      <span class="text-xs text-gray-500 mt-1">Config. Tostado</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.conf_molienda }}
-                      <span class="text-xs text-gray-500 mt-1">Config. Molienda</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.conf_empaque }}
-                      <span class="text-xs text-gray-500 mt-1">Config. Empaque</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Bloque 4 — Otros datos -->
-                <div class="mb-6">
-                  <h3 class="text-base font-semibold mb-2">Otros datos</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="label">Fecha Entrega</label>
-                      {{ form.fecha_entrega }}
-                      {{ form.fecha_entrega.errors }}
-                    </div>
-                    <div>
-                      <label class="label">Prioridad</label>
-                      {{ form.prioridad }}
-                      {{ form.prioridad.errors }}
-                    </div>
-                  </div>
-                  <div class="mt-4">
-                    <label class="label">Notas</label>
-                    <textarea
-                      name="notas"
-                      id="id_notas"
-                      class="w-full h-24 max-h-40 overflow-y-auto resize-y border rounded input p-2 text-sm"
-                    >{{ form.notas.value|default_if_none:'' }}</textarea>
-                    {{ form.notas.errors }}
-                  </div>
-                </div>
+        <!-- Bloque 1 — Datos principales -->
+        <div class="mb-6">
+          <h3 class="text-base font-semibold mb-2">Datos principales</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Orden</label>
+              {{ form.orden }}
+              {{ form.orden.errors }}
+            </div>
+            <div>
+              <label class="label">Cliente</label>
+              {{ form.cliente }}
+              {{ form.cliente.errors }}
+            </div>
+            <div>
+              <label class="label">Empleado</label>
+              {{ form.id_empleado }}
+              {{ form.id_empleado.errors }}
+            </div>
+            <div>
+              <label class="label">Estado Orden</label>
+              {{ form.estado_orden }}
+              {{ form.estado_orden.errors }}
+            </div>
+            {% if form.estado_inven_cafe %}
+            <div>
+              <label class="label">Estado Café</label>
+              {{ form.estado_inven_cafe }}
+              {{ form.estado_inven_cafe.errors }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <!-- Bloque 2 — Inventario Café -->
+        <div class="mb-6">
+          <h3 class="text-base font-semibold mb-2">Cafe</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Cafe</label>
+              {{ form.id_inven_cafe }}
+              {{ form.id_inven_cafe.errors }}
+            </div>
+            <div>
+              <label class="label">Sacos Enteros</label>
+              {{ form.sacos_entero }}
+              {{ form.sacos_entero.errors }}
+            </div>
+            <div>
+              <label class="label">Peso Bruto (kg)</label>
+              {{ form.peso_bruto }}
+              {{ form.peso_bruto.errors }}
+            </div>
+            <div>
+              <label class="label">Peso Neto (kg)</label>
+              {{ form.peso }}
+              {{ form.peso.errors }}
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="label">Trajo Empaque</label>
+              {{ form.trabajo_empaque }}
+              {{ form.trabajo_empaque.errors }}
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="label">Etiqueta Invima</label>
+              {{ form.etiqueta_invima }}
+              {{ form.etiqueta_invima.errors }}
+            </div>
+          </div>
+        </div>
+        <!-- Bloque 3 — Procesos de transformación -->
+        <div class="mb-6">
+          <h3 class="text-base font-semibold mb-2">Procesos de transformación</h3>
+          <div class="grid grid-cols-4 gap-3">
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.trilla }}
+              <span class="text-xs text-gray-500 mt-1">Trilla</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.selec_cafe_verde }}
+              <span class="text-xs text-gray-500 mt-1">Selección Verde</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.tueste_flag }}
+              <span class="text-xs text-gray-500 mt-1">Tostado</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.selec_cafe_tostado }}
+              <span class="text-xs text-gray-500 mt-1">Selección Tostado</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.molienda_flag }}
+              <span class="text-xs text-gray-500 mt-1">Molienda</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.empaque_flag }}
+              <span class="text-xs text-gray-500 mt-1">Empaque</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.conf_trilla }}
+              <span class="text-xs text-gray-500 mt-1">Config. Trilla</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.conf_sel_verde }}
+              <span class="text-xs text-gray-500 mt-1">Config. Sel Verde</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.conf_tueste }}
+              <span class="text-xs text-gray-500 mt-1">Config. Tostado</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.conf_molienda }}
+              <span class="text-xs text-gray-500 mt-1">Config. Molienda</span>
+            </div>
+            <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
+              {{ form.conf_empaque }}
+              <span class="text-xs text-gray-500 mt-1">Config. Empaque</span>
+            </div>
+          </div>
+        </div>
+        <!-- Bloque 4 — Otros datos -->
+        <div class="mb-6">
+          <h3 class="text-base font-semibold mb-2">Otros datos</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">Fecha Inicio Orden</label>
+              <input type="date" name="fecha_inicio_orden" class="input-form w-full input" data-datepicker="1" value="{{ form.fecha_inicio_orden.value|date:'Y-m-d' }}">
+              {{ form.fecha_inicio_orden.errors }}
+            </div>
+            <div>
+              <label class="label">Fecha Entrega</label>
+              <input type="date" name="fecha_entrega" class="input-form w-full input" data-datepicker="1" value="{{ form.fecha_entrega.value|date:'Y-m-d' }}">
+              {{ form.fecha_entrega.errors }}
+            </div>
+            <div>
+              <label class="label">Prioridad</label>
+              {{ form.prioridad }}
+              {{ form.prioridad.errors }}
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="label">Notas</label>
+            <textarea
+              name="notas"
+              id="id_notas"
+              class="w-full h-24 max-h-40 overflow-y-auto resize-y border rounded input p-2 text-sm"
+            >{{ form.notas.value|default_if_none:'' }}</textarea>
+            {{ form.notas.errors }}
+          </div>
         </div>
       </div>
-      <div class="px-6 py-4 flex items-center justify-end gap-2 border-t border-brand-dark/20">
+      <div class="modal-footer shrink-0 flex justify-end gap-2 border-t border-brand-dark/20 px-6 py-4">
         <button type="button" class="btn-base" data-close-modal>Cancelar</button>
         <button type="submit" class="btn-base btn-primary">Guardar</button>
       </div>
-      <!-- Datepicker se inicializa de forma global en base.html (MicroDatepicker local) -->
     </form>
   </div>
 </div>

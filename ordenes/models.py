@@ -16,7 +16,7 @@ class Orden(models.Model):
     etiqueta_invima = models.BooleanField(db_column='EtiquetaInvima', default=False, help_text="Indica si requiere etiqueta Invima en el empaque")
     id = models.AutoField(db_column='Id', primary_key=True)
     cliente = models.ForeignKey('clientes.Cliente', models.SET_NULL, db_column='IdClientes', blank=True, null=True)
-    orden = models.CharField(db_column='Orden', max_length=8, blank=True, null=True)
+    orden = models.CharField(db_column='Orden', max_length=16, blank=True, null=True)
     id_inven_cafe = models.ForeignKey(
         'inventario_cafe.InventarioCafe',
         on_delete=models.CASCADE,
@@ -28,7 +28,7 @@ class Orden(models.Model):
     fecha_ingreso = models.DateTimeField(db_column='FechaIngreso', blank=True, null=True)
     fecha_inicio_orden = models.DateTimeField(db_column='FechaIncioOrden', blank=True, null=True)
     fecha_entrega = models.DateTimeField(db_column='FechaEntrega', blank=True, null=True)
-    notas = models.CharField(db_column='Notas', max_length=30, blank=True, null=True)
+    notas = models.CharField(db_column='Notas', max_length=500, blank=True, null=True)
     trilla = models.BooleanField(db_column='Trilla', blank=True, null=True)
     selec_cafe_verde = models.BooleanField(db_column='SelecCafeVerde', blank=True, null=True)
     tueste_flag = models.BooleanField(db_column='Tueste', blank=True, null=True)

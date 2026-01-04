@@ -65,6 +65,14 @@ END
 class Migration(migrations.Migration):
     dependencies = []
 
+    def run_sql_if_not_test(apps, schema_editor):
+        db_name = schema_editor.connection.settings_dict.get('NAME', '')
+        if not db_name.startswith('test_'):
+            schema_editor.execute(UP_SQL)
+    def reverse_sql_if_not_test(apps, schema_editor):
+        db_name = schema_editor.connection.settings_dict.get('NAME', '')
+        if not db_name.startswith('test_'):
+            schema_editor.execute(DOWN_SQL)
     operations = [
-        migrations.RunSQL(sql=UP_SQL, reverse_sql=DOWN_SQL),
+        migrations.RunPython(run_sql_if_not_test, reverse_code=reverse_sql_if_not_test),
     ]

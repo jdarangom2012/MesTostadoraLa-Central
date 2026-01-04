@@ -11,6 +11,11 @@
           <div class="mb-2 text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
             Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
           </div>
+          {% if form.non_field_errors %}
+          <div class="mb-2 text-sm px-3 py-2 rounded border bg-yellow-50 border-yellow-300 text-yellow-800">
+            {{ form.non_field_errors }}
+          </div>
+          {% endif %}
         {% endif %}
                 <!-- Bloque 1 — Datos principales -->
                 <div class="mb-6">
@@ -136,6 +141,11 @@
                 <div class="mb-6">
                   <h3 class="text-base font-semibold mb-2">Otros datos</h3>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="label">Fecha Inicio Orden</label>
+                      {{ form.fecha_inicio_orden }}
+                      {{ form.fecha_inicio_orden.errors }}
+                    </div>
                     <div>
                       <label class="label">Fecha Entrega</label>
                       {{ form.fecha_entrega }}

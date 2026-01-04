@@ -12,7 +12,11 @@ from .models import Orden
 
 class OrdenForm(forms.ModelForm):
     id_empleado = forms.ModelChoiceField(queryset=None, required=False)
-    id_inven_cafe = forms.ModelChoiceField(queryset=None, required=False)
+    def cafe_label_from_instance(self, obj):
+        if hasattr(obj, 'codigo') and obj.codigo:
+            return obj.codigo
+        return str(obj)
+    id_inven_cafe = forms.ModelChoiceField(queryset=None, required=False, label='Café')
     sacos_entero = forms.IntegerField(required=False, min_value=0)
     peso_bruto = forms.FloatField(required=False, min_value=0)
     peso = forms.FloatField(required=False, min_value=0)
@@ -36,28 +40,23 @@ class OrdenForm(forms.ModelForm):
             'conf_trilla', 'conf_sel_verde', 'conf_tueste', 'conf_sel_tostado', 'conf_molienda', 'conf_empaque',
             'prioridad',
         ]
-    widgets = {
-        'id_empleado': forms.Select(attrs={'class': 'w-full select'}),
-        'id_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
-        'sacos_entero': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Sacos enteros'}),
-        'peso_bruto': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso bruto (kg)', 'step': '0.01'}),
-        'peso': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso neto (kg)', 'step': '0.01'}),
-        'trabajo_empaque': forms.CheckboxInput(attrs={'class': 'checkbox'}),
-        'etiqueta_invima': forms.CheckboxInput(attrs={'class': 'checkbox'}),
-        'orden': forms.TextInput(attrs={'class': 'w-full input', 'placeholder': 'Código de orden'}),
-        'cliente': forms.Select(attrs={'class': 'w-full select'}),
-        'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
-        'fecha_inicio_orden': forms.TextInput(attrs={
-            'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': r'\d{2}/\d{2}/\d{4}'
-        }),
-        'fecha_entrega': forms.TextInput(attrs={
-            'data-datepicker': '1', 'class': 'w-full input', 'placeholder': 'DD/MM/YYYY', 'lang':'es-ES',
-            'inputmode': 'numeric', 'autocomplete': 'off', 'pattern': r'\d{2}/\d{2}/\d{4}'
-        }),
-        'notas': forms.TextInput(attrs={'class': 'w-full input'}),
-        'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
-    }
+        widgets = {
+            'id_empleado': forms.Select(attrs={'class': 'w-full select'}),
+            'id_inven_cafe': forms.Select(attrs={'class': 'w-full select'}),
+            'sacos_entero': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Sacos enteros'}),
+            'peso_bruto': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso bruto (kg)', 'step': '0.01'}),
+            'peso': forms.NumberInput(attrs={'class': 'w-full input', 'placeholder': 'Peso neto (kg)', 'step': '0.01'}),
+            'trabajo_empaque': forms.CheckboxInput(attrs={'class': 'checkbox'}),
+            'etiqueta_invima': forms.CheckboxInput(attrs={'class': 'checkbox'}),
+            'orden': forms.TextInput(attrs={'class': 'w-full input', 'placeholder': 'Código de orden'}),
+            'cliente': forms.Select(attrs={'class': 'w-full select'}),
+            'estado_orden': forms.Select(attrs={'class': 'w-full select'}),
+            # Widgets tipo date nativo con activación del calendario local
+            'fecha_inicio_orden': forms.DateInput(attrs={"type": "date", "class": "input-form w-full input", "data-datepicker": "1"}),
+            'fecha_entrega': forms.DateInput(attrs={"type": "date", "class": "input-form w-full input", "data-datepicker": "1"}),
+            'notas': forms.TextInput(attrs={'class': 'w-full input'}),
+            'prioridad': forms.NumberInput(attrs={'class': 'w-full input'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,6 +64,32 @@ class OrdenForm(forms.ModelForm):
         from inventario_cafe.models import InventarioCafe
         self.fields['id_empleado'].queryset = Empleado.objects.all()
         self.fields['id_inven_cafe'].queryset = InventarioCafe.objects.all()
+        self.fields['id_inven_cafe'].label_from_instance = self.cafe_label_from_instance
+        # Etiquetas vacías visibles para selects
+        if hasattr(self.fields.get('id_empleado', None), 'empty_label'):
+            self.fields['id_empleado'].empty_label = 'Seleccione…'
+        if hasattr(self.fields.get('id_inven_cafe', None), 'empty_label'):
+            self.fields['id_inven_cafe'].empty_label = 'Seleccione…'
+        # Asegurar que ningún campo quede deshabilitado o readonly
+        for name, field in self.fields.items():
+            field.disabled = False
+            try:
+                field.widget.attrs.pop('disabled', None)
+                field.widget.attrs.pop('readonly', None)
+            except Exception:
+                pass
+        # Asegurar widgets tipo date para campos declarados explícitamente
+        date_attrs = {"type": "date", "class": "input-form w-full input", "data-datepicker": "1"}
+        if 'fecha_inicio_orden' in self.fields:
+            try:
+                self.fields['fecha_inicio_orden'].widget = forms.DateInput(attrs=date_attrs)
+            except Exception:
+                pass
+        if 'fecha_entrega' in self.fields:
+            try:
+                self.fields['fecha_entrega'].widget = forms.DateInput(attrs=date_attrs)
+            except Exception:
+                pass
 
     def clean_fecha_entrega(self):
         from django.utils import timezone
@@ -74,6 +99,23 @@ class OrdenForm(forms.ModelForm):
             dt = datetime.combine(d, datetime.min.time())
             return timezone.make_aware(dt)
         return d
+
+    def clean_fecha_inicio_orden(self):
+        from django.utils import timezone
+        from datetime import datetime
+        d = self.cleaned_data.get('fecha_inicio_orden')
+        if d:
+            dt = datetime.combine(d, datetime.min.time())
+            return timezone.make_aware(dt)
+        return d
+
+    def clean(self):
+        cleaned = super().clean()
+        peso_bruto = cleaned.get('peso_bruto')
+        peso = cleaned.get('peso')
+        if peso_bruto is not None and peso is not None and peso > peso_bruto:
+            self.add_error('peso', 'El peso neto no puede ser mayor que el peso bruto.')
+        return cleaned
 
 
 @permission_required('ordenes.view_orden', raise_exception=True)

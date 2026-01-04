@@ -10,9 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='cliente',
-            name='codigo_cliente',
-            field=models.CharField(blank=True, db_column='CodigoCliente', editable=False, max_length=9, null=True, unique=True),
-        ),
+        # Migración eliminada por duplicidad de columna CodigoCliente.
     ]
