@@ -71,3 +71,15 @@ scripts/output/
 # Cloudflare / Túnel config (si se añade luego)
 .cloudflared/
 
+# --- Proyecto: Reportes y artefactos binarios ---
+# Ignorar archivos binarios grandes de reportes (Power BI, presentaciones, paquetes)
+reportes/*.pbix
+reportes/*.pptx
+reportes/*.zip
+reportes/AgroInduGestor_IndustrialPremium_Package/
+reportes/AgroInduGestor_IndustrialPremium_Package/**
+
+# --- Bases de datos y reportes locales de pruebas ---
+test.sqlite3
+test_report.json
+
