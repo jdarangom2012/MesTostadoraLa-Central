@@ -1,3 +1,7 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'cafe_empaque.add_cafeempaque' 'crear_empaque_cafe' as puede_crear %}
+{% tiene_permiso_accion request.user 'cafe_empaque.change_cafeempaque' 'editar_empaque_cafe' as puede_editar %}
+{% tiene_permiso_accion request.user 'cafe_empaque.delete_cafeempaque' 'eliminar_empaque_cafe' as puede_eliminar %}
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="cafe-empaque-list" data-list-url="/empaque-cafe/listar/">
   <div class="palette-surface w-full max-w-3xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
@@ -14,7 +18,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.cafe_empaque.add_cafeempaque %}
+          {% if puede_crear %}
             <a href="{% url 'cafe_empaque_nuevo' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -33,14 +37,14 @@
             <tr class="row group">
               <td class="td">{{ obj.empaque_cafe }}</td>
               <td class="td action">
-                {% if perms.cafe_empaque.change_cafeempaque %}
+                {% if puede_editar %}
                   <a href="{% url 'cafe_empaque_editar' obj.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}
               </td>
               <td class="td action">
-                {% if perms.cafe_empaque.delete_cafeempaque %}
+                {% if puede_eliminar %}
                   <a href="{% url 'cafe_empaque_eliminar' obj.pk %}" class="link link-delete" data-modal-navigate>Eliminar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>

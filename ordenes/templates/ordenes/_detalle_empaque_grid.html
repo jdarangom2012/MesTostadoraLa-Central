@@ -1,0 +1,69 @@
+<div class="hidden">
+  {{ form.empaque_cafe }}
+  {{ form.tamano_empaque }}
+</div>
+<div class="mb-6 hidden" data-orden-empaque-extra>
+  <div class="space-y-3" data-detalle-empaque-grid>
+    <div>
+      <h3 class="text-base font-semibold mb-2">Empaque recibido</h3>
+      <p class="text-xs text-gray-500">Registra una o varias combinaciones de empaque y cantidad. No se permite eliminar filas.</p>
+    </div>
+
+    {{ detalle_formset.management_form }}
+
+    {% if detalle_formset.non_form_errors %}
+      <div class="text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
+        {{ detalle_formset.non_form_errors }}
+      </div>
+    {% endif %}
+
+    <div class="overflow-x-auto rounded-lg border border-brand-dark/30 shadow-inner">
+      <table class="min-w-full text-sm" data-detalle-empaque-table>
+        <thead class="bg-gray-50/80">
+          <tr>
+            <th class="px-3 py-2 text-left font-semibold">#</th>
+            <th class="px-3 py-2 text-left font-semibold">Empaque Café</th>
+            <th class="px-3 py-2 text-left font-semibold">Tamaño Empaque</th>
+            <th class="px-3 py-2 text-left font-semibold">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody data-detalle-empaque-body>
+          {% for detalle_form in detalle_formset.forms %}
+            <tr class="border-t border-brand-dark/10 align-top" data-detalle-empaque-row>
+              <td class="px-3 py-3 text-xs text-gray-500" data-detalle-empaque-index>{{ forloop.counter }}</td>
+              <td class="px-3 py-3 min-w-[12rem]">
+                {{ detalle_form.id }}
+                {{ detalle_form.empaque_cafe }}
+                {{ detalle_form.empaque_cafe.errors }}
+              </td>
+              <td class="px-3 py-3 min-w-[12rem]">
+                {{ detalle_form.tamano_empaque }}
+                {{ detalle_form.tamano_empaque.errors }}
+              </td>
+              <td class="px-3 py-3 min-w-[8rem]">
+                {{ detalle_form.cantidad }}
+                {{ detalle_form.cantidad.errors }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <template data-detalle-empaque-empty-form>
+      <tr class="border-t border-brand-dark/10 align-top" data-detalle-empaque-row>
+        <td class="px-3 py-3 text-xs text-gray-500" data-detalle-empaque-index></td>
+        <td class="px-3 py-3 min-w-[12rem]">
+          {{ detalle_formset.empty_form.id }}
+          {{ detalle_formset.empty_form.empaque_cafe }}
+        </td>
+        <td class="px-3 py-3 min-w-[12rem]">
+          {{ detalle_formset.empty_form.tamano_empaque }}
+        </td>
+        <td class="px-3 py-3 min-w-[8rem]">
+          {{ detalle_formset.empty_form.cantidad }}
+        </td>
+      </tr>
+    </template>
+  </div>
+</div>

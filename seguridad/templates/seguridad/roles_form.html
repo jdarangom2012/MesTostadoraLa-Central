@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold">{{ titulo }}</h1>
+    <a href="{% url 'seguridad_roles_listar' %}" class="text-sm text-brand-dark hover:underline">Volver</a>
+  </div>
+
+  <form method="post" class="bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="text-sm text-red-700">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Nombre</label>
+      {{ form.nombre }}
+      {% for e in form.nombre.errors %}<div class="text-sm text-red-700">{{ e }}</div>{% endfor %}
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Descripción</label>
+      {{ form.descripcion }}
+      {% for e in form.descripcion.errors %}<div class="text-sm text-red-700">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div class="flex justify-end">
+      <button type="submit" class="px-4 py-2 rounded bg-brand-dark text-white hover:opacity-90">Guardar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

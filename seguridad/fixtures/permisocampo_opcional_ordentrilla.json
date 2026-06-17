@@ -1,0 +1,32 @@
+[
+  {
+    "model": "seguridad.permisocampo",
+    "fields": {
+      "rol": 1,
+      "modelo": "OrdenTrilla",
+      "campo": "peso_cafe_verde",
+      "puede_ver": true,
+      "puede_editar": false
+    }
+  },
+  {
+    "model": "seguridad.permisocampo",
+    "fields": {
+      "rol": 1,
+      "modelo": "OrdenTrilla",
+      "campo": "peso_cafe_neto",
+      "puede_ver": true,
+      "puede_editar": false
+    }
+  },
+  {
+    "model": "seguridad.permisocampo",
+    "fields": {
+      "rol": 1,
+      "modelo": "OrdenTrilla",
+      "campo": "rendimiento",
+      "puede_ver": true,
+      "puede_editar": false
+    }
+  }
+]

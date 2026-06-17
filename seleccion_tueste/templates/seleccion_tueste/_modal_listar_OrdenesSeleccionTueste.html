@@ -1,3 +1,7 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'seleccion_tueste.add_selecciontueste' 'crear_orden_seleccion_tueste' as puede_crear %}
+{% tiene_permiso_accion request.user 'seleccion_tueste.change_selecciontueste' 'editar_orden_seleccion_tueste' as puede_editar %}
+{% tiene_permiso_accion request.user 'seleccion_tueste.delete_selecciontueste' 'eliminar_orden_seleccion_tueste' as puede_eliminar %}
 {% url 'ordenes_seleccion_tueste_listar' as base_list_url %}
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="ordenes-seleccion-tueste-list" data-list-url="{{ base_list_url }}">
   <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
@@ -16,7 +20,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.seleccion_tueste.add_selecciontueste %}
+          {% if puede_crear %}
             <a href="{% url 'orden_seleccion_tueste_nuevo' %}?fragment=1" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -42,7 +46,7 @@
             {% for s in selecciones %}
               <tr class="row group">
                 <td class="td mono">{{ s.id }}</td>
-                <td class="td">{{ s.orden_id }}</td>
+                <td class="td">{% if s.orden %}{{ s.orden.orden|default:s.orden }}{% else %}—{% endif %}</td>
                 <td class="td">{{ s.orden.cliente|default:'—' }}</td>
                 <td class="td">{{ s.estado_tareas|default:'—' }}</td>
                 <td class="td">{{ s.cat_limpieza|yesno:'Sí,No' }}</td>
@@ -51,14 +55,14 @@
                 <td class="td">{% if s.cat_grupo2 %}{{ s.desc_grupo2 }} ({{ s.peso_grupo2 }}){% else %}—{% endif %}</td>
                 <td class="td">{% if s.cat_grupo3 %}{{ s.desc_grupo3 }} ({{ s.peso_grupo3 }}){% else %}—{% endif %}</td>
                 <td class="td action">
-                  {% if perms.seleccion_tueste.change_selecciontueste %}
+                  {% if puede_editar %}
                     <a href="{% url 'orden_seleccion_tueste_editar' s.pk %}?fragment=1" class="link link-edit" data-modal-navigate>Editar</a>
                   {% else %}
                     <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                   {% endif %}
                 </td>
                 <td class="td action">
-                  {% if perms.seleccion_tueste.delete_selecciontueste %}
+                  {% if puede_eliminar %}
                     <a href="{% url 'orden_seleccion_tueste_eliminar' s.pk %}?fragment=1" class="link link-delete" data-modal-navigate>Eliminar</a>
                   {% else %}
                     <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>

@@ -444,13 +444,16 @@
   function bindModal(root){
     if(!root) return;
     const close = ()=>{ try { root.remove(); } catch(_){} };
-    root.addEventListener('click', e=>{ if(e.target === root) close(); });
+    const modalContent = root.firstElementChild;
+    if (modalContent) {
+      modalContent.addEventListener('click', (e) => { e.stopPropagation(); });
+    }
     root.querySelectorAll('[data-close-modal]').forEach(btn=>btn.addEventListener('click', (e)=>{ e.preventDefault(); close(); }));
     // navegación interna en el modal
     root.addEventListener('click', async (ev)=>{
       const link = ev.target.closest('a[data-modal-navigate]');
       if(link){ ev.preventDefault(); const url = link.getAttribute('href'); if(url) await loadFragment(url); }
-    });
+    }, true);
     // submit ajax
     root.querySelectorAll('form[data-modal-form]').forEach(form=>{
       form.addEventListener('submit', async e=>{

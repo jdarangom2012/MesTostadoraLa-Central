@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Django dev server (no reload)",
+			"type": "shell",
+			"command": "bash -lc \"cd d:/Obras/TostadoraCentral/AppTostadoraCentral && python manage.py runserver --noreload\"",
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "build"
+		}
+	]
+}

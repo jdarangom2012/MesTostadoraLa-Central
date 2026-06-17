@@ -38,7 +38,7 @@ class OrdenSeleccionTostado(models.Model):
     desc_grupo3 = models.CharField(db_column='DescipGrupo3', max_length=100, blank=True, null=True)
     peso_grupo3 = models.FloatField(db_column='pesogrupo3', blank=True, null=True)
 
-    notas = models.CharField(db_column='notas', max_length=100, blank=True, null=True)
+    notas = models.CharField(db_column='notas', max_length=500, blank=True, null=True)
 
     created_at = models.DateTimeField(db_column='created_at')
     updated_at = models.DateTimeField(db_column='updated_at', blank=True, null=True)

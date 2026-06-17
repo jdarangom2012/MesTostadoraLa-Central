@@ -1,4 +1,4 @@
-<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-orden-trilla-defaults-url="{% url 'orden_trilla_defaults' %}">
   <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <form method="post" action="{% url 'orden_trilla_nuevo' %}" data-modal-form class="p-0">
       {% csrf_token %}
@@ -15,6 +15,11 @@
         {{ form.non_field_errors }}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
+            <label class="label">Cliente</label>
+            {{ form.cliente }}
+            {{ form.cliente.errors }}
+          </div>
+          <div>
             <label class="label">Orden</label>
             {{ form.orden }}
             {{ form.orden.errors }}
@@ -25,7 +30,7 @@
             {{ form.estado_tareas.errors }}
           </div>
           <div>
-            <label class="label">Peso Café Bruto (kg)</label>
+            <label class="label">Peso Café Neto (kg)</label>
             {{ form.peso_cafe_bruto }}
             {{ form.peso_cafe_bruto.errors }}
           </div>
@@ -38,6 +43,11 @@
             <label class="label">Rendimiento (%)</label>
             {{ form.rendimiento }}
             {{ form.rendimiento.errors }}
+          </div>
+          <div class="md:col-span-2">
+            <label class="label">Notas</label>
+            {{ form.notas }}
+            {{ form.notas.errors }}
           </div>
         </div>
       </div>

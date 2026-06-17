@@ -1,3 +1,41 @@
+{% load seguridad_permisos %}
+{% tiene_permiso request.user "ver_orden_produccion" as CAN_VER_ORDEN_PRODUCCION %}
+{% tiene_permiso request.user "ver_orden_trilla" as CAN_VER_ORDEN_TRILLA %}
+{% tiene_permiso request.user "ver_orden_tueste" as CAN_VER_ORDEN_TUESTE %}
+{% tiene_modulo request.user "Órdenes Tueste" as CAN_MOD_ORDEN_TUESTE %}
+{% tiene_permiso request.user "ver_orden_seleccion_tueste" as CAN_VER_SEL_TUESTE %}
+{% tiene_permiso request.user "ver_orden_seleccion_verde" as CAN_VER_SEL_VERDE %}
+{% tiene_permiso request.user "ver_orden_seleccion_tostado" as CAN_VER_SEL_TOSTADO %}
+{% tiene_permiso request.user "ver_ordenes_seleccion_verde" as CAN_VER_ORDENES_SEL_VERDE %}
+{% tiene_modulo request.user "Órdenes Selección Tueste" as CAN_MOD_SEL_TUESTE %}
+
+{% tiene_permiso request.user "ver_empaque" as CAN_VER_EMPAQUE %}
+
+{% tiene_permiso request.user "ver_curvas_tueste" as CAN_VER_CURVAS_TUESTE %}
+
+{% tiene_permiso request.user "ver_inventario" as CAN_VER_INVENTARIO %}
+
+{% tiene_permiso request.user "ver_clientes" as CAN_VER_CLIENTES %}
+{% tiene_permiso request.user "ver_empleados" as CAN_VER_EMPLEADOS %}
+{% tiene_permiso request.user "ver_materiales" as CAN_VER_MATERIALES %}
+{% tiene_permiso request.user "ver_estados" as CAN_VER_ESTADOS %}
+{% tiene_permiso request.user "ver_origenes" as CAN_VER_ORIGENES %}
+{% tiene_permiso request.user "ver_proceso_inventario_cafe" as CAN_VER_PROCESO_INV_CAFE %}
+{% tiene_permiso request.user "ver_variendad_inven_cafe" as CAN_VER_VARIENDAD_INVEN_CAFE %}
+{% tiene_permiso request.user "ver_empaque_cafe" as CAN_VER_EMPAQUE_CAFE %}
+{% tiene_permiso request.user "ver_estado_orden" as CAN_VER_ESTADO_ORDEN %}
+{% tiene_permiso request.user "ver_estado_tareas" as CAN_VER_ESTADO_TAREAS %}
+{% tiene_permiso request.user "ver_zaranda_grupo" as CAN_VER_ZARANDA_GRUPO %}
+{% tiene_permiso request.user "ver_nivel_molienda" as CAN_VER_NIVEL_MOLIENDA %}
+{% tiene_permiso request.user "ver_tamano_empaque" as CAN_VER_TAMANO_EMPAQUE %}
+
+{% tiene_permiso request.user "ver_reportes" as CAN_VER_REPORTES %}
+{% tiene_permiso request.user "configurar_sistema" as CAN_CONFIGURAR_SISTEMA %}
+{% tiene_permiso request.user "gestionar_permisos" as CAN_GESTIONAR_PERMISOS %}
+{% tiene_permiso request.user "ver_permisos" as CAN_VER_PERMISOS %}
+{% tiene_modulo request.user "Seguridad" as CAN_MOD_SEGURIDAD %}
+{% es_programador_tag request.user as USER_ES_PROGRAMADOR %}
+
 <aside class="hidden md:flex w-60 shrink-0 flex-col border-r bg-white/80 dark:bg-gray-900/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 border-gray-200 dark:border-gray-800 overflow-y-auto text-[13px]" x-data>
   <style>
     /* Guía vertical + indentación uniforme para submenús */
@@ -15,38 +53,36 @@
   <!-- Enlace Dashboard eliminado -->
 
     <!-- Grupo: Órdenes (abierto por defecto) -->
+    {% if CAN_VER_ORDEN_PRODUCCION or CAN_VER_ORDEN_TRILLA or CAN_MOD_ORDEN_TUESTE or CAN_MOD_SEL_TUESTE or CAN_VER_SEL_VERDE or CAN_VER_SEL_TOSTADO or CAN_VER_ORDENES_SEL_VERDE or CAN_VER_EMPAQUE %}
     <div class="sidebar-group" data-open="true">
       <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="true">
-        <span class="w-4 text-[11px]">📦</span>
-        <span class="flex-1 text-left">Órdenes</span>
+        <span class="w-4 text-[11px]">🏭</span>
+        <span class="flex-1 text-left">Producción</span>
         <span class="caret transition-transform duration-200 rotate-90 text-[10px]">▶</span>
       </button>
   <ul class="mt-1 space-y-1 children">
-  <li><a href="/ordenes-produccion/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧾</span><span class="flex-1">Órdenes de Producción</span></a></li>
-  <li><a href="/ordenes-trilla/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌾</span><span class="flex-1">Órdenes de Trilla</span></a></li>
-  <li><a href="/ordenes-tueste/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🔥</span><span class="flex-1">Órdenes de Tueste</span></a></li>
-  <li><a href="{% url 'ordenes_seleccion_tueste_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🔍</span><span class="flex-1">Órdenes Selección Tueste</span></a></li>
-  <li><a href="{% url 'ordenes_seleccion_verde_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🍃</span><span class="flex-1">Órdenes Selección Verde</span></a></li>
-  <li><a href="{% url 'ordenes_seleccion_tostado_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">☕</span><span class="flex-1">Órdenes Selección Tostado</span></a></li>
+  {% if CAN_VER_ORDEN_PRODUCCION %}<li><a href="/ordenes-produccion/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧾</span><span class="flex-1">Órdenes de Producción</span></a></li>{% endif %}
+  {% if CAN_VER_ORDEN_TRILLA %}<li><a href="/ordenes-trilla/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌾</span><span class="flex-1">Órdenes de Trilla</span></a></li>{% endif %}
+  {% if CAN_MOD_ORDEN_TUESTE %}<li><a href="/ordenes-tueste/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🔥</span><span class="flex-1">Órdenes de Tueste</span></a></li>{% endif %}
+  {% if CAN_MOD_SEL_TUESTE %}<li><a href="{% url 'ordenes_seleccion_tueste_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🔍</span><span class="flex-1">Órdenes Selección Tueste</span></a></li>{% endif %}
+  {% if CAN_VER_SEL_VERDE %}<li><a href="{% url 'ordenes_seleccion_verde_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🍃</span><span class="flex-1">Órdenes Selección Verde</span></a></li>{% endif %}
+  {% if CAN_VER_ORDENES_SEL_VERDE %}
+  <li>
+    <a href="{% url 'ordenes_seleccion_verde_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700">
+      <span class="w-4 text-[11px]">🍃</span><span class="flex-1">Selección Café Verde</span>
+    </a>
+  </li>
+  {% endif %}
+  {% if CAN_VER_SEL_TOSTADO %}<li><a href="{% url 'ordenes_seleccion_tostado_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">☕</span><span class="flex-1">Órdenes Selección Tostado</span></a></li>{% endif %}
+  {% if CAN_VER_EMPAQUE %}<li><a href="/empaque/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🏷️</span><span class="flex-1">Órdenes de Empaque</span></a></li>{% endif %}
       </ul>
     </div>
-
-    <!-- Grupo: Producción -->
-    <div class="sidebar-group" data-open="false">
-      <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
-        <span class="w-4 text-[11px]">🏭</span>
-        <span class="flex-1 text-left">Producción</span>
-        <span class="caret transition-transform duration-200 text-[10px]">▶</span>
-      </button>
-  <ul class="mt-1 space-y-1 children hidden">
-  <li><a href="/molienda/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">⚙️</span><span class="flex-1">Molienda</span></a></li>
-  <li><a href="/empaque/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🏷️</span><span class="flex-1">Empaque</span></a></li>
-      </ul>
-    </div>
+    {% endif %}
 
   <!-- Grupo: Calidad -->
   {% if user.is_authenticated %}
     {% if user.is_staff or HAS_GROUP_CALIDAD %}
+  {% if CAN_VER_CURVAS_TUESTE %}
   <div class="sidebar-group" data-open="false">
       <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
         <span class="w-4 text-[11px]">🧪</span>
@@ -57,10 +93,12 @@
   <li><a href="/curvas_tueste/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📈</span><span class="flex-1">Curvas de Tueste</span></a></li>
       </ul>
     </div>
+  {% endif %}
     {% endif %}
   {% endif %}
 
     <!-- Grupo: Inventario -->
+    {% if CAN_VER_INVENTARIO %}
     <div class="sidebar-group" data-open="false">
       <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
         <span class="w-4 text-[11px]">📦</span>
@@ -71,7 +109,9 @@
   <li><a href="{% url 'inventario_cafe_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🫘</span><span class="flex-1">Café</span></a></li>
       </ul>
     </div>
+    {% endif %}
 
+    {% if CAN_VER_CLIENTES or CAN_VER_EMPLEADOS or CAN_VER_MATERIALES or CAN_VER_ESTADOS or CAN_VER_ORIGENES or CAN_VER_PROCESO_INV_CAFE or CAN_VER_VARIENDAD_INVEN_CAFE or CAN_VER_EMPAQUE_CAFE or CAN_VER_ESTADO_ORDEN or CAN_VER_ESTADO_TAREAS or CAN_VER_ZARANDA_GRUPO or CAN_VER_NIVEL_MOLIENDA or CAN_VER_TAMANO_EMPAQUE %}
     <div class="sidebar-group" data-open="false">
       <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
         <span class="w-4 text-[11px]">🗂️</span>
@@ -79,29 +119,34 @@
         <span class="caret transition-transform duration-200 text-[10px]">▶</span>
       </button>
   <ul class="mt-1 pl-8 space-y-1 children hidden">
-  <li><a href="/clientes/listar/" data-modal-clientes class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👥</span><span class="flex-1">Clientes</span></a></li>
-  <li><a href="/empleados/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👨‍💼</span><span class="flex-1">Empleados</span></a></li>
-  <li><a href="/materiales/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧱</span><span class="flex-1">Materiales</span></a></li>
-  <li><a href="/estado-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🏷️</span><span class="flex-1">Estados</span></a></li>
-  <li><a href="/origen-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌍</span><span class="flex-1">Orígenes</span></a></li>
-  <li><a href="/proceso-inven-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧪</span><span class="flex-1">Proceso Inventario Café</span></a></li>
-  <li><a href="/empaque-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📦</span><span class="flex-1">Empaque Café</span></a></li>
-  <li><a href="/estado-orden/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📑</span><span class="flex-1">Estado Orden</span></a></li>
-  <li><a href="/estado-tareas/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">✅</span><span class="flex-1">Estado Tareas</span></a></li>
-  <li><a href="/zaranda-grupo/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🗺️</span><span class="flex-1">Zaranda/Grupo</span></a></li>
-  <li><a href="/nivel-molienda/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📊</span><span class="flex-1">Niveles Molienda</span></a></li>
-  <li><a href="/tamano-empaque/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📏</span><span class="flex-1">Tamaños Empaque</span></a></li>
+  {% if CAN_VER_CLIENTES %}<li><a href="/clientes/listar/" data-modal-clientes class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👥</span><span class="flex-1">Clientes</span></a></li>{% endif %}
+  {% if CAN_VER_EMPLEADOS %}<li><a href="/empleados/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👨‍💼</span><span class="flex-1">Empleados</span></a></li>{% endif %}
+  {% if CAN_VER_MATERIALES %}<li><a href="/materiales/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧱</span><span class="flex-1">Materiales</span></a></li>{% endif %}
+  {% if CAN_VER_ESTADOS %}<li><a href="/estado-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🏷️</span><span class="flex-1">Estados</span></a></li>{% endif %}
+  {% if CAN_VER_ORIGENES %}<li><a href="/origen-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌍</span><span class="flex-1">Orígenes</span></a></li>{% endif %}
+  {% if CAN_VER_PROCESO_INV_CAFE %}<li><a href="/proceso-inven-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🧪</span><span class="flex-1">Proceso Cafe</span></a></li>{% endif %}
+  {% if CAN_VER_VARIENDAD_INVEN_CAFE %}<li><a href="{% url 'variedad_inven_cafe_listar' %}" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🌱</span><span class="flex-1">Variedad Cafe</span></a></li>{% endif %}
+  {% if CAN_VER_EMPAQUE_CAFE %}<li><a href="/empaque-cafe/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📦</span><span class="flex-1">Empaque Café</span></a></li>{% endif %}
+  {% if CAN_VER_ESTADO_ORDEN %}<li><a href="/estado-orden/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📑</span><span class="flex-1">Estado Orden</span></a></li>{% endif %}
+  {% if CAN_VER_ESTADO_TAREAS %}<li><a href="/estado-tareas/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">✅</span><span class="flex-1">Estado Tareas</span></a></li>{% endif %}
+  {% if CAN_VER_ZARANDA_GRUPO %}<li><a href="/zaranda-grupo/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🗺️</span><span class="flex-1">Zaranda/Grupo</span></a></li>{% endif %}
+  {% if CAN_VER_NIVEL_MOLIENDA %}<li><a href="/nivel-molienda/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📊</span><span class="flex-1">Niveles Molienda</span></a></li>{% endif %}
+  {% if CAN_VER_TAMANO_EMPAQUE %}<li><a href="/tamano-empaque/listar/" data-modal-navigate class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">📏</span><span class="flex-1">Tamaños Empaque</span></a></li>{% endif %}
       </ul>
     </div>
+    {% endif %}
 
     <!-- Item simple Reportes -->
+    {% if CAN_VER_REPORTES %}
     <a href="/reportes/" class="group flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition">
       <span class="w-4 text-[11px]">📈</span>
       <span class="flex-1">Reportes</span>
     </a>
+    {% endif %}
 
   <!-- Grupo: Administración (solo staff) -->
   {% if user.is_authenticated and user.is_staff %}
+  {% if request.user.is_superuser or CAN_CONFIGURAR_SISTEMA or CAN_MOD_SEGURIDAD or CAN_VER_PERMISOS or CAN_GESTIONAR_PERMISOS %}
     <div class="sidebar-group" data-open="false">
       <button type="button" class="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700 transition group parent-btn" aria-expanded="false">
         <span class="w-4 text-[11px]">⚙️</span>
@@ -109,11 +154,14 @@
         <span class="caret transition-transform duration-200 text-[10px]">▶</span>
       </button>
   <ul class="mt-1 space-y-1 children hidden">
-  <li><a href="/admin/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🛠️</span><span class="flex-1">Django Admin</span></a></li>
-  <li><a href="/usuarios/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">👤</span><span class="flex-1">Usuarios y Roles</span></a></li>
+  {% if request.user.is_superuser or CAN_MOD_SEGURIDAD or CAN_VER_PERMISOS or CAN_GESTIONAR_PERMISOS %}<li><a href="/seguridad/roles/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🛡️</span><span class="flex-1">Seguridad</span></a></li>{% endif %}
+  {% if not USER_ES_PROGRAMADOR %}
+  {% if request.user.is_superuser or CAN_GESTIONAR_PERMISOS %}<li><a href="/seguridad/gestionar-permisos/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">🛡️</span><span class="flex-1">Gestión Permisos</span></a></li>{% endif %}
   <li><a href="/parametros/" class="flex items-center gap-2 px-2 py-1 rounded hover:bg-brand-primary/10 dark:hover:bg-gray-700"><span class="w-4 text-[11px]">⚙️</span><span class="flex-1">Parámetros</span></a></li>
+  {% endif %}
       </ul>
     </div>
+    {% endif %}
     {% endif %}
   </nav>
   <div class="p-2 text-[10px] text-gray-500 dark:text-gray-600 border-t border-gray-200 dark:border-gray-800">© {{ now|date:'Y' }} La Central</div>

@@ -52,7 +52,7 @@ def test_bulk_crud_sqlserver():
     assert Orden.objects.filter(id__in=ids).count() == 0
 from django.test import TestCase, SimpleTestCase
 from django.urls import reverse
-from .models import Orden
+from .models import DetalleEmpaqueOrden, Orden
 from clientes.models import Cliente
 
 class OrdenTests(TestCase):
@@ -66,6 +66,26 @@ class OrdenTests(TestCase):
         from django.contrib.auth.models import Permission
         perms = Permission.objects.filter(codename__in=['add_orden', 'change_orden', 'view_orden', 'delete_orden'])
         self.user.user_permissions.set(perms)
+
+    def _detalle_management_data(self, total_forms, initial_forms=0):
+        return {
+            'detalle_empaque-TOTAL_FORMS': str(total_forms),
+            'detalle_empaque-INITIAL_FORMS': str(initial_forms),
+            'detalle_empaque-MIN_NUM_FORMS': '0',
+            'detalle_empaque-MAX_NUM_FORMS': '1000',
+        }
+
+    def _base_orden_data(self, **overrides):
+        data = {
+            'cliente': self.cliente.id,
+            'orden': 'ORD-BASE',
+            'estado_orden': self.estado_orden.id,
+            'fecha_inicio_orden': '2026-05-19',
+            'prioridad': 1,
+        }
+        data.update(self._detalle_management_data(total_forms=1))
+        data.update(overrides)
+        return data
 
     def test_creacion_orden_con_campo_orden(self):
         url = reverse('ordenes_produccion_nuevo')
@@ -95,6 +115,31 @@ class OrdenTests(TestCase):
         self.assertEqual(response.status_code, 200)
         orden = Orden.objects.latest('id')
         self.assertEqual(orden.orden, 'ORD00001')
+
+    def test_no_permite_orden_duplicada_muestra_mensaje(self):
+        from django.utils import timezone
+
+        existente = Orden.objects.create(
+            cliente=self.cliente,
+            orden='ORDSQL99',
+            estado_orden=self.estado_orden,
+            created_at=timezone.now(),
+        )
+
+        url = reverse('ordenes_produccion_nuevo') + '?fragment=1'
+        data = {
+            'cliente': self.cliente.id,
+            'orden': 'ordsqL99',
+            'estado_orden': self.estado_orden.id,
+            'prioridad': 1,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'La orden de producción ya existe')
+        self.assertEqual(Orden.objects.count(), 1)
+
+        existente.refresh_from_db()
+        self.assertEqual(existente.orden, 'ORDSQL99')
 
     def test_edicion_orden_modifica_campo_orden(self):
         from django.utils import timezone
@@ -177,6 +222,144 @@ class OrdenTests(TestCase):
             self.assertEqual(response.status_code, 200)
 
         self.assertEqual(Orden.objects.count(), 0)
+
+    def test_form_requiere_campos_empaque_cuando_empaque_activo(self):
+        from ordenes.forms import OrdenForm
+
+        form = OrdenForm(data={
+            'cliente': self.cliente.id,
+            'orden': 'ORDPACK01',
+            'estado_orden': self.estado_orden.id,
+            'fecha_inicio_orden': '2026-05-17',
+            'empaque_flag': 'on',
+            'prioridad': 1,
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('empaque_cafe', form.errors)
+        self.assertIn('tamano_empaque', form.errors)
+
+    def test_form_acepta_campos_empaque_cuando_estan_completos(self):
+        from ordenes.forms import OrdenForm
+        from cafe_empaque.models import CafeEmpaque
+        from tamano_empaque.models import TamanoEmpaque
+
+        empaque = CafeEmpaque.objects.create(empaque_cafe='Bolsa Test')
+        tamano = TamanoEmpaque.objects.create(tamano_empaque='500g')
+
+        form = OrdenForm(data={
+            'cliente': self.cliente.id,
+            'orden': 'ORDPACK02',
+            'estado_orden': self.estado_orden.id,
+            'fecha_inicio_orden': '2026-05-17',
+            'conf_empaque': 'on',
+            'empaque_cafe': empaque.id,
+            'tamano_empaque': tamano.id,
+            'prioridad': 1,
+        })
+
+        self.assertTrue(form.is_valid(), form.errors.as_json())
+
+    def test_formset_requiere_al_menos_un_detalle_cuando_trajo_empaque_esta_activo(self):
+        from ordenes.forms import build_detalle_empaque_formset
+
+        formset = build_detalle_empaque_formset(data={
+            'trabajo_empaque': 'on',
+            **self._detalle_management_data(total_forms=1),
+        })
+
+        self.assertFalse(formset.is_valid())
+        self.assertIn('Debe registrar al menos un detalle de empaque', formset.non_form_errors()[0])
+
+    def test_crea_orden_con_multiples_detalles_empaque_y_sincroniza_fk_legacy(self):
+        from cafe_empaque.models import CafeEmpaque
+        from tamano_empaque.models import TamanoEmpaque
+
+        empaque_1 = CafeEmpaque.objects.create(empaque_cafe='Bolsa Kraft')
+        empaque_2 = CafeEmpaque.objects.create(empaque_cafe='Bolsa Negra')
+        tamano_1 = TamanoEmpaque.objects.create(tamano_empaque='250g')
+        tamano_2 = TamanoEmpaque.objects.create(tamano_empaque='500g')
+
+        url = reverse('ordenes_produccion_nuevo')
+        data = self._base_orden_data(
+            orden='ORDPACKGRID01',
+            trabajo_empaque='on',
+            **self._detalle_management_data(total_forms=3),
+            **{
+                'detalle_empaque-0-empaque_cafe': str(empaque_1.id),
+                'detalle_empaque-0-tamano_empaque': str(tamano_1.id),
+                'detalle_empaque-0-cantidad': '10',
+                'detalle_empaque-1-empaque_cafe': str(empaque_2.id),
+                'detalle_empaque-1-tamano_empaque': str(tamano_2.id),
+                'detalle_empaque-1-cantidad': '5',
+                'detalle_empaque-2-empaque_cafe': '',
+                'detalle_empaque-2-tamano_empaque': '',
+                'detalle_empaque-2-cantidad': '',
+            },
+        )
+
+        response = self.client.post(url, data, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        orden = Orden.objects.get(orden='ORDPACKGRID01')
+        detalles = list(orden.detalles_empaque.order_by('id'))
+
+        self.assertEqual(len(detalles), 2)
+        self.assertEqual(detalles[0].cantidad, 10)
+        self.assertEqual(detalles[1].cantidad, 5)
+        self.assertEqual(orden.empaque_cafe_id, empaque_1.id)
+        self.assertEqual(orden.tamano_empaque_id, tamano_1.id)
+
+    def test_edicion_orden_limpia_detalle_empaque_cuando_trajo_empaque_se_desactiva(self):
+        from cafe_empaque.models import CafeEmpaque
+        from tamano_empaque.models import TamanoEmpaque
+        from django.utils import timezone
+
+        empaque = CafeEmpaque.objects.create(empaque_cafe='Bolsa Blanca')
+        tamano = TamanoEmpaque.objects.create(tamano_empaque='1Kg')
+        orden = Orden.objects.create(
+            cliente=self.cliente,
+            orden='ORDPACKGRID02',
+            estado_orden=self.estado_orden,
+            fecha_inicio_orden=timezone.now(),
+            created_at=timezone.now(),
+            trabajo_empaque=True,
+            empaque_cafe=empaque,
+            tamano_empaque=tamano,
+            prioridad=1,
+        )
+        detalle = DetalleEmpaqueOrden.objects.create(
+            orden=orden,
+            empaque_cafe=empaque,
+            tamano_empaque=tamano,
+            cantidad=3,
+        )
+
+        url = reverse('ordenes_produccion_editar', args=[orden.id])
+        data = self._base_orden_data(
+            orden='ORDPACKGRID02',
+            trabajo_empaque='',
+            prioridad=2,
+            **self._detalle_management_data(total_forms=2, initial_forms=1),
+            **{
+                'detalle_empaque-0-id': str(detalle.id),
+                'detalle_empaque-0-empaque_cafe': str(empaque.id),
+                'detalle_empaque-0-tamano_empaque': str(tamano.id),
+                'detalle_empaque-0-cantidad': '3',
+                'detalle_empaque-1-empaque_cafe': '',
+                'detalle_empaque-1-tamano_empaque': '',
+                'detalle_empaque-1-cantidad': '',
+            },
+        )
+
+        response = self.client.post(url, data, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        orden.refresh_from_db()
+        self.assertFalse(orden.trabajo_empaque)
+        self.assertIsNone(orden.empaque_cafe_id)
+        self.assertIsNone(orden.tamano_empaque_id)
+        self.assertEqual(orden.detalles_empaque.count(), 0)
 from django.test import TestCase
 from .models import Orden
 from clientes.models import Cliente
@@ -233,6 +416,26 @@ class OrdenCrudSQLServerTest(TestCase):
 class OrdenModalStructureTests(TestCase):
     def setUp(self):
         from django.utils import timezone
+
+
+class OrdenPermisosHtmxTests(TestCase):
+    def setUp(self):
+        from django.contrib.auth.models import User
+        from seguridad.models import PerfilUsuario, Rol
+
+        self.user = User.objects.create_user(username='programador_sin_permiso', password='testpass')
+        self.rol_programador = Rol.objects.create(nombre='Programador')
+        PerfilUsuario.objects.create(user=self.user, rol=self.rol_programador)
+        self.client.login(username='programador_sin_permiso', password='testpass')
+
+    def test_nueva_orden_sin_permiso_devuelve_modal_html_para_hx_request(self):
+        url = reverse('ordenes_produccion_nuevo')
+        response = self.client.get(url, HTTP_HX_REQUEST='true')
+
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(response, 'data-modal-root', html=False)
+        self.assertContains(response, 'Acceso denegado')
+        self.assertContains(response, 'No tienes permiso para realizar esta acción.')
         from empleados.models import Empleado
         from estado_ordenes.models import EstadoOrden
         from inventario_cafe.models import InventarioCafe

@@ -1,3 +1,7 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'estado_ordenes.add_estadoorden' 'crear_estado_orden' as puede_crear %}
+{% tiene_permiso_accion request.user 'estado_ordenes.change_estadoorden' 'editar_estado_orden' as puede_editar %}
+{% tiene_permiso_accion request.user 'estado_ordenes.delete_estadoorden' 'eliminar_estado_orden' as puede_eliminar %}
 <div id="modalEstadoOrden" class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="estado-orden-list" data-list-url="/estado-orden/listar/">
   <div class="palette-surface w-full max-w-3xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
@@ -14,7 +18,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.estado_ordenes.add_estadoorden %}
+          {% if puede_crear %}
             <a href="{% url 'estado_orden_nuevo' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -33,14 +37,14 @@
             <tr class="row group">
               <td class="td">{{ e.estado_orden }}</td>
               <td class="td action">
-                {% if perms.estado_ordenes.change_estadoorden %}
+                {% if puede_editar %}
                   <a href="{% url 'estado_orden_editar' e.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}
               </td>
               <td class="td action">
-                {% if perms.estado_ordenes.delete_estadoorden %}
+                {% if puede_eliminar %}
                   <a href="{% url 'estado_orden_eliminar' e.pk %}" class="link link-delete" data-modal-navigate>Eliminar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>

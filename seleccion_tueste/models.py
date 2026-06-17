@@ -18,6 +18,7 @@ class SeleccionTueste(models.Model):
     cat_grupo3 = models.BooleanField(db_column='CatGrupo3', blank=True, null=True)
     desc_grupo3 = models.CharField(db_column='DescGrupo3', max_length=20, blank=True, null=True)
     peso_grupo3 = models.FloatField(db_column='PesoGrupo3', blank=True, null=True)
+    notas = models.CharField(db_column='Notas', max_length=500, blank=True, null=True)
     created_at = models.DateTimeField(db_column='created_at')
     updated_at = models.DateTimeField(db_column='updated_at', blank=True, null=True)
 

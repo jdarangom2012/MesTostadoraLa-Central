@@ -1,3 +1,8 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'ordenes_trilla.add_ordentrilla' 'crear_orden_trilla' as puede_crear %}
+{% tiene_permiso request.user "editar_orden_trilla" as puede_editar %}
+{% tiene_permiso request.user "eliminar_orden_trilla" as puede_eliminar %}
+
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="ordenes-trilla-list" data-list-url="/ordenes-trilla/listar/">
   <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
@@ -14,7 +19,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.ordenes_trilla.add_ordentrilla %}
+          {% if puede_crear %}
             <a href="{% url 'orden_trilla_nuevo' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -27,7 +32,7 @@
               <th>Fecha</th>
               <th>Orden</th>
               <th>Cliente</th>
-              <th>Peso Bruto</th>
+              <th>Peso Neto</th>
               <th>Peso Verde</th>
               <th>Rendimiento</th>
               <th>Estado</th>
@@ -40,24 +45,20 @@
             <tr class="row group">
               <td class="td mono">{{ t.id }}</td>
               <td class="td">{% if t.fecha_ingreso %}{{ t.fecha_ingreso|date:'d/m/Y' }}{% endif %}</td>
-              <td class="td">{% if t.orden %}Orden {{ t.orden.id }}{% else %}—{% endif %}</td>
-              <td class="td">{% if t.orden and t.orden.cliente %}{{ t.orden.cliente }}{% else %}—{% endif %}</td>
+              <td class="td">{% if t.orden %}{{ t.orden.orden|default:t.orden }}{% else %}—{% endif %}</td>
+              <td class="td">{{ t.cliente_display|default:"—" }}</td>
               <td class="td text-right">{{ t.peso_cafe_bruto|default_if_none:"0" }}</td>
               <td class="td text-right">{{ t.peso_cafe_verde|default_if_none:"0" }}</td>
               <td class="td text-right">{{ t.rendimiento|default_if_none:"0" }}</td>
               <td class="td">{{ t.estado_tareas }}</td>
               <td class="td action">
-                {% if perms.ordenes_trilla.change_ordentrilla %}
+                {% if puede_editar %}
                   <a href="{% url 'orden_trilla_editar' t.id %}" class="link link-edit" data-modal-navigate>Editar</a>
-                {% else %}
-                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}
               </td>
               <td class="td action">
-                {% if perms.ordenes_trilla.delete_ordentrilla %}
+                {% if puede_eliminar %}
                   <a href="{% url 'orden_trilla_eliminar' t.id %}" class="link link-delete" data-modal-navigate>Eliminar</a>
-                {% else %}
-                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>
                 {% endif %}
               </td>
             </tr>

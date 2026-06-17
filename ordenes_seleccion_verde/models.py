@@ -6,6 +6,62 @@ class OrdenSeleccionVerde(models.Model):
     estado_tareas = models.ForeignKey('estado_tareas.EstadoTarea', models.SET_NULL, db_column='IdEstadoTareas', blank=True, null=True)
     fecha_ingreso = models.DateTimeField(db_column='FechaIngreso', blank=True, null=True)
     zaranda = models.BooleanField(db_column='Zaranda', blank=True, null=True)
+
+    orden = models.ForeignKey(
+        'ordenes.Orden',
+        on_delete=models.SET_NULL,
+        db_column='IdOrden',
+        null=True,
+        blank=True,
+        db_constraint=False,
+    )
+
+    IdZarandaGrupo1 = models.ForeignKey(
+        'zaranda_grupo.ZarandaGrupo',
+        on_delete=models.SET_NULL,
+        db_column='IdZarandaGrupo1',
+        null=True,
+        blank=True,
+        related_name='+',
+        db_constraint=False,
+    )
+    IdZarandaGrupo2 = models.ForeignKey(
+        'zaranda_grupo.ZarandaGrupo',
+        on_delete=models.SET_NULL,
+        db_column='IdZarandaGrupo2',
+        null=True,
+        blank=True,
+        related_name='+',
+        db_constraint=False,
+    )
+    IdZarandaGrupo3 = models.ForeignKey(
+        'zaranda_grupo.ZarandaGrupo',
+        on_delete=models.SET_NULL,
+        db_column='IdZarandaGrupo3',
+        null=True,
+        blank=True,
+        related_name='+',
+        db_constraint=False,
+    )
+    IdZarandaGrupo4 = models.ForeignKey(
+        'zaranda_grupo.ZarandaGrupo',
+        on_delete=models.SET_NULL,
+        db_column='IdZarandaGrupo4',
+        null=True,
+        blank=True,
+        related_name='+',
+        db_constraint=False,
+    )
+    IdZarandaGrupo5 = models.ForeignKey(
+        'zaranda_grupo.ZarandaGrupo',
+        on_delete=models.SET_NULL,
+        db_column='IdZarandaGrupo5',
+        null=True,
+        blank=True,
+        related_name='+',
+        db_constraint=False,
+    )
+
     grupo1 = models.CharField(db_column='Grupo1', max_length=10, blank=True, null=True)
     peso_grupo1 = models.FloatField(db_column='PesoGrupo1', blank=True, null=True)
     grupo2 = models.CharField(db_column='Grupo2', max_length=10, blank=True, null=True)
@@ -31,6 +87,7 @@ class OrdenSeleccionVerde(models.Model):
     humedad = models.FloatField(db_column='Humedad', blank=True, null=True)
     medir_densidad = models.BooleanField(db_column='MedirDensidad', blank=True, null=True)
     densidad = models.FloatField(db_column='Densidad', blank=True, null=True)
+    notas = models.CharField(db_column='Notas', max_length=500, blank=True, null=True)
     created_at = models.DateTimeField(db_column='created_at')
     updated_at = models.DateTimeField(db_column='updated_at', blank=True, null=True)
 

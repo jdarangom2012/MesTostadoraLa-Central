@@ -9,7 +9,7 @@ document.addEventListener('click', function(e) {
     modal.remove();
     document.dispatchEvent(new CustomEvent('modal:close'));
   }
-});
+}, true);
 
 // Handler global para botón CANCELAR en cualquier modal
 document.addEventListener('click', async function(e) {
@@ -28,4 +28,4 @@ document.addEventListener('click', async function(e) {
     const html = await resp.text();
     container.innerHTML = html;
   }
-});
+}, true);

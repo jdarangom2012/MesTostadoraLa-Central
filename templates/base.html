@@ -21,6 +21,7 @@
                 {% block page_header %}{% endblock %}
                 {% block content %}{% endblock %}
             </main>
+            
         </div>
         {% include 'includes/footer.html' %}
         {% block extra_js %}{% endblock %}
@@ -54,15 +55,29 @@
                                     await loadFragment(url);
                                 }
                             }
-                });
+                }, true);
                 function bindModal(root){
                     if(!root) return;
-                    root.addEventListener('click', e=>{ if(e.target === root) close(); });
+                    const modalContent = root.firstElementChild;
+                    if (modalContent) {
+                        // Evita que los clicks dentro del contenido burbujeen hacia listeners globales.
+                        // La navegación de modales se maneja en fase de captura arriba.
+                        modalContent.addEventListener('click', (e) => { e.stopPropagation(); });
+                    }
                     root.querySelectorAll('[data-close-modal]').forEach(btn=>btn.addEventListener('click', (e)=>{ e.preventDefault(); close(); }));
                             // intercept submit
                                         root.querySelectorAll('form[data-modal-form]').forEach(form=>{
                                 form.addEventListener('submit', async e=>{
                                     e.preventDefault();
+                                e.stopPropagation();
+                                    if (form.dataset.submitting === '1') {
+                                        return;
+                                    }
+                                    form.dataset.submitting = '1';
+                                    const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                                    submitButtons.forEach(btn => {
+                                        btn.disabled = true;
+                                    });
                                     const formData = new FormData(form);
                                     const action = form.getAttribute('action') || location.href;
                                     try {
@@ -85,7 +100,14 @@
                                             // fallback
                                             location.reload();
                                         }
-                                    } catch(err){ console.error(err); location.reload(); }
+                                    } catch(err){
+                                        console.error(err);
+                                        form.dataset.submitting = '0';
+                                        submitButtons.forEach(btn => {
+                                            btn.disabled = false;
+                                        });
+                                        location.reload();
+                                    }
                                 });
                             });
                     function close(){ root.remove(); }
@@ -97,6 +119,7 @@
                                     // Normaliza agregando el atributo data-datepicker para estilos y futura detección
                                     inputs.forEach(i=>{ if(!i.hasAttribute('data-datepicker')) i.setAttribute('data-datepicker','1'); });
                                     const attachOpener = (input)=>{
+                                        if(input.dataset.dpNoOpener==='1') return; // opt-out por widget/template
                                         if(input.dataset.dpOpener==='1') return; // evitar duplicados
                                         const wrap = document.createElement('div');
                                         wrap.style.position = 'relative';
@@ -133,6 +156,64 @@
                                     } else {
                                         initLocal();
                                     }
+                                })();
+
+                                // Normalizar decimales con coma en inputs numéricos (evita "no puede ser parseado")
+                                (function initNumberNormalization(){
+                                    const nums = Array.from(root.querySelectorAll('input[type="number"]'));
+                                    if(!nums.length) return;
+                                    const normalize = (el)=>{
+                                        let v = (el.value ?? '').toString();
+                                        if(!v) return;
+                                        v = v.replace(/\s+/g,'').replace(',', '.');
+                                        // Evitar estados inválidos comunes al perder foco
+                                        if(v.endsWith('.')) v = v.slice(0, -1);
+                                        el.value = v;
+                                    };
+                                    nums.forEach(el=>{
+                                        el.addEventListener('input', ()=>{
+                                            const v = (el.value ?? '').toString();
+                                            if(v.includes(',')) el.value = v.replace(',', '.');
+                                        }, {passive:true});
+                                        el.addEventListener('change', ()=>normalize(el), {passive:true});
+                                        el.addEventListener('blur', ()=>normalize(el), {passive:true});
+                                    });
+                                })();
+
+                                (function initInventarioCafeCodigo(){
+                                    const codigo = root.querySelector('input[data-auto-codigo="inventario-cafe"]');
+                                    if(!codigo) return;
+                                    const fields = Array.from(root.querySelectorAll('select[data-codigo-source]'));
+                                    if(!fields.length) return;
+
+                                    const formatSegment = (value, length)=>{
+                                        const normalized = (value || '').toString().trim().replace(/[\s-]+/g, '');
+                                        if(!normalized) return '';
+                                        const clipped = normalized.slice(0, length);
+                                        return clipped.charAt(0).toUpperCase() + clipped.slice(1).toLowerCase();
+                                    };
+
+                                    const currentDate = ()=>{
+                                        const now = new Date();
+                                        const year = String(now.getFullYear());
+                                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                                        const day = String(now.getDate()).padStart(2, '0');
+                                        return `${year}${month}${day}`;
+                                    };
+
+                                    const updateCodigo = ()=>{
+                                        const parts = fields.map(field => {
+                                            const option = field.options[field.selectedIndex];
+                                            const text = option && option.value ? (option.dataset.codigoValue || option.text) : '';
+                                            return formatSegment(text, Number(field.dataset.codigoLength || 0));
+                                        });
+                                        codigo.value = `${parts.join('')}${currentDate()}`;
+                                    };
+
+                                    codigo.readOnly = true;
+                                    fields.forEach(field => field.addEventListener('change', updateCodigo));
+                                    codigo.addEventListener('input', updateCodigo);
+                                    updateCodigo();
                                 })();
 
                                 // Auto-buscar (debounce) en listados con data-list-url (clientes, materiales)

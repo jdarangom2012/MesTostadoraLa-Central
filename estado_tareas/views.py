@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django import forms
@@ -17,7 +17,7 @@ class EstadoTareaForm(forms.ModelForm):
         }
 
 
-@permission_required('estado_tareas.view_estadotarea', raise_exception=True)
+@permiso_accion_requerido('estado_tareas.view_estadotarea', 'ver_estado_tareas')
 def listar_estado_tareas(request):
     qs = EstadoTarea.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +47,7 @@ def listar_estado_tareas(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('estado_tareas.add_estadotarea', raise_exception=True)
+@permiso_accion_requerido('estado_tareas.add_estadotarea', 'crear_estado_tareas')
 def add_estado_tareas(request):
     if request.method == 'POST':
         form = EstadoTareaForm(request.POST)
@@ -68,7 +68,7 @@ def add_estado_tareas(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('estado_tareas.change_estadotarea', raise_exception=True)
+@permiso_accion_requerido('estado_tareas.change_estadotarea', 'editar_estado_tareas')
 def edit_estado_tareas(request, pk):
     obj = get_object_or_404(EstadoTarea, pk=pk)
     if request.method == 'POST':
@@ -89,7 +89,7 @@ def edit_estado_tareas(request, pk):
     return render(request, 'estado_tareas/listar_EstadoTareas.html', {})
 
 
-@permission_required('estado_tareas.delete_estadotarea', raise_exception=True)
+@permiso_accion_requerido('estado_tareas.delete_estadotarea', 'eliminar_estado_tareas')
 def delete_estado_tareas(request, pk):
     obj = get_object_or_404(EstadoTarea, pk=pk)
     if request.method == 'POST':

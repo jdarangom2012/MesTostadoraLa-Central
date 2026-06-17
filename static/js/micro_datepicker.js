@@ -4,6 +4,14 @@
   const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const days = ['Lu','Ma','Mi','Ju','Vi','Sa','Do'];
 
+  function parseISO(str){
+    if(!str) return null;
+    const m = String(str).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!m) return null;
+    const d = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
+    return isNaN(d.getTime())? null : d;
+  }
+
   function parseDMY(str){
     if(!str) return null;
     const m = String(str).match(/^(\d{1,2})[\/](\d{1,2})[\/](\d{4})$/);
@@ -14,11 +22,25 @@
 
   function formatDMY(d){ return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear(); }
 
+  function formatISO(d){
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  }
+
+  function parseInputValue(input){
+    // input[type=date] y valores ISO
+    if(input && input.type === 'date') return parseISO(input.value) || parseDMY(input.value);
+    return parseISO(input.value) || parseDMY(input.value);
+  }
+
+  function formatForInput(input, d){
+    return (input && input.type === 'date') ? formatISO(d) : formatDMY(d);
+  }
+
   class Picker{
     constructor(input){
       this.input = input;
       this.visible = false;
-      this.date = parseDMY(input.value) || new Date();
+      this.date = parseInputValue(input) || new Date();
       this.month = this.date.getMonth();
       this.year = this.date.getFullYear();
       this._build();
@@ -55,7 +77,7 @@
         if(e.target===this.input) return;
         if(this.root.contains(e.target)) return;
         this.close();
-      });
+      }, true);
       document.addEventListener('keydown', (e)=>{ if(this.visible && e.key==='Escape'){ this.close(); } });
     }
     _change(delta){
@@ -77,13 +99,13 @@
         btn.type='button'; btn.className='mdp-date'; btn.textContent = String(d);
         const dt = new Date(this.year, this.month, d);
         if(this.input.value){
-          const sel = parseDMY(this.input.value);
+          const sel = parseInputValue(this.input);
           if(sel && sel.getFullYear()===dt.getFullYear() && sel.getMonth()===dt.getMonth() && sel.getDate()===dt.getDate()){
             btn.classList.add('is-selected');
           }
         }
         btn.addEventListener('click', ()=>{
-            this.input.value = formatDMY(dt);
+            this.input.value = formatForInput(this.input, dt);
             this.input.dispatchEvent(new Event('input', {bubbles:true}));
             this.input.dispatchEvent(new Event('change', {bubbles:true}));
             this.close();

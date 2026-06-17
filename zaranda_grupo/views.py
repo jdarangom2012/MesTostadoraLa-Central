@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django import forms
@@ -17,7 +17,7 @@ class ZarandaGrupoForm(forms.ModelForm):
         }
 
 
-@permission_required('zaranda_grupo.view_zarandagrupo', raise_exception=True)
+@permiso_accion_requerido('zaranda_grupo.view_zarandagrupo', 'ver_zaranda_grupo')
 def listar_zaranda_grupo(request):
     qs = ZarandaGrupo.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +47,7 @@ def listar_zaranda_grupo(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('zaranda_grupo.add_zarandagrupo', raise_exception=True)
+@permiso_accion_requerido('zaranda_grupo.add_zarandagrupo', 'crear_zaranda_grupo')
 def add_zaranda_grupo(request):
     if request.method == 'POST':
         form = ZarandaGrupoForm(request.POST)
@@ -68,7 +68,7 @@ def add_zaranda_grupo(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('zaranda_grupo.change_zarandagrupo', raise_exception=True)
+@permiso_accion_requerido('zaranda_grupo.change_zarandagrupo', 'editar_zaranda_grupo')
 def edit_zaranda_grupo(request, pk):
     obj = get_object_or_404(ZarandaGrupo, pk=pk)
     if request.method == 'POST':
@@ -89,7 +89,7 @@ def edit_zaranda_grupo(request, pk):
     return render(request, 'zaranda_grupo/listar_ZarandaGrupo.html', {})
 
 
-@permission_required('zaranda_grupo.delete_zarandagrupo', raise_exception=True)
+@permiso_accion_requerido('zaranda_grupo.delete_zarandagrupo', 'eliminar_zaranda_grupo')
 def delete_zaranda_grupo(request, pk):
     obj = get_object_or_404(ZarandaGrupo, pk=pk)
     if request.method == 'POST':

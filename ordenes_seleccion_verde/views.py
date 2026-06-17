@@ -1,74 +1,49 @@
+from functools import wraps
+
+from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from django import forms
 from django.utils import timezone
 
+from seguridad.helpers import tiene_permiso_accion
+
+from ordenes.models import Orden
 from .models import OrdenSeleccionVerde
-from estado_tareas.models import EstadoTarea
+from .forms import OrdenSeleccionVerdeForm
 
 
-class OrdenSeleccionVerdeForm(forms.ModelForm):
-    estado_tareas = forms.ModelChoiceField(
-        queryset=EstadoTarea.objects.all().order_by('estado_tareas'),
-        required=False,
-        widget=forms.Select(attrs={'class': 'w-full select'})
-    )
+def permiso_o_codigo_required(django_perm: str, codigo: str):
+    """Permite acceso si el usuario tiene el permiso Django o el permiso por rol (RolPermiso).
 
-    class Meta:
-        model = OrdenSeleccionVerde
-        fields = [
-            'estado_tareas',
-            'zaranda',
-            'grupo1','peso_grupo1',
-            'grupo2','peso_grupo2',
-            'grupo3','peso_grupo3',
-            'grupo4','peso_grupo4',
-            'grupo5','peso_grupo5',
-            'peso_grupo_ripio',
-            'catadora',
-            'catacion_ripio','peso_cat_ripio',
-            'catacion_balsos','peso_cat_balsos',
-            'catacion_grupo1','peso_cat_grupo1',
-            'catacion_grupo2','peso_cat_grupo2',
-            'peso_aceptado',
-            'medir_humedad','humedad',
-            'medir_densidad','densidad',
-        ]
-        widgets = {
-            'zaranda': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'grupo1': forms.TextInput(attrs={'class': 'w-full input'}),
-            'peso_grupo1': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'grupo2': forms.TextInput(attrs={'class': 'w-full input'}),
-            'peso_grupo2': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'grupo3': forms.TextInput(attrs={'class': 'w-full input'}),
-            'peso_grupo3': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'grupo4': forms.TextInput(attrs={'class': 'w-full input'}),
-            'peso_grupo4': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'grupo5': forms.TextInput(attrs={'class': 'w-full input'}),
-            'peso_grupo5': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'peso_grupo_ripio': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'catadora': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'catacion_ripio': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'peso_cat_ripio': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'catacion_balsos': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'peso_cat_balsos': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'catacion_grupo1': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'peso_cat_grupo1': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'catacion_grupo2': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'peso_cat_grupo2': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'peso_aceptado': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-            'medir_humedad': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'humedad': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01', 'min': '0', 'max': '100'}),
-            'medir_densidad': forms.CheckboxInput(attrs={'class': 'toggle'}),
-            'densidad': forms.NumberInput(attrs={'class': 'w-full input', 'step': '0.01'}),
-        }
+    Mantiene compatibilidad con `permission_required(..., raise_exception=True)` sin cambiar rutas ni lógica.
+    """
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped(request, *args, **kwargs):
+            user = getattr(request, 'user', None)
+            if tiene_permiso_accion(user, django_perm=django_perm, codigo=codigo):
+                return view_func(request, *args, **kwargs)
+            raise PermissionDenied
+
+        return _wrapped
+
+    return decorator
 
 
-@permission_required('ordenes_seleccion_verde.view_ordenseleccionverde', raise_exception=True)
+@permiso_o_codigo_required(
+    'ordenes_seleccion_verde.view_ordenseleccionverde',
+    'ver_ordenes_seleccion_verde',
+)
 def listar_ordenes_seleccion_verde(request):
+    is_fragment = request.GET.get('fragment') == '1' or request.headers.get('X-Fragment')
+    if not is_fragment:
+        # Unificar render: la página completa solo actúa como "wrapper" y abre el modal vía JS.
+        return render(request, 'ordenes_seleccion_verde/listar_OrdenesSelecionVerde.html', {})
+
     qs = (
         OrdenSeleccionVerde.objects
         .select_related('estado_tareas')
@@ -106,16 +81,39 @@ def listar_ordenes_seleccion_verde(request):
         'is_paginated': paginator.num_pages > 1,
         'search': search,
     }
-    if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
-        return render(request, 'ordenes_seleccion_verde/_modal_listar_OrdenesSelecionVerde.html', ctx)
-    return render(request, 'ordenes_seleccion_verde/listar_OrdenesSelecionVerde.html', ctx)
+    return render(request, 'ordenes_seleccion_verde/_modal_listar_OrdenesSelecionVerde.html', ctx)
+
+
+@require_http_methods(["GET"])
+@permiso_o_codigo_required(
+    'ordenes_seleccion_verde.add_ordenseleccionverde',
+    'crear_orden_seleccion_verde',
+)
+def orden_seleccion_verde_defaults(request):
+    orden_id = request.GET.get('orden_id')
+    if not orden_id:
+        return JsonResponse({'cliente_id': None, 'cliente_label': ''})
+
+    try:
+        orden = Orden.objects.select_related('cliente').get(pk=orden_id, selec_cafe_verde=True)
+    except (TypeError, ValueError, Orden.DoesNotExist):
+        return JsonResponse({'detail': 'Orden no encontrada.'}, status=404)
+
+    cliente = getattr(orden, 'cliente', None)
+    return JsonResponse({
+        'cliente_id': getattr(cliente, 'id', None),
+        'cliente_label': str(cliente) if cliente is not None else '',
+    })
 
 
 @require_http_methods(["GET","POST"])
-@permission_required('ordenes_seleccion_verde.add_ordenseleccionverde', raise_exception=True)
+@permiso_o_codigo_required(
+    'ordenes_seleccion_verde.add_ordenseleccionverde',
+    'crear_orden_seleccion_verde',
+)
 def add_orden_seleccion_verde(request):
     if request.method == 'POST':
-        form = OrdenSeleccionVerdeForm(request.POST)
+        form = OrdenSeleccionVerdeForm(request.POST, user=request.user)
         if form.is_valid():
             obj = form.save(commit=False)
             if not obj.fecha_ingreso:
@@ -127,18 +125,21 @@ def add_orden_seleccion_verde(request):
                 return listar_ordenes_seleccion_verde(request)
             return redirect('ordenes_seleccion_verde_listar')
     else:
-        form = OrdenSeleccionVerdeForm()
+        form = OrdenSeleccionVerdeForm(user=request.user)
     if request.headers.get('X-Fragment') or request.GET.get('fragment') == '1':
         return render(request, 'ordenes_seleccion_verde/add_OrdenesSelecionVerde.html', {'form': form})
     return render(request, 'ordenes_seleccion_verde/listar_OrdenesSelecionVerde.html', {})
 
 
 @require_http_methods(["GET","POST"])
-@permission_required('ordenes_seleccion_verde.change_ordenseleccionverde', raise_exception=True)
+@permiso_o_codigo_required(
+    'ordenes_seleccion_verde.change_ordenseleccionverde',
+    'editar_orden_seleccion_verde',
+)
 def edit_orden_seleccion_verde(request, pk):
     obj = get_object_or_404(OrdenSeleccionVerde, pk=pk)
     if request.method == 'POST':
-        form = OrdenSeleccionVerdeForm(request.POST, instance=obj)
+        form = OrdenSeleccionVerdeForm(request.POST, instance=obj, user=request.user)
         if form.is_valid():
             inst = form.save(commit=False)
             inst.updated_at = timezone.now()
@@ -147,13 +148,16 @@ def edit_orden_seleccion_verde(request, pk):
                 return listar_ordenes_seleccion_verde(request)
             return redirect('ordenes_seleccion_verde_listar')
     else:
-        form = OrdenSeleccionVerdeForm(instance=obj)
+        form = OrdenSeleccionVerdeForm(instance=obj, user=request.user)
     if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
         return render(request, 'ordenes_seleccion_verde/detail_OrdenesSelecionVerde.html', {'form': form, 'obj': obj})
     return render(request, 'ordenes_seleccion_verde/listar_OrdenesSelecionVerde.html', {})
 
 
-@permission_required('ordenes_seleccion_verde.delete_ordenseleccionverde', raise_exception=True)
+@permiso_o_codigo_required(
+    'ordenes_seleccion_verde.delete_ordenseleccionverde',
+    'eliminar_orden_seleccion_verde',
+)
 def delete_orden_seleccion_verde(request, pk):
     obj = get_object_or_404(OrdenSeleccionVerde, pk=pk)
     if request.method == 'POST':

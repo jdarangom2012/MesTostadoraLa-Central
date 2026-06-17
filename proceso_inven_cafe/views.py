@@ -1,23 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from django import forms
 
 from .models import ProcesoInvenCafe
+from .forms import ProcesoInvenCafeForm
 
 
-class ProcesoInvenCafeForm(forms.ModelForm):
-    class Meta:
-        model = ProcesoInvenCafe
-        fields = ['proceso_inven_cafe']
-        widgets = {
-            'proceso_inven_cafe': forms.TextInput(attrs={'class': 'w-full input'}),
-        }
-
-
-@permission_required('proceso_inven_cafe.view_procesoinvencafe', raise_exception=True)
+@permiso_accion_requerido('proceso_inven_cafe.view_procesoinvencafe', 'ver_proceso_inventario_cafe')
 def listar_proceso_inven_cafe(request):
     qs = ProcesoInvenCafe.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +38,7 @@ def listar_proceso_inven_cafe(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('proceso_inven_cafe.add_procesoinvencafe', raise_exception=True)
+@permiso_accion_requerido('proceso_inven_cafe.add_procesoinvencafe', 'crear_proceso_inventario_cafe')
 def add_proceso_inven_cafe(request):
     if request.method == 'POST':
         form = ProcesoInvenCafeForm(request.POST)
@@ -68,7 +59,7 @@ def add_proceso_inven_cafe(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('proceso_inven_cafe.change_procesoinvencafe', raise_exception=True)
+@permiso_accion_requerido('proceso_inven_cafe.change_procesoinvencafe', 'editar_proceso_inventario_cafe')
 def edit_proceso_inven_cafe(request, pk):
     obj = get_object_or_404(ProcesoInvenCafe, pk=pk)
     if request.method == 'POST':
@@ -89,7 +80,7 @@ def edit_proceso_inven_cafe(request, pk):
     return render(request, 'proceso_inven_cafe/listar_ProcesoInventarioCafe.html', {})
 
 
-@permission_required('proceso_inven_cafe.delete_procesoinvencafe', raise_exception=True)
+@permiso_accion_requerido('proceso_inven_cafe.delete_procesoinvencafe', 'eliminar_proceso_inventario_cafe')
 def delete_proceso_inven_cafe(request, pk):
     obj = get_object_or_404(ProcesoInvenCafe, pk=pk)
     if request.method == 'POST':

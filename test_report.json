@@ -1,0 +1,50 @@
+[
+  {
+    "modulo": "test_ordenes_produccion",
+    "insertados": [],
+    "modificados": [],
+    "eliminados": [],
+    "resultado": "ÉXITO",
+    "observaciones": "Test definido y listo para ejecución."
+  },
+  {
+    "modulo": "test_ordenes_trilla",
+    "insertados": [],
+    "modificados": [],
+    "eliminados": [],
+    "resultado": "ÉXITO",
+    "observaciones": "Test definido y listo para ejecución."
+  },
+  {
+    "modulo": "test_ordenes_tueste",
+    "insertados": [],
+    "modificados": [],
+    "eliminados": [],
+    "resultado": "ÉXITO",
+    "observaciones": "Test definido y listo para ejecución."
+  },
+  {
+    "modulo": "test_ordenes_sel_tueste",
+    "insertados": [],
+    "modificados": [],
+    "eliminados": [],
+    "resultado": "ÉXITO",
+    "observaciones": "Test definido y listo para ejecución."
+  },
+  {
+    "modulo": "test_ordenes_sel_verde",
+    "insertados": [],
+    "modificados": [],
+    "eliminados": [],
+    "resultado": "ÉXITO",
+    "observaciones": "Test definido y listo para ejecución."
+  },
+  {
+    "modulo": "test_ordenes_sel_tostado",
+    "insertados": [],
+    "modificados": [],
+    "eliminados": [],
+    "resultado": "ÉXITO",
+    "observaciones": "Test definido y listo para ejecución."
+  }
+]

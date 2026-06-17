@@ -1,3 +1,8 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'ordenes.view_orden' 'ver_orden_produccion' as puede_ver %}
+{% tiene_permiso_accion request.user 'ordenes.add_orden' 'crear_orden_produccion' as puede_crear %}
+{% tiene_permiso_accion request.user 'ordenes.change_orden' 'editar_orden_produccion' as puede_editar %}
+{% tiene_permiso_accion request.user 'ordenes.delete_orden' 'eliminar_orden_produccion' as puede_eliminar %}
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="ordenes-produccion-list" data-list-url="/ordenes-produccion/listar/">
   <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
@@ -14,7 +19,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.ordenes.add_orden %}
+          {% if puede_crear %}
             <a href="{% url 'ordenes_produccion_nuevo' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -33,9 +38,10 @@
               <th>Sacos Enteros</th>
               <th>Peso Bruto</th>
               <th>Peso Neto</th>
-              <th>Trabajo Empaque</th>
+              <th>Trajo Empaque</th>
               <th>Etiqueta Invima</th>
               <th>Café</th>
+              <th>Ver</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
@@ -59,14 +65,21 @@
                 {% if o.id_inven_cafe.codigo %}{{ o.id_inven_cafe.codigo }}{% elif o.id_inven_cafe.descripcion %}{{ o.id_inven_cafe.descripcion }}{% else %}{{ o.id_inven_cafe }}{% endif %}
               {% else %}-{% endif %}</td>
               <td class="td action">
-                {% if perms.ordenes.change_orden %}
-                  <a href="{% url 'ordenes_produccion_editar' o.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
+                {% if puede_ver %}
+                  <a href="{% url 'ordenes_produccion_ver' o.pk %}?fragment=1" class="link link-edit" data-modal-navigate>Ver</a>
+                {% else %}
+                  <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Ver</span>
+                {% endif %}
+              </td>
+              <td class="td action">
+                {% if puede_editar %}
+                  <a href="{% url 'ordenes_produccion_editar' o.pk %}?fragment=1" class="link link-edit" data-modal-navigate>Editar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}
               </td>
               <td class="td action">
-                {% if perms.ordenes.delete_orden %}
+                {% if puede_eliminar %}
                   <a href="{% url 'ordenes_produccion_eliminar' o.pk %}" class="link link-delete" data-modal-navigate>Eliminar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>

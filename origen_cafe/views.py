@@ -1,23 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from django import forms
 
 from .models import OrigenCafe
+from .forms import OrigenCafeForm
 
 
-class OrigenCafeForm(forms.ModelForm):
-    class Meta:
-        model = OrigenCafe
-        fields = ['origen']
-        widgets = {
-            'origen': forms.TextInput(attrs={'class': 'w-full input'}),
-        }
-
-
-@permission_required('origen_cafe.view_origencafe', raise_exception=True)
+@permiso_accion_requerido('origen_cafe.view_origencafe', 'ver_origenes')
 def listar_origen_cafe(request):
     qs = OrigenCafe.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +38,7 @@ def listar_origen_cafe(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('origen_cafe.add_origencafe', raise_exception=True)
+@permiso_accion_requerido('origen_cafe.add_origencafe', 'crear_origenes')
 def add_origen_cafe(request):
     if request.method == 'POST':
         form = OrigenCafeForm(request.POST)
@@ -68,7 +59,7 @@ def add_origen_cafe(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('origen_cafe.change_origencafe', raise_exception=True)
+@permiso_accion_requerido('origen_cafe.change_origencafe', 'editar_origenes')
 def edit_origen_cafe(request, pk):
     obj = get_object_or_404(OrigenCafe, pk=pk)
     if request.method == 'POST':
@@ -89,7 +80,7 @@ def edit_origen_cafe(request, pk):
     return render(request, 'origen_cafe/listar_OrigenCafe.html', {})
 
 
-@permission_required('origen_cafe.delete_origencafe', raise_exception=True)
+@permiso_accion_requerido('origen_cafe.delete_origencafe', 'eliminar_origenes')
 def delete_origen_cafe(request, pk):
     obj = get_object_or_404(OrigenCafe, pk=pk)
     if request.method == 'POST':

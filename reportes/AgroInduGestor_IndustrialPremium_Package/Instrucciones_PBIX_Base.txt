@@ -1,0 +1,9 @@
+Instrucciones para construir el PBIX base AgroInduGestor – Industrial Premium
+
+1. Abra Power BI Desktop.
+2. Aplique el tema 'theme_AgroInduGestor_Industrial.json' desde la opción de Temas.
+3. Cree una nueva página y configure tamaño 16:9.
+4. Ubique los KPIs y gráficos siguiendo el diseño del archivo 'IndustrialPremium_Dashboard_Template.pptx'.
+5. Cree las medidas necesarias en DAX (Producción del día, Inventario total, Órdenes activas, Rendimiento %, Trazabilidad %).
+6. Agregue los slicers recomendados: Fecha, Cliente, Origen, Tipo de producto, Estado de orden, Estado de lote, Planta, Empleado, Máquina.
+7. Guarde el archivo como PBIX y luego expórtelo como plantilla PBIT.

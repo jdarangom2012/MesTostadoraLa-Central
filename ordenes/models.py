@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Orden(models.Model):
@@ -16,7 +17,23 @@ class Orden(models.Model):
     etiqueta_invima = models.BooleanField(db_column='EtiquetaInvima', default=False, help_text="Indica si requiere etiqueta Invima en el empaque")
     id = models.AutoField(db_column='Id', primary_key=True)
     cliente = models.ForeignKey('clientes.Cliente', models.SET_NULL, db_column='IdClientes', blank=True, null=True)
-    orden = models.CharField(db_column='Orden', max_length=16, blank=True, null=True)
+    variedad_cafe = models.ForeignKey(
+        'variedad_cafe.VariedadCafe',
+        on_delete=models.SET_NULL,
+        db_column='IdVaridadCafe',
+        blank=True,
+        null=True
+    )
+    proceso_inventario_cafe = models.ForeignKey(
+        'proceso_inven_cafe.ProcesoInvenCafe',
+        on_delete=models.SET_NULL,
+        db_column='IdProcesoInvenCafe',
+        blank=True,
+        null=True
+    )
+    empaque_cafe = models.ForeignKey('cafe_empaque.CafeEmpaque', models.SET_NULL, db_column='IdEmpaque', blank=True, null=True)
+    tamano_empaque = models.ForeignKey('tamano_empaque.TamanoEmpaque', models.SET_NULL, db_column='IdTamanoEmpaque', blank=True, null=True)
+    orden = models.CharField(db_column='Orden', max_length=16, blank=True, null=True, unique=True)
     id_inven_cafe = models.ForeignKey(
         'inventario_cafe.InventarioCafe',
         on_delete=models.CASCADE,
@@ -38,7 +55,7 @@ class Orden(models.Model):
     conf_trilla = models.BooleanField(db_column='ConfTrilla', blank=True, null=True)
     conf_sel_verde = models.BooleanField(db_column='ConfSelVerde', blank=True, null=True)
     conf_tueste = models.BooleanField(db_column='ConfTueste', blank=True, null=True)
-    conf_sel_tostado = models.BooleanField(db_column='ConfSelTostado', blank=True, null=True)
+    conf_sel_tostado = models.BooleanField(db_column='ConfSelTostado', blank=True, null=True, default=False)
     conf_molienda = models.BooleanField(db_column='ConfMolienda', blank=True, null=True)
     conf_empaque = models.BooleanField(db_column='ConfEmpaque', blank=True, null=True)
     prioridad = models.IntegerField(db_column='Prioridad', blank=True, null=True)
@@ -54,6 +71,36 @@ class Orden(models.Model):
         ]
 
     def __str__(self):
-        if self.cliente and getattr(self.cliente, 'nombre', None):
-            return f'Orden {self.id} · {self.cliente.nombre}'
-        return f'Orden {self.id}'
+        return self.orden or ""
+
+
+class DetalleEmpaqueOrden(models.Model):
+    id = models.AutoField(db_column='Id', primary_key=True)
+    orden = models.ForeignKey(
+        'ordenes.Orden',
+        on_delete=models.CASCADE,
+        db_column='IdOrden',
+        related_name='detalles_empaque',
+    )
+    empaque_cafe = models.ForeignKey(
+        'cafe_empaque.CafeEmpaque',
+        on_delete=models.SET_NULL,
+        db_column='IdEmpaqueCafe',
+        null=True,
+        blank=True,
+    )
+    tamano_empaque = models.ForeignKey(
+        'tamano_empaque.TamanoEmpaque',
+        on_delete=models.SET_NULL,
+        db_column='IdTamanoEmpaque',
+        null=True,
+        blank=True,
+    )
+    cantidad = models.PositiveIntegerField(db_column='Cantidad', null=True, blank=True)
+
+    class Meta:
+        db_table = 'tblDetalleEmpaqueOrden'
+        ordering = ['id']
+
+    def __str__(self):
+        return f'DetalleEmpaqueOrden {self.id or "nuevo"}'

@@ -1,0 +1,110 @@
+<div class="space-y-3" data-empaque-detalle-grid>
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h3 class="text-sm font-semibold">Detalle de empaque</h3>
+      <p class="text-xs text-brand-dark/60">Registra una o varias lineas dentro de la orden de empaque.</p>
+    </div>
+    <button type="button" class="btn-base btn-primary" data-empaque-detalle-add>+ Agregar linea</button>
+  </div>
+
+  {{ detalle_formset.management_form }}
+
+  {% if detalle_formset.non_form_errors %}
+    <div class="text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
+      {{ detalle_formset.non_form_errors }}
+    </div>
+  {% endif %}
+
+  <div class="overflow-x-auto rounded-lg border border-brand-dark/30 shadow-inner">
+    <table class="min-w-[980px] w-full text-sm" data-empaque-detalle-table>
+      <thead class="bg-gray-50/80">
+        <tr>
+          <th class="px-3 py-2 text-left font-semibold">#</th>
+          <th class="px-3 py-2 text-left font-semibold">Empaque Cafe</th>
+          <th class="px-3 py-2 text-left font-semibold">Tamano Empaque</th>
+          <th class="px-3 py-2 text-left font-semibold">Pedido</th>
+          <th class="px-3 py-2 text-left font-semibold">Empacado</th>
+          <th class="px-3 py-2 text-left font-semibold">Molienda</th>
+          <th class="px-3 py-2 text-center font-semibold">Suministro</th>
+          <th class="px-3 py-2 text-left font-semibold">Notas</th>
+          <th class="px-3 py-2 text-right font-semibold">Acciones</th>
+        </tr>
+      </thead>
+      <tbody data-empaque-detalle-body>
+        {% for detalle_form in detalle_formset.forms %}
+          <tr class="border-t border-brand-dark/10 align-top" data-empaque-detalle-row>
+            <td class="px-3 py-3 text-xs text-gray-500" data-empaque-detalle-index>{{ forloop.counter }}</td>
+            <td class="px-3 py-3 min-w-[12rem]">
+              {{ detalle_form.id }}
+              {{ detalle_form.empaque_cafe }}
+              {{ detalle_form.empaque_cafe.errors }}
+            </td>
+            <td class="px-3 py-3 min-w-[12rem]">
+              {{ detalle_form.tamano_empaque }}
+              {{ detalle_form.tamano_empaque.errors }}
+            </td>
+            <td class="px-3 py-3 min-w-[8rem]">
+              {{ detalle_form.pedido }}
+              {{ detalle_form.pedido.errors }}
+            </td>
+            <td class="px-3 py-3 min-w-[8rem]">
+              {{ detalle_form.empacado }}
+              {{ detalle_form.empacado.errors }}
+            </td>
+            <td class="px-3 py-3 min-w-[12rem]">
+              {{ detalle_form.nivel_molienda }}
+              {{ detalle_form.nivel_molienda.errors }}
+            </td>
+            <td class="px-3 py-3 text-center min-w-[6rem]">
+              <div class="flex items-center justify-center h-10">
+                {{ detalle_form.suministro }}
+              </div>
+            </td>
+            <td class="px-3 py-3 min-w-[12rem]">
+              {{ detalle_form.notas }}
+              {{ detalle_form.notas.errors }}
+            </td>
+            <td class="px-3 py-3 text-right min-w-[7rem]">
+              {{ detalle_form.DELETE }}
+              <button type="button" class="link link-delete" data-empaque-detalle-remove>Eliminar</button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <template data-empaque-detalle-template>
+    <tr class="border-t border-brand-dark/10 align-top" data-empaque-detalle-row>
+      <td class="px-3 py-3 text-xs text-gray-500" data-empaque-detalle-index></td>
+      <td class="px-3 py-3 min-w-[12rem]">
+        {{ detalle_formset.empty_form.id }}
+        {{ detalle_formset.empty_form.empaque_cafe }}
+      </td>
+      <td class="px-3 py-3 min-w-[12rem]">
+        {{ detalle_formset.empty_form.tamano_empaque }}
+      </td>
+      <td class="px-3 py-3 min-w-[8rem]">
+        {{ detalle_formset.empty_form.pedido }}
+      </td>
+      <td class="px-3 py-3 min-w-[8rem]">
+        {{ detalle_formset.empty_form.empacado }}
+      </td>
+      <td class="px-3 py-3 min-w-[12rem]">
+        {{ detalle_formset.empty_form.nivel_molienda }}
+      </td>
+      <td class="px-3 py-3 text-center min-w-[6rem]">
+        <div class="flex items-center justify-center h-10">
+          {{ detalle_formset.empty_form.suministro }}
+        </div>
+      </td>
+      <td class="px-3 py-3 min-w-[12rem]">
+        {{ detalle_formset.empty_form.notas }}
+      </td>
+      <td class="px-3 py-3 text-right min-w-[7rem]">
+        {{ detalle_formset.empty_form.DELETE }}
+        <button type="button" class="link link-delete" data-empaque-detalle-remove>Eliminar</button>
+      </td>
+    </tr>
+  </template>
+</div>

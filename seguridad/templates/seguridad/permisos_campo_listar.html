@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold">Permisos por Campo</h1>
+    {% if puede_gestionar_seguridad %}
+    <a href="{% url 'seguridad_permisos_campo_crear' %}" class="px-4 py-2 rounded bg-brand-dark text-white hover:opacity-90">Nuevo</a>
+    {% endif %}
+  </div>
+
+  <div class="bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 dark:bg-gray-900/40">
+        <tr>
+          <th class="text-left p-3">Rol</th>
+          <th class="text-left p-3">Modelo</th>
+          <th class="text-left p-3">Campo</th>
+          <th class="text-left p-3">Ver</th>
+          <th class="text-left p-3">Editar</th>
+          <th class="p-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in items %}
+          <tr class="border-t border-gray-200 dark:border-gray-700">
+            <td class="p-3 font-medium">{{ it.rol.nombre }}</td>
+            <td class="p-3 font-mono text-xs">{{ it.modelo }}</td>
+            <td class="p-3 font-mono text-xs">{{ it.campo }}</td>
+            <td class="p-3">{% if it.puede_ver %}✅{% else %}—{% endif %}</td>
+            <td class="p-3">{% if it.puede_editar %}✅{% else %}—{% endif %}</td>
+            <td class="p-3 text-right space-x-2">
+              {% if puede_gestionar_seguridad %}
+              <a class="text-brand-dark hover:underline" href="{% url 'seguridad_permisos_campo_editar' it.id %}">Editar</a>
+              <a class="text-red-700 hover:underline" href="{% url 'seguridad_permisos_campo_eliminar' it.id %}">Eliminar</a>
+              {% else %}
+              <span class="text-gray-400">Solo lectura</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td class="p-3" colspan="6">No hay permisos de campo configurados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+    Si no existe configuración para un campo, por defecto se permite ver/editar (modo progresivo).
+  </div>
+</div>
+{% endblock %}

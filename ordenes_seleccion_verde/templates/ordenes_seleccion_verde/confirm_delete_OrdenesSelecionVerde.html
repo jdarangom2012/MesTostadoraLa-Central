@@ -1,3 +1,6 @@
+{% load seguridad_permisos %}
+{% tiene_permiso request.user "eliminar_orden_seleccion_verde" as puede_eliminar %}
+
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
   <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl bg-[#DD3F2E] text-white">
@@ -9,7 +12,9 @@
       <p>¿Seguro que deseas eliminar este registro?</p>
       <div class="flex justify-end gap-2 pt-2">
         <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
-        <button type="submit" class="btn-base btn-danger">Eliminar</button>
+        {% if puede_eliminar %}
+          <button type="submit" class="btn-base btn-danger">Eliminar</button>
+        {% endif %}
       </div>
     </form>
   </div>

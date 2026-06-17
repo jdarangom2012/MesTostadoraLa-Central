@@ -18,7 +18,7 @@ from typing import List, Dict, Any
 class OrdenViewSet(OptimizedQuerysetMixin, viewsets.ModelViewSet):
     queryset = Orden.objects.all().order_by('-fecha_inicio_orden')
     serializer_class = OrdenSerializer
-    select_related_fields = ['cliente', 'estado_orden']
+    select_related_fields = ['cliente', 'estado_orden', 'empaque_cafe', 'tamano_empaque']
 
     # ----------------- Helper interno reutilizable -----------------
     def _serialize_detalle(self, orden: Orden) -> Dict[str, Any]:
@@ -55,7 +55,7 @@ class OrdenViewSet(OptimizedQuerysetMixin, viewsets.ModelViewSet):
 
     def _prefetch_detalle_queryset(self, base_qs):
         """Aplica los prefetch estandarizados de detalle a un queryset base."""
-        return base_qs.select_related('cliente', 'estado_orden').prefetch_related(
+        return base_qs.select_related('cliente', 'estado_orden', 'empaque_cafe', 'tamano_empaque').prefetch_related(
             Prefetch('tueste_set', queryset=Tueste.objects.order_by('-fecha_ingreso')[:20]),
             Prefetch('molienda_set', queryset=Molienda.objects.order_by('-fecha')[:20]),
             Prefetch('ordentrilla_set', queryset=OrdenTrilla.objects.order_by('-fecha_ingreso')[:20]),

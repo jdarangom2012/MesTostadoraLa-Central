@@ -10,7 +10,10 @@ router.register(r'tueste', TuesteViewSet)
 urlpatterns = [
 	path('ordenes-tueste/listar/', views.listar_ordenes_tueste, name='ordenes_tueste_listar'),
 	path('ordenes-tueste/nuevo/', views.add_orden_tueste, name='orden_tueste_nuevo'),
+	path('ordenes-tueste/defaults/', views.orden_tueste_defaults, name='orden_tueste_defaults'),
 	path('ordenes-tueste/<int:pk>/editar/', views.edit_orden_tueste, name='orden_tueste_editar'),
+	path('ordenes-tueste/<int:pk>/batches/nuevo/', views.add_batch_tueste, name='orden_tueste_batch_nuevo'),
+	path('ordenes-tueste/<int:pk>/batches/<int:detalle_pk>/editar/', views.edit_batch_tueste, name='orden_tueste_batch_editar'),
 	path('ordenes-tueste/<int:pk>/eliminar/', views.delete_orden_tueste, name='orden_tueste_eliminar'),
 ]
 

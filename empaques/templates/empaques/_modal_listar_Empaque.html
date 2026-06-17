@@ -1,3 +1,7 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'empaques.add_empaque' 'crear_empaque' as puede_crear %}
+{% tiene_permiso_accion request.user 'empaques.change_empaque' 'editar_empaque' as puede_editar %}
+{% tiene_permiso_accion request.user 'empaques.delete_empaque' 'eliminar_empaque' as puede_eliminar %}
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="empaque-list" data-list-url="/empaque/listar/">
   <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
@@ -14,7 +18,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.empaques.add_empaque %}
+          {% if puede_crear %}
             <a href="{% url 'empaque_nuevo' %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -24,10 +28,9 @@
           <thead>
             <tr>
               <th>Orden</th>
-              <th>Molienda</th>
-              <th>Estado Café</th>
+              <th>Cliente</th>
+              <th>Nivel Molienda</th>
               <th>Estado Tareas</th>
-              <th>Notas</th>
               <th>Editar</th>
               <th>Eliminar</th>
             </tr>
@@ -35,20 +38,19 @@
           <tbody>
           {% for obj in items %}
             <tr class="row group">
-                <td class="td">{% if obj.orden %}Orden {{ obj.orden.id }}{% else %}—{% endif %}</td>
-              <td class="td">{{ obj.molienda|default:'—' }}</td>
-              <td class="td">{{ obj.estado_inven_cafe|default:'—' }}</td>
+                <td class="td">{{ obj.orden.orden|default:'—' }}</td>
+              <td class="td">{{ obj.orden.cliente|default:'—' }}</td>
+              <td class="td">{{ obj.nivel_molienda|default:'—' }}</td>
               <td class="td">{{ obj.estado_tareas|default:'—' }}</td>
-              <td class="td">{{ obj.notas|default:'—'|truncatechars:40 }}</td>
               <td class="td action">
-                {% if perms.empaques.change_empaque %}
+                {% if puede_editar %}
                   <a href="{% url 'empaque_editar' obj.pk %}" class="link link-edit" data-modal-navigate>Editar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                 {% endif %}
               </td>
               <td class="td action">
-                {% if perms.empaques.delete_empaque %}
+                {% if puede_eliminar %}
                   <a href="{% url 'empaque_eliminar' obj.pk %}" class="link link-delete" data-modal-navigate>Eliminar</a>
                 {% else %}
                   <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>
@@ -56,7 +58,7 @@
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="5" class="text-center py-8 text-brand-dark/60 text-sm">No hay registros de empaque.</td></tr>
+            <tr><td colspan="6" class="text-center py-8 text-brand-dark/60 text-sm">No hay registros de empaque.</td></tr>
           {% endfor %}
           </tbody>
         </table>

@@ -7,9 +7,14 @@
         <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
       </div>
       <div class="p-6 space-y-4">
+        <h1 class="text-base font-semibold text-brand-dark">FORM NUEVO ORDEN PRODUCCION</h1>
         {% if form.errors %}
           <div class="mb-2 text-sm px-3 py-2 rounded border bg-red-50 border-red-300 text-red-700">
-            Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
+            {% if form.orden.errors %}
+              {{ form.orden.errors.0 }}
+            {% else %}
+              Hay errores en el formulario. Por favor, revísalos e intenta nuevamente.
+            {% endif %}
           </div>
           {% if form.non_field_errors %}
           <div class="mb-2 text-sm px-3 py-2 rounded border bg-yellow-50 border-yellow-300 text-yellow-800">
@@ -26,35 +31,38 @@
                       {{ form.orden }}
                       {{ form.orden.errors }}
                     </div>
-                    <div>
-                      <label class="label">Cliente</label>
+                    <div class="space-y-1">
+                      <label class="label font-semibold">Cliente</label>
                       {{ form.cliente }}
                       {{ form.cliente.errors }}
                     </div>
-                    <div>
-                      <label class="label">Empleado</label>
+                    <div class="space-y-1">
+                      <label class="label font-semibold">Empleado</label>
                       {{ form.id_empleado }}
                       {{ form.id_empleado.errors }}
                     </div>
-                    <div>
-                      <label class="label">Estado Orden</label>
+                    <div class="space-y-1">
+                      <label class="label font-semibold">Estado Orden</label>
                       {{ form.estado_orden }}
                       {{ form.estado_orden.errors }}
                     </div>
-                    <div>
-                      <label class="label">Estado Café</label>
-                      {{ form.estado_inven_cafe }}
-                      {{ form.estado_inven_cafe.errors }}
+                    <div class="space-y-1">
+                      <label class="label font-semibold">Variedad Café</label>
+                      {{ form.variedad_cafe }}
+                      {{ form.variedad_cafe.errors }}
+                    </div>
+                    <div class="space-y-1">
+                      <label class="label font-semibold">Proceso Cafe</label>
+                      {{ form.proceso_inventario_cafe }}
+                      {{ form.proceso_inventario_cafe.errors }}
                     </div>
                   </div>
                 </div>
 
-                <!-- Bloque 2 — Inventario Café -->
                 <div class="mb-6">
-                  <h3 class="text-base font-semibold mb-2">Cafe</h3>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="label">Cafe</label>
+                    <div class="space-y-1">
+                      <label class="label font-semibold">Inventario Cafe</label>
                       {{ form.id_inven_cafe }}
                       {{ form.id_inven_cafe.errors }}
                     </div>
@@ -107,35 +115,33 @@
                       <span class="text-xs text-gray-600 mt-1">Selección Tostado</span>
                     </div>
                     <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.molienda_flag }}
-                      <span class="text-xs text-gray-600 mt-1">Molienda</span>
-                    </div>
-                    <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
                       {{ form.empaque_flag }}
                       <span class="text-xs text-gray-600 mt-1">Empaque</span>
                     </div>
                     <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
                       {{ form.conf_trilla }}
-                      <span class="text-xs text-gray-600 mt-1">Config. Trilla</span>
+                      <span class="text-xs text-gray-600 mt-1">Confir. Trilla</span>
                     </div>
                     <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
                       {{ form.conf_sel_verde }}
-                      <span class="text-xs text-gray-600 mt-1">Config. Sel Verde</span>
+                      <span class="text-xs text-gray-600 mt-1">Confir. Sel Verde</span>
                     </div>
                     <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
                       {{ form.conf_tueste }}
-                      <span class="text-xs text-gray-600 mt-1">Config. Tostado</span>
+                      <span class="text-xs text-gray-600 mt-1">Confir. Tostado</span>
                     </div>
                     <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
-                      {{ form.conf_molienda }}
-                      <span class="text-xs text-gray-600 mt-1">Config. Molienda</span>
+                      {{ form.conf_sel_tostado }}
+                      <span class="text-xs text-gray-600 mt-1">Confir. SelecTostado</span>
                     </div>
                     <div class="border border-gray-300 rounded-xl p-2 flex flex-col items-stretch">
                       {{ form.conf_empaque }}
-                      <span class="text-xs text-gray-600 mt-1">Config. Empaque</span>
+                      <span class="text-xs text-gray-600 mt-1">Confir. Empaque</span>
                     </div>
                   </div>
                 </div>
+
+                {% include 'ordenes/_detalle_empaque_grid.html' %}
 
                 <!-- Bloque 4 — Otros datos -->
                 <div class="mb-6">

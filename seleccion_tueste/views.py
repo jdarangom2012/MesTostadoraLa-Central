@@ -1,14 +1,23 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django import forms
+from django.utils import timezone
 import re
 
 from .models import SeleccionTueste
 from ordenes.models import Orden
+from seguridad.helpers import puede_editar_campo
+from seguridad.models import PermisoCampo
 from estado_tareas.models import EstadoTarea
+from clientes.models import Cliente
+
+
+MODELO_PERMISO_SELECCION_TUESTE = 'SeleccionTueste'
+CAMPO_PESO_GRUPO_TOSTADOR = {'peso_grupo1', 'peso_grupo2', 'peso_grupo3'}
 
 
 class OrdenChoiceField(forms.ModelChoiceField):
@@ -21,6 +30,7 @@ class OrdenChoiceField(forms.ModelChoiceField):
 
 class SeleccionTuesteForm(forms.ModelForm):
     orden = OrdenChoiceField(queryset=Orden.objects.none(), required=False, widget=forms.Select(attrs={'class':'w-full select'}))
+    cliente = forms.ModelChoiceField(queryset=Cliente.objects.none(), required=False, disabled=True, widget=forms.Select(attrs={'class':'w-full select'}))
     estado_tareas = forms.ModelChoiceField(queryset=EstadoTarea.objects.all().order_by('estado_tareas'), required=False, widget=forms.Select(attrs={'class':'w-full select'}))
 
     class Meta:
@@ -31,6 +41,7 @@ class SeleccionTuesteForm(forms.ModelForm):
             'cat_grupo1','desc_grupo1','peso_grupo1',
             'cat_grupo2','desc_grupo2','peso_grupo2',
             'cat_grupo3','desc_grupo3','peso_grupo3',
+            'notas',
         ]
         widgets = {
             'cat_limpieza': forms.CheckboxInput(attrs={'class':'toggle'}),
@@ -45,19 +56,194 @@ class SeleccionTuesteForm(forms.ModelForm):
             'cat_grupo3': forms.CheckboxInput(attrs={'class':'toggle'}),
             'desc_grupo3': forms.TextInput(attrs={'class':'w-full input'}),
             'peso_grupo3': forms.NumberInput(attrs={'class':'w-full input','step':'0.01'}),
+            'notas': forms.Textarea(attrs={'class':'w-full textarea','rows':'3','maxlength':'500'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        base_qs = Orden.objects.all().order_by('-id')
+        base_qs = Orden.objects.filter(selec_cafe_tostado=True).order_by('-id')
+        estado_pendiente = EstadoTarea.objects.filter(estado_tareas__iexact='Pendiente').order_by('id').first()
+        self.fields['cliente'].queryset = Cliente.objects.all().order_by('nombre', 'apellidos', 'id')
         if self.is_bound:
             self.fields['orden'].queryset = base_qs
         else:
             self.fields['orden'].queryset = base_qs.select_related('cliente')[:200]
         self.fields['orden'].empty_label = 'Seleccione una orden'
+        self.fields['cliente'].empty_label = 'Seleccione un cliente'
+        cliente = None
+        orden_id = self.data.get('orden') if self.is_bound else None
+        if orden_id:
+            try:
+                cliente = base_qs.select_related('cliente').get(pk=orden_id).cliente
+            except (TypeError, ValueError, Orden.DoesNotExist):
+                cliente = None
+        elif getattr(self.instance, 'orden', None) is not None:
+            cliente = getattr(self.instance.orden, 'cliente', None)
+        if cliente is not None:
+            self.fields['cliente'].initial = cliente.pk
+            self.initial['cliente'] = cliente.pk
+        if estado_pendiente is not None and not getattr(self.instance, 'pk', None) and not self.is_bound:
+            self.fields['estado_tareas'].initial = estado_pendiente.pk
+            self.initial['estado_tareas'] = estado_pendiente.pk
+
+    def clean_orden(self):
+        orden = self.cleaned_data.get('orden')
+        if orden and not getattr(orden, 'selec_cafe_tostado', False):
+            raise forms.ValidationError('Solo se permiten órdenes de producción con selección tostado habilitada.')
+        return orden
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        cat_quaker = bool(cleaned_data.get('cat_quaker'))
+        peso_quaker = cleaned_data.get('peso_quaker')
+        cat_grupo1 = bool(cleaned_data.get('cat_grupo1'))
+        cat_grupo2 = bool(cleaned_data.get('cat_grupo2'))
+        cat_grupo3 = bool(cleaned_data.get('cat_grupo3'))
+        desc_grupo1 = (cleaned_data.get('desc_grupo1') or '').strip()
+        desc_grupo2 = (cleaned_data.get('desc_grupo2') or '').strip()
+        desc_grupo3 = (cleaned_data.get('desc_grupo3') or '').strip()
+
+        if cat_quaker and (peso_quaker is None or peso_quaker < 0):
+            self.add_error('peso_quaker', 'Debe ingresar un peso mayor o igual a 0 cuando Cat. Quaker está marcado')
+
+        if cat_grupo1 and not desc_grupo1:
+            self.add_error('desc_grupo1', 'La descripción del Grupo 1 es obligatoria.')
+
+        if cat_grupo2 and not desc_grupo2:
+            self.add_error('desc_grupo2', 'La descripción del Grupo 2 es obligatoria.')
+
+        if cat_grupo3 and not desc_grupo3:
+            self.add_error('desc_grupo3', 'La descripción del Grupo 3 es obligatoria.')
+
+        cleaned_data['desc_grupo1'] = desc_grupo1 or None
+        cleaned_data['desc_grupo2'] = desc_grupo2 or None
+        cleaned_data['desc_grupo3'] = desc_grupo3 or None
+
+        estado_tareas = cleaned_data.get('estado_tareas')
+        estado_nombre = (getattr(estado_tareas, 'estado_tareas', '') or '').strip().lower()
+        if estado_nombre == 'completada':
+            pesos_requeridos = (
+                cleaned_data.get('peso_quaker'),
+                cleaned_data.get('peso_grupo1'),
+                cleaned_data.get('peso_grupo2'),
+                cleaned_data.get('peso_grupo3'),
+            )
+            if any(peso is None or peso <= 0 for peso in pesos_requeridos):
+                raise forms.ValidationError(
+                    'La tarea no se puede poner en estado completada porque uno o más pesos son menores o iguales a cero.'
+                )
+
+        return cleaned_data
 
 
-@permission_required('seleccion_tueste.view_selecciontueste', raise_exception=True)
+def _build_orden_seleccion_tueste_defaults(orden):
+    cliente = getattr(orden, 'cliente', None)
+
+    return {
+        'cliente_id': getattr(cliente, 'id', None),
+        'cliente_label': str(cliente) if cliente is not None else '',
+    }
+
+
+@require_http_methods(["GET"])
+@permiso_accion_requerido('seleccion_tueste.add_selecciontueste', 'crear_orden_seleccion_tueste')
+def orden_seleccion_tueste_defaults(request):
+    orden_id = request.GET.get('orden_id')
+    if not orden_id:
+        return JsonResponse(_build_orden_seleccion_tueste_defaults(Orden()))
+
+    try:
+        orden = Orden.objects.select_related('cliente').get(pk=orden_id, selec_cafe_tostado=True)
+    except (TypeError, ValueError, Orden.DoesNotExist):
+        return JsonResponse({'detail': 'Orden no encontrada.'}, status=404)
+
+    return JsonResponse(_build_orden_seleccion_tueste_defaults(orden))
+
+
+def obtener_rol_usuario(user):
+    perfil = getattr(user, 'perfilusuario', None) or getattr(user, 'profile', None)
+    rol = getattr(perfil, 'rol', None)
+    if rol is not None:
+        return rol
+    return None
+
+
+def es_tostador(user) -> bool:
+    rol = obtener_rol_usuario(user)
+    nombre = getattr(rol, 'nombre', '')
+    return str(nombre).strip().lower() == 'tostador'
+
+
+def campos_editables_tostador(user):
+    rol = obtener_rol_usuario(user)
+    if rol is None:
+        return set()
+
+    configurados = set(
+        PermisoCampo.objects.filter(rol=rol, modelo=MODELO_PERMISO_SELECCION_TUESTE, campo__in=CAMPO_PESO_GRUPO_TOSTADOR)
+        .values_list('campo', flat=True)
+        .distinct()
+    )
+
+    editables = set()
+    for campo in CAMPO_PESO_GRUPO_TOSTADOR:
+        if campo not in configurados or puede_editar_campo(user, MODELO_PERMISO_SELECCION_TUESTE, campo):
+            editables.add(campo)
+
+    return editables
+
+
+def aplicar_restricciones_form_tostador(form):
+    user = getattr(form, '_request_user', None)
+    campos_editables = campos_editables_tostador(user) if user is not None else set()
+
+    for field_name, field in form.fields.items():
+        css = field.widget.attrs.get('class', '')
+        if field_name in campos_editables:
+            field.disabled = False
+            field.widget.attrs.pop('disabled', None)
+            field.widget.attrs.pop('readonly', None)
+            field.widget.attrs['class'] = f"{css} ring-1 ring-brand-primary/30".strip()
+            continue
+
+        field.disabled = True
+        field.widget.attrs['disabled'] = 'disabled'
+        field.widget.attrs['aria-readonly'] = 'true'
+        field.widget.attrs['class'] = f"{css} bg-gray-100 text-gray-500 cursor-not-allowed opacity-90".strip()
+
+
+def proteger_campos_tostador(obj, original):
+    campos_editables = campos_editables_tostador(getattr(obj, '_request_user', None))
+    for campo in SeleccionTuesteForm.Meta.fields:
+        if campo in campos_editables:
+            continue
+        setattr(obj, campo, getattr(original, campo))
+
+
+def construir_contexto_seleccion_tueste(request, obj, form=None):
+    user_is_tostador = es_tostador(request.user)
+    form = form or SeleccionTuesteForm(instance=obj)
+    form._request_user = request.user
+    if user_is_tostador:
+        aplicar_restricciones_form_tostador(form)
+
+    return {
+        'form': form,
+        'obj': obj,
+        'user_is_tostador': user_is_tostador,
+    }
+
+
+def render_editar_seleccion_tueste(request, obj, form=None):
+    return render(
+        request,
+        'seleccion_tueste/detail_OrdenesSeleccionTueste.html',
+        construir_contexto_seleccion_tueste(request, obj, form=form),
+    )
+
+
+@permiso_accion_requerido('seleccion_tueste.view_selecciontueste', 'ver_orden_seleccion_tueste')
 def listar_ordenes_seleccion_tueste(request):
     qs = (
         SeleccionTueste.objects
@@ -116,13 +302,12 @@ def listar_ordenes_seleccion_tueste(request):
 
 
 @require_http_methods(["GET","POST"])
-@permission_required('seleccion_tueste.add_selecciontueste', raise_exception=True)
+@permiso_accion_requerido('seleccion_tueste.add_selecciontueste', 'crear_orden_seleccion_tueste')
 def add_orden_seleccion_tueste(request):
     if request.method == 'POST':
         form = SeleccionTuesteForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            from django.utils import timezone
             if not obj.fecha_ingreso:
                 obj.fecha_ingreso = timezone.now()
             obj.created_at = timezone.now()
@@ -139,14 +324,21 @@ def add_orden_seleccion_tueste(request):
 
 
 @require_http_methods(["GET","POST"])
-@permission_required('seleccion_tueste.change_selecciontueste', raise_exception=True)
+@permiso_accion_requerido('seleccion_tueste.change_selecciontueste', 'editar_orden_seleccion_tueste')
 def edit_orden_seleccion_tueste(request, pk):
     obj = get_object_or_404(SeleccionTueste, pk=pk)
+    user_is_tostador = es_tostador(request.user)
+
     if request.method == 'POST':
         form = SeleccionTuesteForm(request.POST, instance=obj)
+        form._request_user = request.user
+        if user_is_tostador:
+            aplicar_restricciones_form_tostador(form)
         if form.is_valid():
             inst = form.save(commit=False)
-            from django.utils import timezone
+            inst._request_user = request.user
+            if user_is_tostador:
+                proteger_campos_tostador(inst, obj)
             inst.updated_at = timezone.now()
             inst.save()
             if request.headers.get('X-Fragment'):
@@ -154,12 +346,15 @@ def edit_orden_seleccion_tueste(request, pk):
             return redirect('ordenes_seleccion_tueste_listar')
     else:
         form = SeleccionTuesteForm(instance=obj)
+        form._request_user = request.user
+        if user_is_tostador:
+            aplicar_restricciones_form_tostador(form)
     if request.GET.get('fragment') == '1' or request.headers.get('X-Fragment'):
-        return render(request, 'seleccion_tueste/detail_OrdenesSeleccionTueste.html', {'form': form, 'obj': obj})
+        return render_editar_seleccion_tueste(request, obj, form=form)
     return render(request, 'seleccion_tueste/listar_OrdenesSeleccionTueste.html', {})
 
 
-@permission_required('seleccion_tueste.delete_selecciontueste', raise_exception=True)
+@permiso_accion_requerido('seleccion_tueste.delete_selecciontueste', 'eliminar_orden_seleccion_tueste')
 def delete_orden_seleccion_tueste(request, pk):
     obj = get_object_or_404(SeleccionTueste, pk=pk)
     if request.method == 'POST':

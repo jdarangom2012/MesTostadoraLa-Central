@@ -1,7 +1,9 @@
-<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-orden-tueste-defaults-url="{% url 'orden_tueste_defaults' %}">
   <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
-    <form method="post" action="{% url 'orden_tueste_nuevo' %}" data-modal-form class="p-0">
+    <form method="post" action="{% url 'orden_tueste_nuevo' %}" hx-post="{% url 'orden_tueste_nuevo' %}" hx-trigger="submit" data-modal-form class="p-0">
       {% csrf_token %}
+      <input type="hidden" name="_submitted" value="1">
+      <input type="hidden" name="_submission_token" value="{{ submit_token }}">
       <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
         <h2 class="text-lg font-semibold">Nuevo Tueste</h2>
         <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
@@ -20,6 +22,11 @@
             {{ form.orden.errors }}
           </div>
           <div>
+            <label class="label">Cliente</label>
+            {{ form.cliente }}
+            {{ form.cliente.errors }}
+          </div>
+          <div>
             <label class="label">Café</label>
             {{ form.inventario_cafe_ref }}
             {{ form.inventario_cafe_ref.errors }}
@@ -33,21 +40,6 @@
             <label class="label">Nivel Tueste</label>
             {{ form.nivel_tueste }}
             {{ form.nivel_tueste.errors }}
-          </div>
-          <div>
-            <label class="label">Batche</label>
-            {{ form.batche }}
-            {{ form.batche.errors }}
-          </div>
-          <div>
-            <label class="label">Peso Café Verde (kg)</label>
-            {{ form.peso_cafe_vede }}
-            {{ form.peso_cafe_vede.errors }}
-          </div>
-          <div>
-            <label class="label">Peso Café Tostado (kg)</label>
-            {{ form.peso_cafe_tostado }}
-            {{ form.peso_cafe_tostado.errors }}
           </div>
           <div>
             <label class="label">Rendimiento (%)</label>
@@ -73,6 +65,16 @@
             <label class="label">Notas OP</label>
             {{ form.notas_op }}
             {{ form.notas_op.errors }}
+          </div>
+          <div class="md:col-span-2 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-sm font-semibold">Detalle de Batches</h3>
+              <button type="button" class="btn-base opacity-60 cursor-not-allowed" disabled>+ Agregar Batch</button>
+            </div>
+            <div class="text-xs text-amber-800 bg-amber-50 border border-amber-300 px-3 py-2 rounded">
+              Guarda primero el tueste para habilitar el detalle de batches.
+            </div>
+            {% include 'tueste/_tabla_batches_OrdenesTueste.html' with detalle_batches=detalle_batches %}
           </div>
         </div>
       </div>

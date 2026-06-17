@@ -25,3 +25,17 @@ class Cliente(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellidos}' if self.nombre else f'Cliente {self.id}'
+
+    def save(self, *args, **kwargs):
+        """Ensure timestamps are populated to match DB constraints.
+
+        The DB table has `created_at` non-nullable; some code paths may call
+        `save()` without setting it. Populate `created_at` on create and
+        always update `updated_at` before saving.
+        """
+        from django.utils import timezone
+        now = timezone.now()
+        if not self.created_at:
+            self.created_at = now
+        self.updated_at = now
+        super().save(*args, **kwargs)

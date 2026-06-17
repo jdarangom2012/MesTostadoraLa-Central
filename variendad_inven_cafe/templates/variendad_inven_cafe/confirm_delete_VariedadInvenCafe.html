@@ -1,0 +1,17 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-md rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">🗑️ Eliminar Variedad</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+    <div class="p-6 space-y-6">
+      <p>¿Seguro que deseas eliminar "{{ obj.variedad_inven_cafe }}"?</p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
+        <form method="post" action="{% url 'variedad_inven_cafe_eliminar' obj.pk %}" data-modal-form>{% csrf_token %}
+          <button class="btn-base btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-5xl">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold">Gestionar permisos</h1>
+    <div class="text-sm text-gray-600 dark:text-gray-300">
+      Solo usuarios staff
+    </div>
+  </div>
+
+  <form method="get" class="bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
+    <label class="block text-sm font-medium mb-2">Selecciona un rol</label>
+    <div class="flex gap-2 items-center">
+      <select name="rol" class="w-full input bg-white text-black">
+        <option value="" class="text-black">-- Selecciona --</option>
+        {% for r in roles %}
+          <option value="{{ r.id }}" class="text-black" {% if rol_actual and r.id == rol_actual.id %}selected{% endif %}>{{ r.nombre }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="px-4 py-2 rounded bg-brand-dark text-white hover:opacity-90">Cargar</button>
+    </div>
+  </form>
+
+  {% if rol_actual %}
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <input type="hidden" name="rol" value="{{ rol_actual.id }}" />
+
+    <div class="bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">Módulos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {% for m in modulos %}
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="modulos" value="{{ m.id }}" class="h-4 w-4" {% if m.id in seleccion_modulos %}checked{% endif %} />
+            <span class="font-medium">{{ m.nombre }}</span>
+            <span class="text-gray-500">({{ m.url }})</span>
+          </label>
+        {% empty %}
+          <p class="text-sm text-gray-600 dark:text-gray-300">No hay módulos.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">Permisos</h2>
+
+      {% for tipo, perms in permisos_por_tipo.items %}
+        <div class="mb-4">
+          <div class="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-200 mb-2">{{ tipo }}</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {% for p in perms %}
+              <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="permisos" value="{{ p.id }}" class="h-4 w-4" {% if p.id in seleccion_permisos %}checked{% endif %} />
+                <span class="font-mono text-xs bg-gray-100 dark:bg-gray-900/50 px-2 py-1 rounded">{{ p.codigo }}</span>
+                <span class="text-gray-700 dark:text-gray-200">{{ p.descripcion }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-sm text-gray-600 dark:text-gray-300">No hay permisos.</p>
+      {% endfor %}
+    </div>
+
+    <div class="flex justify-end">
+      <button type="submit" class="px-4 py-2 rounded bg-brand-dark text-white hover:opacity-90">Guardar</button>
+    </div>
+  </form>
+  {% else %}
+    <div class="text-sm text-gray-600 dark:text-gray-300">Selecciona un rol para ver módulos y permisos.</div>
+  {% endif %}
+</div>
+{% endblock %}

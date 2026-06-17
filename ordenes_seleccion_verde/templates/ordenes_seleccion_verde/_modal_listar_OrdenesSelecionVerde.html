@@ -1,4 +1,8 @@
+{% load seguridad_permisos %}
 {% url 'ordenes_seleccion_verde_listar' as base_list_url %}
+{% tiene_permiso request.user "crear_orden_seleccion_verde" as puede_crear %}
+{% tiene_permiso request.user "editar_orden_seleccion_verde" as puede_editar %}
+{% tiene_permiso request.user "eliminar_orden_seleccion_verde" as puede_eliminar %}
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="ordenes-seleccion-verde-list" data-list-url="{{ base_list_url }}">
   <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
@@ -16,7 +20,7 @@
           <span data-search-status class="absolute top-1/2 -translate-y-1/2 right-3 text-[10px] font-medium text-brand-dark/60">{{ paginator.count }} resultado{% if paginator.count != 1 %}s{% endif %}</span>
         </div>
         <div class="flex gap-2">
-          {% if perms.ordenes_seleccion_verde.add_ordenseleccionverde %}
+          {% if puede_crear %}
             <a href="{% url 'orden_seleccion_verde_nuevo' %}?fragment=1" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -26,6 +30,7 @@
           <thead>
             <tr>
               <th>ID</th>
+              <th>Orden</th>
               <th>Estado</th>
               <th>Zaranda</th>
               <th>Peso Aceptado</th>
@@ -39,20 +44,21 @@
             {% for s in items %}
               <tr class="row group">
                 <td class="td mono">{{ s.id }}</td>
+                <td class="td">{{ s.orden.orden|default:"-" }}</td>
                 <td class="td">{{ s.estado_tareas|default:'—' }}</td>
                 <td class="td">{{ s.zaranda|yesno:'Sí,No' }}</td>
                 <td class="td">{{ s.peso_aceptado|default_if_none:'—' }}</td>
                 <td class="td">{{ s.humedad|default_if_none:'—' }}</td>
                 <td class="td">{{ s.densidad|default_if_none:'—' }}</td>
                 <td class="td action">
-                  {% if perms.ordenes_seleccion_verde.change_ordenseleccionverde %}
+                  {% if puede_editar %}
                     <a href="{% url 'orden_seleccion_verde_editar' s.pk %}?fragment=1" class="link link-edit" data-modal-navigate>Editar</a>
                   {% else %}
                     <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                   {% endif %}
                 </td>
                 <td class="td action">
-                  {% if perms.ordenes_seleccion_verde.delete_ordenseleccionverde %}
+                  {% if puede_eliminar %}
                     <a href="{% url 'orden_seleccion_verde_eliminar' s.pk %}?fragment=1" class="link link-delete" data-modal-navigate>Eliminar</a>
                   {% else %}
                     <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>
@@ -60,7 +66,7 @@
                 </td>
               </tr>
             {% empty %}
-              <tr><td colspan="8" class="text-center py-8 text-brand-dark/60 text-sm">No hay órdenes de selección verde.</td></tr>
+              <tr><td colspan="9" class="text-center py-8 text-brand-dark/60 text-sm">No hay órdenes de selección verde.</td></tr>
             {% endfor %}
           </tbody>
         </table>

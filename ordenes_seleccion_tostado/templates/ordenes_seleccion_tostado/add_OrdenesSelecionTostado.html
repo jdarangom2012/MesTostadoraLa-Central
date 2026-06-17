@@ -1,4 +1,4 @@
-<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root data-orden-seleccion-tostado-defaults-url="{% url 'orden_seleccion_tostado_defaults' %}">
   <div class="palette-surface w-full max-w-4xl rounded-xl shadow-xl border border-brand-dark/30 fade-in">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
       <h2 class="text-lg font-semibold flex items-center gap-2">➕ Nueva Orden Selección Tostado</h2>
@@ -15,6 +15,11 @@
           <label class="label">Orden</label>
           {{ form.orden }}
           {{ form.orden.errors }}
+        </div>
+        <div>
+          <label class="label">Cliente</label>
+          {{ form.cliente }}
+          {{ form.cliente.errors }}
         </div>
         <div>
           <label class="label">Inventario Café</label>
@@ -59,6 +64,11 @@
             <label class="label">Peso Grupo 3</label>
             {{ form.peso_grupo3 }}
           </div>
+        </div>
+        <div class="md:col-span-2">
+          <label class="label">Notas</label>
+          {{ form.notas }}
+          {{ form.notas.errors }}
         </div>
       </div>
 

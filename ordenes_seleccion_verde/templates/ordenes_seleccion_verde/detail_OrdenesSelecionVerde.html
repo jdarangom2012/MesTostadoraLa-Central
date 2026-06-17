@@ -1,4 +1,7 @@
-<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+{% load seguridad_permisos %}
+{% tiene_permiso request.user "editar_orden_seleccion_verde" as puede_guardar %}
+
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root data-orden-seleccion-verde-defaults-url="{% url 'orden_seleccion_verde_defaults' %}">
   <div class="palette-surface w-full max-w-4xl rounded-xl shadow-xl border border-brand-dark/30 fade-in">
     <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
       <h2 class="text-lg font-semibold flex items-center gap-2">✏️ Editar Selección Verde #{{ obj.id }}</h2>
@@ -10,6 +13,16 @@
         <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label class="label">Orden</label>
+          {{ form.orden }}
+          {{ form.orden.errors }}
+        </div>
+        <div class="md:col-span-2">
+          <label class="label">Cliente</label>
+          {{ form.cliente }}
+          {{ form.cliente.errors }}
+        </div>
         <div>
           <label class="label">Estado</label>
           {{ form.estado_tareas }}
@@ -19,23 +32,23 @@
           <label class="flex items-center gap-2">{{ form.zaranda }} <span>Zaranda</span></label>
         </div>
         <div>
-          <label class="label">Grupo 1</label>{{ form.grupo1 }}
+          <label class="label">Mallas Grupo 1</label>{{ form.IdZarandaGrupo1 }}
           <label class="label">Peso</label>{{ form.peso_grupo1 }}
         </div>
         <div>
-          <label class="label">Grupo 2</label>{{ form.grupo2 }}
+          <label class="label">Mallas Grupo 2</label>{{ form.IdZarandaGrupo2 }}
           <label class="label">Peso</label>{{ form.peso_grupo2 }}
         </div>
         <div>
-          <label class="label">Grupo 3</label>{{ form.grupo3 }}
+          <label class="label">Mallas Grupo 3</label>{{ form.IdZarandaGrupo3 }}
           <label class="label">Peso</label>{{ form.peso_grupo3 }}
         </div>
         <div>
-          <label class="label">Grupo 4</label>{{ form.grupo4 }}
+          <label class="label">Mallas Grupo 4</label>{{ form.IdZarandaGrupo4 }}
           <label class="label">Peso</label>{{ form.peso_grupo4 }}
         </div>
         <div>
-          <label class="label">Grupo 5</label>{{ form.grupo5 }}
+          <label class="label">Mallas Grupo 5</label>{{ form.IdZarandaGrupo5 }}
           <label class="label">Peso</label>{{ form.peso_grupo5 }}
         </div>
         <div>
@@ -83,11 +96,130 @@
             </div>
           </div>
         </div>
+        <div class="md:col-span-2">
+          <label class="label">Notas</label>
+          <textarea name="notas" id="id_notas" rows="3" maxlength="500" class="w-full textarea">{{ form.notas.value|default_if_none:'' }}</textarea>
+          {{ form.notas.errors }}
+        </div>
       </div>
       <div class="flex justify-end gap-2 pt-2">
         <button type="button" class="btn-base btn-dark" data-close-modal>Cancelar</button>
-        <button type="submit" class="btn-base btn-primary">Guardar</button>
+        {% if puede_guardar %}
+          <button type="submit" class="btn-base btn-primary">Guardar</button>
+        {% endif %}
       </div>
     </form>
+    <script>
+      (function () {
+        const root = document.currentScript.closest("[data-modal-root]") || document;
+        const zaranda = root.querySelector("#id_zaranda");
+        if (!zaranda) return;
+
+        const campos = [
+          "#id_IdZarandaGrupo1",
+          "#id_IdZarandaGrupo2",
+          "#id_IdZarandaGrupo3",
+          "#id_IdZarandaGrupo4",
+          "#id_IdZarandaGrupo5",
+          "#id_peso_grupo1",
+          "#id_peso_grupo2",
+          "#id_peso_grupo3",
+          "#id_peso_grupo4",
+          "#id_peso_grupo5"
+        ];
+
+        function lockSelect(campo, lock) {
+          if (lock) {
+            campo.setAttribute("readonly", "true");
+            campo.style.pointerEvents = "none";
+            campo.classList.add("bg-gray-200", "cursor-not-allowed");
+            if (!campo.hasAttribute("data-prev-tabindex")) {
+              campo.setAttribute("data-prev-tabindex", campo.getAttribute("tabindex") || "");
+            }
+            campo.setAttribute("tabindex", "-1");
+          } else {
+            campo.removeAttribute("readonly");
+            campo.style.pointerEvents = "";
+            campo.classList.remove("bg-gray-200", "cursor-not-allowed");
+            const prev = campo.getAttribute("data-prev-tabindex");
+            if (prev === "") {
+              campo.removeAttribute("tabindex");
+            } else if (prev !== null) {
+              campo.setAttribute("tabindex", prev);
+            }
+          }
+        }
+
+        function toggleCampos() {
+          campos.forEach(selector => {
+            const campo = root.querySelector(selector);
+            if (!campo) return;
+
+            if (campo.tagName === "SELECT") {
+              lockSelect(campo, !zaranda.checked);
+            } else {
+              if (zaranda.checked) {
+                campo.readOnly = false;
+                campo.classList.remove("bg-gray-200", "cursor-not-allowed");
+              } else {
+                campo.readOnly = true;
+                campo.classList.add("bg-gray-200", "cursor-not-allowed");
+              }
+            }
+          });
+        }
+
+        zaranda.addEventListener("change", toggleCampos);
+        toggleCampos();
+
+        // --- Catadora toggle ---
+        const catadora = root.querySelector("#id_catadora");
+        if (catadora) {
+          const camposCatadora = [
+            "#id_catacion_ripio",
+            "#id_peso_cat_ripio",
+            "#id_catacion_balsos",
+            "#id_peso_cat_balsos"
+          ];
+
+          function toggleCatadora() {
+            const enabled = catadora.checked;
+            camposCatadora.forEach(function(selector) {
+              const campo = root.querySelector(selector);
+              if (!campo) return;
+
+              // Para inputs: readonly + bloqueo visual
+              if (campo.type !== "checkbox") {
+                if (enabled) {
+                  campo.removeAttribute("readonly");
+                  campo.style.pointerEvents = "";
+                  campo.classList.remove("bg-gray-200", "cursor-not-allowed");
+                } else {
+                  campo.setAttribute("readonly", "readonly");
+                  campo.style.pointerEvents = "none";
+                  campo.classList.add("bg-gray-200", "cursor-not-allowed");
+                }
+              } else {
+                // Para checkboxes: bloquear el input Y el label padre
+                const parentLabel = campo.closest("label");
+                const targets = parentLabel ? [campo, parentLabel] : [campo];
+                targets.forEach(function(el) {
+                  if (enabled) {
+                    el.style.pointerEvents = "";
+                    el.classList.remove("bg-gray-200", "cursor-not-allowed");
+                  } else {
+                    el.style.pointerEvents = "none";
+                    el.classList.add("bg-gray-200", "cursor-not-allowed");
+                  }
+                });
+              }
+            });
+          }
+
+          catadora.addEventListener("change", toggleCatadora);
+          toggleCatadora();
+        }
+      })();
+    </script>
   </div>
 </div>

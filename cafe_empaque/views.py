@@ -1,23 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from django import forms
 
 from .models import CafeEmpaque
+from .forms import CafeEmpaqueForm
 
 
-class CafeEmpaqueForm(forms.ModelForm):
-    class Meta:
-        model = CafeEmpaque
-        fields = ['empaque_cafe']
-        widgets = {
-            'empaque_cafe': forms.TextInput(attrs={'class': 'w-full input'}),
-        }
-
-
-@permission_required('cafe_empaque.view_cafeempaque', raise_exception=True)
+@permiso_accion_requerido('cafe_empaque.view_cafeempaque', 'ver_empaque_cafe')
 def listar_cafe_empaque(request):
     qs = CafeEmpaque.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +38,7 @@ def listar_cafe_empaque(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('cafe_empaque.add_cafeempaque', raise_exception=True)
+@permiso_accion_requerido('cafe_empaque.add_cafeempaque', 'crear_empaque_cafe')
 def add_cafe_empaque(request):
     if request.method == 'POST':
         form = CafeEmpaqueForm(request.POST)
@@ -68,7 +59,7 @@ def add_cafe_empaque(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('cafe_empaque.change_cafeempaque', raise_exception=True)
+@permiso_accion_requerido('cafe_empaque.change_cafeempaque', 'editar_empaque_cafe')
 def edit_cafe_empaque(request, pk):
     obj = get_object_or_404(CafeEmpaque, pk=pk)
     if request.method == 'POST':
@@ -89,7 +80,7 @@ def edit_cafe_empaque(request, pk):
     return render(request, 'cafe_empaque/listar_EmpaqueCafe.html', {})
 
 
-@permission_required('cafe_empaque.delete_cafeempaque', raise_exception=True)
+@permiso_accion_requerido('cafe_empaque.delete_cafeempaque', 'eliminar_empaque_cafe')
 def delete_cafe_empaque(request, pk):
     obj = get_object_or_404(CafeEmpaque, pk=pk)
     if request.method == 'POST':

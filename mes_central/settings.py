@@ -15,6 +15,7 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'molienda.apps.MoliendaConfig',
     'empaques.apps.EmpaquesConfig',
     'materiales.apps.MaterialesConfig',
+    'seguridad.apps.SeguridadConfig',
     'core.apps.CoreConfig',
     'reportes.apps.ReportesConfig',
     'usuarios.apps.UsuariosConfig',
@@ -101,9 +103,9 @@ DATABASES = {
         'ENGINE': 'mssql',
         'NAME': os.getenv('DB_NAME', 'dbTostadoraCentral'),
         'USER': os.getenv('DB_USER', 'sa'),
-        'PASSWORD': os.getenv('DB_PASSWORD', '12345'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Tostadora2026*'),
         # Double backslash in instance name if provided directly here
-        'HOST': os.getenv('DB_HOST', 'DESKTOP-RKBESQD\JUANDA'),
+        'HOST': os.getenv('DB_HOST', 'WIN-BJ6FABBG7OK\TLCMAIN01'),
         'PORT': os.getenv('DB_PORT', '1433'),
         'OPTIONS': {
             'driver': os.getenv('ODBC_DRIVER', 'ODBC Driver 18 for SQL Server'),
@@ -114,6 +116,7 @@ DATABASES = {
         },
     }
 }
+
 
 # Dynamic fallback to SQLite for local/dev if credentials missing or flag set.
 if (
@@ -157,6 +160,102 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+JAZZMIN_SETTINGS = {
+    'site_title': 'AgroInduGestor Admin',
+    'site_header': 'AgroInduGestor',
+    'site_brand': 'AgroInduGestor',
+    'welcome_sign': 'Bienvenido a AgroInduGestor',
+    'copyright': 'Nautilus Tech',
+    'show_sidebar': True,
+    'navigation_expanded': True,
+    'hide_apps': [],
+    'hide_models': [],
+    'order_with_respect_to': [
+        'ordenes',
+        'ordenes_trilla',
+        'ordenes_seleccion_verde',
+        'ordenes_seleccion_tostado',
+        'seleccion_tueste',
+        'tueste',
+        'molienda',
+        'curvas_tueste',
+        'estado_cafe',
+        'estado_inven_cafe',
+        'estado_ordenes',
+        'estado_tareas',
+        'nivel_molienda',
+        'nivel_tueste',
+        'zaranda_grupo',
+        'inventario_cafe',
+        'cafe_empaque',
+        'empaques',
+        'materiales',
+        'tamano_empaque',
+        'proceso_inven_cafe',
+        'clientes',
+        'tipo_identificacion',
+        'tipo_clientes',
+        'estados_clientes',
+        'origen_cafe',
+        'variedad_cafe',
+        'variendad_inven_cafe',
+        'empleados',
+        'usuarios',
+        'auth',
+        'seguridad',
+        'log_eventos',
+        'reportes',
+        'core',
+    ],
+    'topmenu_links': [
+        {'name': 'Produccion', 'app': 'ordenes'},
+        {'name': 'Calidad', 'app': 'estado_cafe'},
+        {'name': 'Inventario', 'app': 'inventario_cafe'},
+        {'name': 'Maestros', 'app': 'clientes'},
+        {'name': 'Administracion', 'app': 'auth'},
+    ],
+    'icons': {
+        'auth': 'fas fa-user-shield',
+        'auth.user': 'fas fa-user',
+        'auth.group': 'fas fa-users',
+        'clientes': 'fas fa-address-book',
+        'curvas_tueste': 'fas fa-chart-line',
+        'empaques': 'fas fa-box-open',
+        'empleados': 'fas fa-id-badge',
+        'estado_cafe': 'fas fa-mug-hot',
+        'estado_inven_cafe': 'fas fa-clipboard-check',
+        'estado_ordenes': 'fas fa-tasks',
+        'estado_tareas': 'fas fa-list-check',
+        'inventario_cafe': 'fas fa-warehouse',
+        'log_eventos': 'fas fa-file-alt',
+        'materiales': 'fas fa-boxes',
+        'molienda': 'fas fa-blender',
+        'nivel_molienda': 'fas fa-sliders-h',
+        'nivel_tueste': 'fas fa-fire',
+        'ordenes': 'fas fa-industry',
+        'ordenes_trilla': 'fas fa-seedling',
+        'ordenes_seleccion_tostado': 'fas fa-filter',
+        'ordenes_seleccion_verde': 'fas fa-leaf',
+        'origen_cafe': 'fas fa-map-marker-alt',
+        'proceso_inven_cafe': 'fas fa-cogs',
+        'reportes': 'fas fa-chart-pie',
+        'seguridad': 'fas fa-shield-alt',
+        'seleccion_tueste': 'fas fa-check-double',
+        'tamano_empaque': 'fas fa-ruler-combined',
+        'tipo_clientes': 'fas fa-user-tag',
+        'tipo_identificacion': 'fas fa-id-card',
+        'tueste': 'fas fa-fire-alt',
+        'usuarios': 'fas fa-users-cog',
+        'variedad_cafe': 'fas fa-coffee',
+        'variendad_inven_cafe': 'fas fa-layer-group',
+        'zaranda_grupo': 'fas fa-object-group',
+    },
+    'default_icon_parents': 'fas fa-folder-open',
+    'default_icon_children': 'fas fa-circle',
+    'related_modal_active': False,
+    'show_ui_builder': False,
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',

@@ -1,0 +1,36 @@
+<div class="rounded-lg border border-brand-dark/30 shadow-inner overflow-x-auto">
+  <table class="mes-table leading-tight w-full">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Batch</th>
+        <th>Nivel Tueste</th>
+        <th>Kilos Verdes</th>
+        <th>Kilos Tostado</th>
+        <th>Observaciones</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detalle in detalle_batches %}
+      <tr class="row group">
+        <td class="td">{{ forloop.counter }}</td>
+        <td class="td">{{ detalle.numero_batch }}</td>
+        <td class="td">{{ detalle.nivel_tueste|default:'—' }}</td>
+        <td class="td">{{ detalle.kilos_verde|default:'—' }}</td>
+        <td class="td">{{ detalle.kilos_tostado|default:'—' }}</td>
+        <td class="td">{{ detalle.observaciones|default:'—' }}</td>
+        <td class="td action">
+          <a href="{% url 'orden_seleccion_tueste_batch_editar' obj.pk detalle.pk %}" class="link link-edit" data-modal-navigate>
+            {% if detalle.tiene_datos %}Editar datos{% else %}Ingresar datos{% endif %}
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center py-8 text-brand-dark/60 text-sm">No hay batches registrados para esta selección.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

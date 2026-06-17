@@ -6,54 +6,44 @@
     </div>
     <form method="post" class="p-6 space-y-4" action="{% url 'empaque_editar' obj.pk %}" data-modal-form>
       {% csrf_token %}
+      {% if user_has_empaque_restrictions %}
+        <div class="text-xs text-amber-800 bg-amber-50 border border-amber-300 px-3 py-2 rounded">
+          Solo puedes editar el detalle de empaque, Cant. Etiquetas y Emp. Clientes. El resto de campos se muestran bloqueados.
+        </div>
+      {% endif %}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="label">Orden</label>
           {{ form.orden }}
+          {{ form.orden.errors }}
         </div>
         <div>
-          <label class="label">Molienda</label>
-          {{ form.molienda }}
-        </div>
-        <div>
-          <label class="label">Estado Café</label>
-          {{ form.estado_inven_cafe }}
+          <label class="label">Cliente</label>
+          {{ form.cliente }}
+          {{ form.cliente.errors }}
         </div>
         <div>
           <label class="label">Estado Tareas</label>
           {{ form.estado_tareas }}
+          {{ form.estado_tareas.errors }}
         </div>
-        <div>
-          <label class="label">Cant. Empaque</label>
-          {{ form.cant_empaque }}
-        </div>
-        <div>
-          <label class="label">Cant. Empacada</label>
-          {{ form.cant_empacada }}
+        <div class="md:col-span-2">
+          {% include 'empaques/_detalle_empaque_grid.html' %}
         </div>
         <div>
           <label class="label">Cant. Etiquetas</label>
           {{ form.cant_etiquetas }}
+          {{ form.cant_etiquetas.errors }}
         </div>
         <div>
           <label class="label">Emp. Clientes</label>
           {{ form.emp_clientes }}
-        </div>
-        <div>
-          <label class="label">Total Empaques</label>
-          {{ form.total_empaques }}
-        </div>
-        <div>
-          <label class="label">Total Etiquetas</label>
-          {{ form.total_etiquetas }}
-        </div>
-        <div>
-          <label class="label">Total Paquetes</label>
-          {{ form.total_paquetes }}
+          {{ form.emp_clientes.errors }}
         </div>
         <div class="md:col-span-2">
-          <label class="label">Notas</label>
+          <label class="label">Notas generales</label>
           {{ form.notas }}
+          {{ form.notas.errors }}
         </div>
       </div>
       {% if form.non_field_errors %}

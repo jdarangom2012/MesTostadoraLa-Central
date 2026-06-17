@@ -1,0 +1,14 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-lg rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl bg-[#DD3F2E] text-white">
+      <h2 class="text-lg font-semibold">Acceso denegado</h2>
+      <button type="button" class="close transition text-sm" data-close-modal aria-label="Cerrar">✕</button>
+    </div>
+    <div class="p-6 space-y-4 text-sm text-brand-dark">
+      <p>{{ message|default:'No tienes permiso para realizar esta acción.' }}</p>
+      <div class="flex justify-end">
+        <button type="button" class="btn-base btn-dark" data-close-modal>Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,20 @@
-{% include 'ordenes_seleccion_verde/_modal_listar_OrdenesSelecionVerde.html' %}
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-sm text-gray-500">Cargando…</div>
+{% endblock %}
+
+{% block extra_js %}
+{% url 'ordenes_seleccion_verde_listar' as base_list_url %}
+<script>
+	document.addEventListener('DOMContentLoaded', async () => {
+		try {
+			// Fuerza el mismo render para todos: cargar el listado como fragmento/modal.
+			if (typeof loadFragment === 'function') {
+				await loadFragment('{{ base_list_url }}');
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	});
+</script>
+{% endblock %}

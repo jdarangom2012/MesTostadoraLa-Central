@@ -63,19 +63,22 @@ urlpatterns.append(path('', include('estado_cafe.urls')))  # rutas HTML estado (
 urlpatterns.append(path('', include('nivel_molienda.urls')))  # rutas HTML niveles molienda (/nivel-molienda/listar/ etc.)
 urlpatterns.append(path('', include('origen_cafe.urls')))  # rutas HTML origen cafe (/origen-cafe/listar/ etc.)
 urlpatterns.append(path('', include('proceso_inven_cafe.urls')))  # rutas HTML proceso inven cafe (/proceso-inven-cafe/listar/ etc.)
+urlpatterns.append(path('', include('variendad_inven_cafe.urls')))  # rutas HTML variedad inven cafe (/variedad-inven-cafe/listar/ etc.)
 urlpatterns.append(path('', include('cafe_empaque.urls')))  # rutas HTML empaque cafe (/empaque-cafe/listar/ etc.)
 urlpatterns.append(path('', include('empaques.urls')))  # rutas HTML empaque (/empaque/listar/ etc.)
 urlpatterns.append(path('', include('zaranda_grupo.urls')))  # rutas HTML zaranda/grupo (/zaranda-grupo/listar/ etc.)
 urlpatterns.append(path('', include('tamano_empaque.urls')))  # rutas HTML tamaños empaque (/tamano-empaque/listar/ etc.)
 urlpatterns.append(path('', include('ordenes.urls')))  # rutas HTML órdenes producción (/ordenes-produccion/listar/ etc.)
 urlpatterns.append(path('', include('ordenes_trilla.urls')))  # rutas HTML órdenes de trilla (/ordenes-trilla/listar/ etc.)
+urlpatterns.append(path('', include('ordenes_seleccion_verde.urls')))  # rutas HTML órdenes selección verde (/ordenes-seleccion-verde/listar/ etc.)
 urlpatterns.append(path('', include('tueste.urls')))  # rutas HTML órdenes de tueste (/ordenes-tueste/listar/ etc.)
 urlpatterns.append(path('', include('seleccion_tueste.urls')))  # rutas HTML órdenes selección tueste (/ordenes-seleccion-tueste/listar/ etc.)
 urlpatterns.append(path('', include('inventario_cafe.urls')))  # rutas HTML inventario café (/inventario-cafe/listar/ etc.)
 urlpatterns.append(path('', include('ordenes_seleccion_tostado.urls')))  # rutas HTML órdenes selección tostado
-urlpatterns.append(path('', include('molienda.urls')))  # rutas HTML molienda (/molienda/listar/ etc.)
+# urlpatterns.append(path('', include('molienda.urls')))  # módulo Molienda oculto en la UI
 urlpatterns.append(path('', include('curvas_tueste.urls')))  # rutas HTML curvas tueste (/curvas_tueste/ etc.)
 urlpatterns.append(path('usuarios/', include('usuarios.urls')))  # página Usuarios y Roles
 urlpatterns.append(path('', include('clientes.urls')))  # rutas HTML clientes (/clientes/listar/ etc.)
 urlpatterns.append(path('', include('empleados.urls')))  # rutas HTML empleados (/empleados/ etc.)
 urlpatterns.append(path('', include('materiales.urls')))  # rutas HTML materiales (/materiales/listar/ etc.)
+urlpatterns.append(path('seguridad/', include('seguridad.urls')))

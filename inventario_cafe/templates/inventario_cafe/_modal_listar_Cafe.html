@@ -1,3 +1,7 @@
+{% load seguridad_permisos %}
+{% tiene_permiso_accion request.user 'inventario_cafe.add_inventariocafe' 'crear_inventario' as puede_crear %}
+{% tiene_permiso_accion request.user 'inventario_cafe.change_inventariocafe' 'editar_inventario' as puede_editar %}
+{% tiene_permiso_accion request.user 'inventario_cafe.delete_inventariocafe' 'eliminar_inventario' as puede_eliminar %}
 {% url 'inventario_cafe_listar' as base_list_url %}
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root data-role="inventario-cafe-list" data-list-url="{{ base_list_url }}">
   <div class="palette-surface w-full max-w-5xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
@@ -17,7 +21,7 @@
         </div>
         
         <div class="flex gap-2">
-          {% if perms.inventario_cafe.add_inventariocafe %}
+          {% if puede_crear %}
             <a href="{% url 'inventario_cafe_nuevo' %}?fragment=1{% if search %}&q={{ search }}{% endif %}{% if f_origen %}&origen={{ f_origen }}{% endif %}{% if f_proceso %}&proceso={{ f_proceso }}{% endif %}{% if f_variedad %}&variedad={{ f_variedad }}{% endif %}{% if page_obj.number %}&page={{ page_obj.number }}{% endif %}" class="btn-base btn-primary" data-modal-navigate>Nuevo</a>
           {% endif %}
         </div>
@@ -56,14 +60,14 @@
                 <td class="td">{{ r.cantidad|default_if_none:'—' }}</td>
                 <td class="td">{{ r.sacos|default_if_none:'—' }}</td>
                 <td class="td action">
-                  {% if perms.inventario_cafe.change_inventariocafe %}
+                  {% if puede_editar %}
                     <a href="{% url 'inventario_cafe_editar' r.pk %}?fragment=1{% if search %}&q={{ search }}{% endif %}{% if f_origen %}&origen={{ f_origen }}{% endif %}{% if f_proceso %}&proceso={{ f_proceso }}{% endif %}{% if f_variedad %}&variedad={{ f_variedad }}{% endif %}{% if page_obj.number %}&page={{ page_obj.number }}{% endif %}" class="link link-edit" data-modal-navigate>Editar</a>
                   {% else %}
                     <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Editar</span>
                   {% endif %}
                 </td>
                 <td class="td action">
-                  {% if perms.inventario_cafe.delete_inventariocafe %}
+                  {% if puede_eliminar %}
                     <a href="{% url 'inventario_cafe_eliminar' r.pk %}?fragment=1{% if search %}&q={{ search }}{% endif %}{% if f_origen %}&origen={{ f_origen }}{% endif %}{% if f_proceso %}&proceso={{ f_proceso }}{% endif %}{% if f_variedad %}&variedad={{ f_variedad }}{% endif %}{% if page_obj.number %}&page={{ page_obj.number }}{% endif %}" class="link link-delete" data-modal-navigate>Eliminar</a>
                   {% else %}
                     <span class="link text-gray-400 cursor-not-allowed" title="Sin permiso">Eliminar</span>

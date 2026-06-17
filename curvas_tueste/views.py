@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django import forms
@@ -22,7 +22,7 @@ class CurvaTuesteForm(forms.ModelForm):
         }
 
 
-@permission_required('curvas_tueste.view_curvatueste', raise_exception=True)
+@permiso_accion_requerido('curvas_tueste.view_curvatueste', 'ver_curvas_tueste')
 def listar_curvas_tueste(request):
     qs = CurvaTueste.objects.all().order_by('-fecha_ingreso', '-id')
     search = request.GET.get('q', '').strip()
@@ -61,7 +61,7 @@ def listar_curvas_tueste(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('curvas_tueste.add_curvatueste', raise_exception=True)
+@permiso_accion_requerido('curvas_tueste.add_curvatueste', 'crear_curvas_tueste')
 def add_curva_tueste(request):
     if request.method == 'POST':
         form = CurvaTuesteForm(request.POST)
@@ -81,7 +81,7 @@ def add_curva_tueste(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('curvas_tueste.change_curvatueste', raise_exception=True)
+@permiso_accion_requerido('curvas_tueste.change_curvatueste', 'editar_curvas_tueste')
 def edit_curva_tueste(request, pk):
     obj = get_object_or_404(CurvaTueste, pk=pk)
     if request.method == 'POST':
@@ -98,7 +98,7 @@ def edit_curva_tueste(request, pk):
     return render(request, 'curvas_tueste/listar_CurvasTueste.html', {})
 
 
-@permission_required('curvas_tueste.delete_curvatueste', raise_exception=True)
+@permiso_accion_requerido('curvas_tueste.delete_curvatueste', 'eliminar_curvas_tueste')
 def delete_curva_tueste(request, pk):
     obj = get_object_or_404(CurvaTueste, pk=pk)
     if request.method == 'POST':

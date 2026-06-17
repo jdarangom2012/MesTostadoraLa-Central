@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponseForbidden
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
@@ -9,8 +10,13 @@ from ordenes.models import Orden
 from .models import Molienda
 
 
+def molienda_deshabilitada(request):
+    return HttpResponseForbidden("Módulo deshabilitado")
+
+
 @permission_required('molienda.view_molienda', raise_exception=True)
 def listar_molienda(request):
+    return molienda_deshabilitada(request)
     qs = (
         Molienda.objects
         .select_related('orden__cliente', 'estado_tarea', 'nivel_molienda', 'estado_inven_cafe')
@@ -48,8 +54,7 @@ def listar_molienda(request):
 
 class OrdenChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        oid = getattr(obj, 'id', None) or getattr(obj, 'pk', '')
-        return f"Orden {oid}"
+        return str(obj)
 
 
 class MoliendaForm(forms.ModelForm):
@@ -77,6 +82,7 @@ class MoliendaForm(forms.ModelForm):
 
 @permission_required('molienda.add_molienda', raise_exception=True)
 def add_molienda(request):
+    return molienda_deshabilitada(request)
     if request.method == 'POST':
         form = MoliendaForm(request.POST)
         if form.is_valid():
@@ -97,6 +103,7 @@ def add_molienda(request):
 
 @permission_required('molienda.change_molienda', raise_exception=True)
 def edit_molienda(request, pk):
+    return molienda_deshabilitada(request)
     obj = get_object_or_404(Molienda, pk=pk)
     if request.method == 'POST':
         form = MoliendaForm(request.POST, instance=obj)
@@ -118,6 +125,7 @@ def edit_molienda(request, pk):
 
 @permission_required('molienda.delete_molienda', raise_exception=True)
 def delete_molienda(request, pk):
+    return molienda_deshabilitada(request)
     obj = get_object_or_404(Molienda, pk=pk)
     if request.method == 'POST':
         obj.delete()

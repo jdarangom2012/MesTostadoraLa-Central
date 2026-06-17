@@ -1,23 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from django import forms
 
 from .models import EstadoOrden
+from .forms import EstadoOrdenForm
 
 
-class EstadoOrdenForm(forms.ModelForm):
-    class Meta:
-        model = EstadoOrden
-        fields = ['estado_orden']
-        widgets = {
-            'estado_orden': forms.TextInput(attrs={'class': 'w-full input'}),
-        }
-
-
-@permission_required('estado_ordenes.view_estadoorden', raise_exception=True)
+@permiso_accion_requerido('estado_ordenes.view_estadoorden', 'ver_estado_orden')
 def listar_estado_orden(request):
     qs = EstadoOrden.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +38,7 @@ def listar_estado_orden(request):
 
 
 @require_http_methods(["GET","POST"])
-@permission_required('estado_ordenes.add_estadoorden', raise_exception=True)
+@permiso_accion_requerido('estado_ordenes.add_estadoorden', 'crear_estado_orden')
 def add_estado_orden(request):
     if request.method == 'POST':
         form = EstadoOrdenForm(request.POST)
@@ -68,7 +59,7 @@ def add_estado_orden(request):
 
 
 @require_http_methods(["GET","POST"])
-@permission_required('estado_ordenes.change_estadoorden', raise_exception=True)
+@permiso_accion_requerido('estado_ordenes.change_estadoorden', 'editar_estado_orden')
 def edit_estado_orden(request, pk):
     obj = get_object_or_404(EstadoOrden, pk=pk)
     if request.method == 'POST':
@@ -89,7 +80,7 @@ def edit_estado_orden(request, pk):
     return render(request, 'estado_ordenes/listar_EstadoOrden.html', {})
 
 
-@permission_required('estado_ordenes.delete_estadoorden', raise_exception=True)
+@permiso_accion_requerido('estado_ordenes.delete_estadoorden', 'eliminar_estado_orden')
 def delete_estado_orden(request, pk):
     obj = get_object_or_404(EstadoOrden, pk=pk)
     if request.method == 'POST':

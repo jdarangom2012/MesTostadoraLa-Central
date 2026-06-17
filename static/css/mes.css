@@ -94,6 +94,9 @@ table.mes-table td.action { text-align:center; }
 input.input,
 select.select,
 textarea.textarea { width:100%; border:1px solid #c9c9c9; background:#fff; border-radius:.75rem; padding:.55rem .7rem; font-size:12.5px; line-height:1.1; transition:border-color .15s var(--ease-emph),box-shadow .15s var(--ease-emph),background-color .15s var(--ease-emph); }
+.field input[type="number"],
+input.input[type="number"],
+input[type="number"] { text-align:right; }
 .field input:focus,
 .field select:focus,
 .field-input:focus,

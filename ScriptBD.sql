@@ -725,6 +725,35 @@ REFERENCES [dbo].[tblEstadoOrdenes] ([Id])
 GO
 ALTER TABLE [dbo].[tblOrdenes] CHECK CONSTRAINT [FK_tblOrdenes_tblEstadoOrdenes]
 GO
+IF COL_LENGTH('dbo.tblDetalleTueste', 'IdEstadoOrden') IS NULL
+BEGIN
+	ALTER TABLE [dbo].[tblDetalleTueste]
+	ADD [IdEstadoOrden] [int] NULL
+END
+GO
+IF NOT EXISTS (
+	SELECT 1
+	FROM sys.foreign_keys
+	WHERE name = 'FK_tblDetalleTueste_tblEstadoOrdenes'
+)
+BEGIN
+	ALTER TABLE [dbo].[tblDetalleTueste]  WITH CHECK ADD  CONSTRAINT [FK_tblDetalleTueste_tblEstadoOrdenes] FOREIGN KEY([IdEstadoOrden])
+	REFERENCES [dbo].[tblEstadoOrdenes] ([Id])
+END
+GO
+ALTER TABLE [dbo].[tblDetalleTueste] CHECK CONSTRAINT [FK_tblDetalleTueste_tblEstadoOrdenes]
+GO
+IF NOT EXISTS (
+	SELECT 1
+	FROM sys.indexes
+	WHERE name = 'IX_tblDetalleTueste_IdEstadoOrden'
+	  AND object_id = OBJECT_ID('dbo.tblDetalleTueste')
+)
+BEGIN
+	CREATE INDEX [IX_tblDetalleTueste_IdEstadoOrden]
+	ON [dbo].[tblDetalleTueste] ([IdEstadoOrden])
+END
+GO
 ALTER TABLE [dbo].[TblOrdenesSeleccionVerde]  WITH CHECK ADD  CONSTRAINT [FK_TblOrdenesSeleccionVerde_tblEstadoTareas] FOREIGN KEY([IdEstadoTareas])
 REFERENCES [dbo].[tblEstadoTareas] ([Id])
 GO

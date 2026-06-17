@@ -1,0 +1,44 @@
+<div class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-6 overflow-y-auto" data-modal-root>
+  <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in">
+    <div class="modal-head flex items-center justify-between px-6 py-4 rounded-t-xl">
+      <h2 class="text-lg font-semibold flex items-center gap-2">{% if detalle %}✏️ Editar Batch{% else %}➕ Nuevo Batch{% endif %}</h2>
+      <button type="button" class="close text-sm" data-close-modal>✕</button>
+    </div>
+    <form method="post" action="{% if detalle %}{% url 'orden_seleccion_tueste_batch_editar' obj.pk detalle.pk %}{% else %}{% url 'orden_seleccion_tueste_batch_nuevo' obj.pk %}{% endif %}" class="p-6 space-y-6" data-modal-form>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="text-xs text-red-600 bg-red-50 border border-red-300 px-3 py-2 rounded">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="label">Batch</label>
+          <input type="text" class="w-full input bg-gray-100 text-gray-500 cursor-not-allowed" value="{{ numero_batch }}" readonly>
+        </div>
+        <div>
+          <label class="label">Nivel Tueste</label>
+          {{ form.nivel_tueste }}
+          {{ form.nivel_tueste.errors }}
+        </div>
+        <div>
+          <label class="label">Kilos Verdes</label>
+          {{ form.kilos_verde }}
+          {{ form.kilos_verde.errors }}
+        </div>
+        <div>
+          <label class="label">Kilos Tostado</label>
+          {{ form.kilos_tostado }}
+          {{ form.kilos_tostado.errors }}
+        </div>
+        <div class="md:col-span-2">
+          <label class="label">Observaciones</label>
+          {{ form.observaciones }}
+          {{ form.observaciones.errors }}
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <a href="{% url 'orden_seleccion_tueste_editar' obj.pk %}" class="btn-base btn-dark" data-modal-navigate>Cancelar</a>
+        <button type="submit" class="btn-base btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

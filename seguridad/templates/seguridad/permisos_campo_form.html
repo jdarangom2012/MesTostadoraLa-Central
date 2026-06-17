@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold">{{ titulo }}</h1>
+    <a href="{% url 'seguridad_permisos_campo_listar' %}" class="text-sm text-brand-dark hover:underline">Volver</a>
+  </div>
+
+  <form method="post" class="bg-white/80 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="text-sm text-red-700">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Rol</label>
+      {{ form.rol }}
+      {% for e in form.rol.errors %}<div class="text-sm text-red-700">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Modelo</label>
+      {{ form.modelo }}
+      <div class="text-xs text-gray-500 mt-1">Ej: <span class="font-mono">ordenes.Orden</span></div>
+      {% for e in form.modelo.errors %}<div class="text-sm text-red-700">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Campo</label>
+      {{ form.campo }}
+      <div class="text-xs text-gray-500 mt-1">Ej: <span class="font-mono">fecha_orden</span></div>
+      {% for e in form.campo.errors %}<div class="text-sm text-red-700">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div class="flex gap-6">
+      <label class="flex items-center gap-2 text-sm">
+        {{ form.puede_ver }}
+        <span>Puede ver</span>
+      </label>
+      <label class="flex items-center gap-2 text-sm">
+        {{ form.puede_editar }}
+        <span>Puede editar</span>
+      </label>
+    </div>
+
+    <div class="flex justify-end">
+      <button type="submit" class="px-4 py-2 rounded bg-brand-dark text-white hover:opacity-90">Guardar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

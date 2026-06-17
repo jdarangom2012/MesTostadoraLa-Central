@@ -27,4 +27,4 @@ document.addEventListener('click', async (e) => {
   } catch (err) {
     console.error('Error cargando modal:', err);
   }
-});
+}, true);

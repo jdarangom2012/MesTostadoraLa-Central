@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Sum
 
 
 class Tueste(models.Model):
@@ -27,3 +29,78 @@ class Tueste(models.Model):
 
     def __str__(self):
         return f'Tueste {self.id}'
+
+    def calcular_peso_cafe_tostado_total_desde_batches(self):
+        if not self.pk:
+            return 0.0
+
+        total = self.batches.aggregate(total=Sum('kilos_tostado')).get('total')
+        try:
+            return float(total or 0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    def sincronizar_peso_cafe_tostado_total(self):
+        self.peso_cafe_tostado_total = self.calcular_peso_cafe_tostado_total_desde_batches()
+        return self.peso_cafe_tostado_total
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.sincronizar_peso_cafe_tostado_total()
+        elif self.peso_cafe_tostado_total in (None, ''):
+            self.peso_cafe_tostado_total = 0
+
+        return super().save(*args, **kwargs)
+
+
+class DetalleTueste(models.Model):
+    id = models.AutoField(db_column='IdDetalleTueste', primary_key=True)
+    tueste = models.ForeignKey('Tueste', on_delete=models.CASCADE, db_column='IdOrdenTueste', related_name='batches')
+    nivel_tueste = models.ForeignKey('nivel_tueste.NivelTueste', on_delete=models.SET_NULL, null=True, blank=True, db_column='IdNivelTueste')
+    estado_orden = models.ForeignKey('estado_ordenes.EstadoOrden', on_delete=models.SET_NULL, null=True, blank=True, db_column='IdEstadoOrden')
+    fecha_ingreso = models.DateTimeField(db_column='FechaIngreso', null=True, blank=True)
+    numero_batch = models.IntegerField(db_column='NumeroBatche')
+    kilos_verde = models.FloatField(db_column='KilosVerde', null=True, blank=True)
+    kilos_tostado = models.FloatField(db_column='KilosTostado', null=True, blank=True)
+    observaciones = models.CharField(db_column='Observaciones', max_length=500, null=True, blank=True)
+
+    class Meta:
+        db_table = 'tblDetalleTueste'
+        ordering = ['numero_batch', 'id']
+
+    COMPLETADA_PESAJE_ERROR = 'No es posible colocar el Batch en estado Completada o En Pesaje porque Kilos Verdes o Kilos Tostado son menores o iguales a cero.'
+
+    def __str__(self):
+        return f'Batch {self.numero_batch}'
+
+    @property
+    def estado_orden_label(self):
+        estado_orden = getattr(self, 'estado_orden', None)
+        if estado_orden is None:
+            return ''
+        return (getattr(estado_orden, 'estado_orden', '') or '').strip()
+
+    def validar_estado_orden_con_pesos(self):
+        estado = self.estado_orden_label.lower()
+        if estado not in {'completada', 'en pesaje'}:
+            return
+
+        kilos_verde = self.kilos_verde or 0
+        kilos_tostado = self.kilos_tostado or 0
+        if kilos_verde <= 0 or kilos_tostado <= 0:
+            raise ValidationError(self.COMPLETADA_PESAJE_ERROR)
+
+    def clean(self):
+        super().clean()
+        self.validar_estado_orden_con_pesos()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    @property
+    def tiene_datos(self):
+        return any(
+            valor not in (None, '')
+            for valor in (self.nivel_tueste_id, self.estado_orden_id, self.kilos_verde, self.kilos_tostado, self.observaciones)
+        )

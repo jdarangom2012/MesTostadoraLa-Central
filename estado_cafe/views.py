@@ -1,23 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
+from seguridad.decorators import permiso_accion_requerido
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from django import forms
 
 from .models import EstadoCafe
+from .forms import EstadoForm
 
 
-class EstadoForm(forms.ModelForm):
-    class Meta:
-        model = EstadoCafe
-        fields = ['estado_cafe']
-        widgets = {
-            'estado_cafe': forms.TextInput(attrs={'class': 'w-full input'}),
-        }
-
-
-@permission_required('estado_cafe.view_estadocafe', raise_exception=True)
+@permiso_accion_requerido('estado_cafe.view_estadocafe', 'ver_estados')
 def listar_estado(request):
     qs = EstadoCafe.objects.all()
     search = request.GET.get('q', '').strip()
@@ -47,7 +38,7 @@ def listar_estado(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('estado_cafe.add_estadocafe', raise_exception=True)
+@permiso_accion_requerido('estado_cafe.add_estadocafe', 'crear_estados')
 def add_estado(request):
     if request.method == 'POST':
         form = EstadoForm(request.POST)
@@ -68,7 +59,7 @@ def add_estado(request):
 
 
 @require_http_methods(["GET", "POST"])
-@permission_required('estado_cafe.change_estadocafe', raise_exception=True)
+@permiso_accion_requerido('estado_cafe.change_estadocafe', 'editar_estados')
 def edit_estado(request, pk):
     obj = get_object_or_404(EstadoCafe, pk=pk)
     if request.method == 'POST':
@@ -89,7 +80,7 @@ def edit_estado(request, pk):
     return render(request, 'estado/listar_Estado.html', {})
 
 
-@permission_required('estado_cafe.delete_estadocafe', raise_exception=True)
+@permiso_accion_requerido('estado_cafe.delete_estadocafe', 'eliminar_estados')
 def delete_estado(request, pk):
     obj = get_object_or_404(EstadoCafe, pk=pk)
     if request.method == 'POST':

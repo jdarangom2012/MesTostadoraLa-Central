@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Error del servidor · AgroInduGestor{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-10 bg-white dark:bg-gray-800 border border-black/10 dark:border-gray-700 rounded-lg p-6 shadow">
+  <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Ocurrió un error</h1>
+  <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">Hubo un problema al procesar la solicitud. Intenta nuevamente.</p>
+  <div class="mt-5 flex gap-2">
+    <a href="/dashboard/" class="px-4 py-2 rounded bg-brand-primary text-white text-sm font-medium hover:bg-brand-secondary">Ir al dashboard</a>
+    <a href="javascript:location.reload()" class="px-4 py-2 rounded border border-gray-300 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Recargar</a>
+  </div>
+</div>
+{% endblock %}

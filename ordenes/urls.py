@@ -10,6 +10,7 @@ router.register(r'ordenes', OrdenViewSet)
 urlpatterns = [
 	path('ordenes-produccion/listar/', views.listar_ordenes, name='ordenes_produccion_listar'),
 	path('ordenes-produccion/nuevo/', views.add_orden, name='ordenes_produccion_nuevo'),
+	path('ordenes-produccion/<int:pk>/ver/', views.view_orden, name='ordenes_produccion_ver'),
 	path('ordenes-produccion/<int:pk>/editar/', views.edit_orden, name='ordenes_produccion_editar'),
 	path('ordenes-produccion/<int:pk>/eliminar/', views.delete_orden, name='ordenes_produccion_eliminar'),
 ]

@@ -1,3 +1,5 @@
+{% load seguridad_permisos %}
+
 <div class="fixed inset-0 z-50 flex items-start justify-center bg-black/45 p-6 overflow-y-auto" data-modal-root>
   <div class="palette-surface w-full max-w-2xl rounded-xl shadow-xl border border-brand-dark/30 fade-in relative">
     <form method="post" action="{% url 'orden_trilla_editar' trilla.id %}" data-modal-form class="p-0">
@@ -15,29 +17,119 @@
         {{ form.non_field_errors }}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
+            <label class="label">Cliente</label>
+            {% if can_edit.cliente %}
+              {{ form.cliente }}
+            {% else %}
+              <input
+                type="text"
+                id="id_cliente_readonly"
+                value="{{ cliente_display|default:'' }}"
+                readonly
+                class="w-full input bg-gray-200 cursor-not-allowed"
+              />
+              <input type="hidden" name="cliente" value="{% if trilla.cliente_id %}{{ trilla.cliente_id }}{% elif trilla.orden and trilla.orden.cliente_id %}{{ trilla.orden.cliente_id }}{% endif %}" />
+            {% endif %}
+            {{ form.cliente.errors }}
+          </div>
+          <div>
             <label class="label">Orden</label>
-            {{ form.orden }}
+            {% if can_edit.orden %}
+              {{ form.orden }}
+            {% else %}
+              <input
+                type="text"
+                id="id_orden_readonly"
+                value="{% if trilla.orden %}{{ trilla.orden }}{% endif %}"
+                readonly
+                class="w-full input bg-gray-200 cursor-not-allowed"
+              />
+              <input type="hidden" name="orden" value="{% if trilla.orden_id %}{{ trilla.orden_id }}{% endif %}" />
+            {% endif %}
             {{ form.orden.errors }}
           </div>
           <div>
             <label class="label">Estado Tareas</label>
-            {{ form.estado_tareas }}
+            {% if can_edit.estado_tareas %}
+              {{ form.estado_tareas }}
+            {% else %}
+              <input
+                type="text"
+                id="id_estado_tareas_readonly"
+                value="{% if trilla.estado_tareas %}{{ trilla.estado_tareas }}{% endif %}"
+                readonly
+                class="w-full input bg-gray-200 cursor-not-allowed"
+              />
+              <input type="hidden" name="estado_tareas" value="{% if trilla.estado_tareas_id %}{{ trilla.estado_tareas_id }}{% endif %}" />
+            {% endif %}
             {{ form.estado_tareas.errors }}
           </div>
           <div>
-            <label class="label">Peso Café Bruto (kg)</label>
-            {{ form.peso_cafe_bruto }}
+            <label class="label">Peso Café Neto (kg)</label>
+            {% if can_edit.peso_cafe_bruto %}
+              {{ form.peso_cafe_bruto }}
+            {% else %}
+              <input
+                type="number"
+                name="peso_cafe_bruto"
+                id="id_peso_cafe_bruto"
+                value="{{ trilla.peso_cafe_bruto|default_if_none:'' }}"
+                step="0.01"
+                readonly
+                class="w-full input bg-gray-200 cursor-not-allowed"
+              />
+            {% endif %}
             {{ form.peso_cafe_bruto.errors }}
           </div>
           <div>
             <label class="label">Peso Café Verde (kg)</label>
-            {{ form.peso_cafe_verde }}
+            {% if can_edit.peso_cafe_verde %}
+              {{ form.peso_cafe_verde }}
+            {% else %}
+              <input
+                type="number"
+                name="peso_cafe_verde"
+                id="id_peso_cafe_verde"
+                value="{{ trilla.peso_cafe_verde|default_if_none:'' }}"
+                step="0.01"
+                readonly
+                class="w-full input bg-gray-200 cursor-not-allowed"
+              />
+            {% endif %}
             {{ form.peso_cafe_verde.errors }}
           </div>
-          <div>
+          <div class="md:col-span-2">
             <label class="label">Rendimiento (%)</label>
-            {{ form.rendimiento }}
+            {% if can_edit.rendimiento %}
+              {{ form.rendimiento }}
+            {% else %}
+              <input
+                type="number"
+                name="rendimiento"
+                id="id_rendimiento"
+                value="{{ trilla.rendimiento|default_if_none:'' }}"
+                step="0.01"
+                readonly
+                class="w-full input bg-gray-200 cursor-not-allowed"
+              />
+            {% endif %}
             {{ form.rendimiento.errors }}
+          </div>
+          <div class="md:col-span-2">
+            <label class="label">Notas</label>
+            {% if can_edit.notas %}
+              {{ form.notas }}
+            {% else %}
+              <textarea
+                name="notas"
+                id="id_notas"
+                rows="3"
+                maxlength="500"
+                readonly
+                class="w-full textarea bg-gray-200 cursor-not-allowed"
+              >{{ trilla.notas|default_if_none:'' }}</textarea>
+            {% endif %}
+            {{ form.notas.errors }}
           </div>
         </div>
       </div>
@@ -46,5 +138,43 @@
         <button type="submit" class="btn-base btn-primary">Guardar</button>
       </div>
     </form>
+    <script>
+      function iniciarCalculoRendimiento() {
+        const pesoNeto =
+          document.getElementById("id_peso_cafe_neto") ||
+          document.getElementById("id_peso_cafe_bruto") ||
+          document.querySelector('input[name="peso_cafe_neto"], input[name="peso_cafe_bruto"]');
+        const pesoVerde =
+          document.getElementById("id_peso_cafe_verde") ||
+          document.querySelector('input[name="peso_cafe_verde"]');
+        const rendimiento =
+          document.getElementById("id_rendimiento") ||
+          document.querySelector('input[name="rendimiento"]:not([type="hidden"])');
+
+        if (!pesoNeto || !pesoVerde || !rendimiento) return;
+
+        rendimiento.setAttribute("readonly", true);
+
+        function calcular() {
+          const neto = parseFloat(String(pesoNeto.value || '').replace(',', '.'));
+          const verde = parseFloat(String(pesoVerde.value || '').replace(',', '.'));
+
+          if (!neto || neto === 0 || !verde) {
+            rendimiento.value = "";
+            return;
+          }
+
+          const resultado = (verde / neto) * 100;
+          rendimiento.value = resultado.toFixed(2);
+        }
+
+        pesoNeto.addEventListener("input", calcular);
+        pesoVerde.addEventListener("input", calcular);
+
+        calcular();
+      }
+
+      document.addEventListener("DOMContentLoaded", iniciarCalculoRendimiento);
+    </script>
   </div>
 </div>

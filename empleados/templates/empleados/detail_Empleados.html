@@ -23,28 +23,23 @@
       <div class="grid grid-cols-2 gap-5 text-sm">
         <div class="field col-span-2 sm:col-span-1">
           <label class="field-label">Identificación</label>
-          <input type="text" name="identificacion" value="{{ empleado.identificacion }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          <input type="text" name="identificacion" value="{{ form.identificacion.value|default:empleado.identificacion }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          {{ form.identificacion.errors }}
         </div>
         <div class="field col-span-2 sm:col-span-1">
           <label class="field-label">Nombres</label>
-          <input type="text" name="nombres" value="{{ empleado.nombres }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          <input type="text" name="nombres" value="{{ form.nombres.value|default:empleado.nombres }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          {{ form.nombres.errors }}
         </div>
         <div class="field col-span-2 sm:col-span-1">
           <label class="field-label">Apellidos</label>
-          <input type="text" name="apellidos" value="{{ empleado.apellidos }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          <input type="text" name="apellidos" value="{{ form.apellidos.value|default:empleado.apellidos }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark placeholder-brand-dark/50 focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          {{ form.apellidos.errors }}
         </div>
         <div class="field col-span-2 sm:col-span-1">
           <label class="field-label">Estado</label>
-          <select name="estado" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary">
-            <option value="Activo" {% if empleado.estado == 'Activo' %}selected{% endif %}>Activo</option>
-            <option value="Inactivo" {% if empleado.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
-            <option value="Suspendido" {% if empleado.estado == 'Suspendido' %}selected{% endif %}>Suspendido</option>
-            <option value="Otro" {% if empleado.estado == 'Otro' %}selected{% endif %}>Otro</option>
-          </select>
-        </div>
-        <div class="field col-span-2 sm:col-span-1">
-          <label class="field-label">Fecha Ingreso</label>
-          <input type="date" name="fecha_ingreso" value="{{ empleado.fecha_ingreso|date:'Y-m-d' }}" class="field-input w-full rounded-lg border border-brand-dark/50 bg-brand-light px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/70 focus:border-brand-primary" />
+          {{ form.estado }}
+          {{ form.estado.errors }}
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-2">
